@@ -1,0 +1,99 @@
+Image 1 : Closest one: Person 1
+Image 2 : Closest one: Person 1
+Image 3 : Closest one: Person 2
+Image 4 : Closest one: Person 2
+Image 5 : Closest one: Person 3
+Image 6 : Closest one: Person 3
+Image 7 : Closest one: Person 4
+Image 8 : Closest one: Person 4
+Image 9 : Closest one: Person 5
+Image 10 : Closest one: Person 5
+Image 11 : Closest one: Person 6
+Image 12 : Closest one: Person 6
+Image 13 : Closest one: Person 7
+Image 14 : Closest one: Person 7
+Image 15 : Closest one: Person 8
+Image 16 : Closest one: Person 8
+Image 17 : Closest one: Person 9
+Image 18 : Closest one: Person 9
+Image 19 : Closest one: Person 10
+Image 20 : Closest one: Person 10
+Image 21 : Closest one: Person 11
+Image 22 : Closest one: Person 11
+Image 23 : Closest one: Person 12
+Image 24 : Closest one: Person 12
+Image 25 : Closest one: Person 13
+Image 26 : Closest one: Person 13
+Image 27 : Closest one: Person 14
+Image 28 : Closest one: Person 14
+Image 29 : Closest one: Person 15
+Image 30 : Closest one: Person 15
+Image 31 : Closest one: Person 16
+Image 32 : Closest one: Person 16
+Image 33 : Closest one: Person 17
+Image 34 : Closest one: Person 17
+Image 35 : Closest one: Person 18
+Image 36 : Closest one: Person 18
+
+Image 37 : Closest one: Person 32 (19)
+
+Image 38 : Closest one: Person 19
+Image 39 : Closest one: Person 20
+
+Image 40 : Closest one: Person 36 (20)
+Image 41 : Closest one: Person 30 (21)
+
+Image 42 : Closest one: Person 21
+Image 43 : Closest one: Person 22
+Image 44 : Closest one: Person 22
+Image 45 : Closest one: Person 23
+Image 46 : Closest one: Person 23
+Image 47 : Closest one: Person 24
+
+Image 48 : Closest one: Person 15 (24)
+
+Image 49 : Closest one: Person 25
+Image 50 : Closest one: Person 25
+Image 51 : Closest one: Person 26
+
+Image 52 : Closest one: Person 13 (26)
+
+Image 53 : Closest one: Person 27
+Image 54 : Closest one: Person 27
+Image 55 : Closest one: Person 28
+Image 56 : Closest one: Person 28
+Image 57 : Closest one: Person 29
+Image 58 : Closest one: Person 29
+Image 59 : Closest one: Person 30
+Image 60 : Closest one: Person 30
+Image 61 : Closest one: Person 31
+
+Image 62 : Closest one: Person 21 (31)
+
+Image 63 : Closest one: Person 32
+
+Image 64 : Closest one: Person 36 (32)
+
+Image 65 : Closest one: Person 33
+Image 66 : Closest one: Person 33
+Image 67 : Closest one: Person 34
+Image 68 : Closest one: Person 34
+
+Image 69 : Closest one: Person 15 (35)
+
+Image 70 : Closest one: Person 35
+Image 71 : Closest one: Person 36
+Image 72 : Closest one: Person 36
+Image 73 : Closest one: Person 37
+
+Image 74 : Closest one: Person 28 (37)
+
+Image 75 : Closest one: Person 38
+Image 76 : Closest one: Person 38
+Image 77 : Closest one: Person 39
+
+Image 78 : Closest one: Person 33 (39)
+
+Image 79 : Closest one: Person 40
+Image 80 : Closest one: Person 40
+
