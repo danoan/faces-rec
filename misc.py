@@ -79,6 +79,7 @@ def create_image_database_2(folder,p,n,tl):
 def create_image_database_3(folder,n,p_db,p_uk,tl):
 	X = None
 	Y = None
+	AVG = None
 	metadb = []
 	rtcl = []
 
@@ -100,12 +101,25 @@ def create_image_database_3(folder,n,p_db,p_uk,tl):
 			else:				
 				#Used as Database Image
 				metadb.append( create_metadb(im=f_str,po=p,ii=k) )
+				img_v = ilib.img_to_rvector(img)
 				if X is None:
-					X = np.array( [ilib.img_to_rvector(img)] )
+					X = np.array( [img_v] )
 				else:
-					X = np.append(X,[ilib.img_to_rvector(img)],axis=0)
+					X = np.append(X,[img_v],axis=0)
+
+				if AVG is None:
+					AVG = np.array( img_v )
+				else:
+					AVG = AVG + img_v
 
 			k+=1		
+	AVG = 1.0/len(p_db)*AVG
+
+	db_images = len(p_db)*( n-len(tl) )
+	test_images = len(p_uk)*n + len(p_db)*( len(tl) )
+
+	AVG_X = np.array( [ AVG for i in range(0,db_images) ] ).T
+	AVG_Y = np.array( [ AVG for i in range(0,test_images) ] ).T
 
 	#Unknown People
 	for p in p_uk:
@@ -122,7 +136,7 @@ def create_image_database_3(folder,n,p_db,p_uk,tl):
 				Y = np.append(Y,[ilib.img_to_rvector(img)],axis=0)							
 
 
-	return X.T,Y.T,metadb,rtcl
+	return X.T,Y.T,AVG_X,AVG_Y,metadb,rtcl
 
 
 def create_rtc(ti=None,mi=None,po=None,pi=None,ii=None,di=None,uk=None,vc=None):
@@ -148,6 +162,7 @@ def build_covariance_matrix(X):
 '''
 X has n^4 x n, then C.T has dimensions n x n, and his eigenvector are computed 
 by X multiplied by the return matrix of the function find_all_heigen()
+AVG - Average Image
 '''
 def build_transpose_covariance_matrix(X):
 	n = X.shape[0]

@@ -1,5 +1,7 @@
 #coding:utf-8
 
+import os
+import fractions as fr
 import Image
 import ImageFont,ImageDraw
 
@@ -14,6 +16,28 @@ def normalize_images(folder,n):
 	while k<=n:
 		Image.open("%s/img_%d.jpg" % (folder,k)).convert('L').save("%s/img_%d.jpg" % (folder,k))
 		k+=1
+
+'''Given a folder, the files receive a numeric name, and converts 
+to black and white .pgm file format'''
+def normalize_scene_images(folder):
+	#Rename
+	file_names = os.listdir(folder)
+	count = 0
+	for fn in file_names:
+		extension = fn.split(".")[-1]
+
+		path = "%s/%s" % (folder,fn)
+		new_path = "%s/%d.%s" %(folder,count,extension)
+
+		f = open(path)
+		g = open(new_path,'w')
+		g.writelines(f.readlines())
+		g.close()
+		f.close()
+
+		os.remove(path)
+		count+=1
+
 
 '''
 	As input, receives the experiments results, and draws test_image |

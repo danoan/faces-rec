@@ -15,15 +15,18 @@ def experiment_1():
 	tl = [3,7]	#Image Indexes used as Test (not included in the database)	
 	ni = 10		#Number of Images per person
 	np = ni - len(tl)
-	X,Y,metadb,rtcl = misc.create_image_database_3("img/att_faces",ni,p_db,p_uk,tl)
+	X,Y,AVG_X,AVG_Y,metadb,rtcl = misc.create_image_database_3("img/att_faces",ni,p_db,p_uk,tl)
 
-	CT = misc.build_transpose_covariance_matrix(X)
+	X_m = X-AVG_X
+	Y_m = Y-AVG_Y
+
+	CT = misc.build_transpose_covariance_matrix(X_m)
 
 	S,U = mlib.find_all_heigen(CT)
 	U = X.dot(U)	#Eigenbasis
 
-	Px = U.T.dot(X)	#Projection of X on the EigenBasis
-	Py = U.T.dot(Y)	#Projection of Y on the EigenBasis
+	Px = U.T.dot(X_m)	#Projection of X on the EigenBasis
+	Py = U.T.dot(Y_m)	#Projection of Y on the EigenBasis
 
 	# print X.shape
 	print Py.shape
