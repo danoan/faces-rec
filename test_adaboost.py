@@ -2,7 +2,7 @@
 #coding:utf-8
 
 import unittest
-from adaboost import *
+from trainning_tools import *
 
 
 class MaskTwoHorizontalFactoryTestCase(unittest.TestCase):
@@ -16,7 +16,7 @@ class MaskTwoHorizontalFactoryTestCase(unittest.TestCase):
 		size_to_match = (2,2)
 		location_to_match = (0,0)
 
-		feature_to_match = FeatureMask(mask_to_match,size_to_match,location_to_match)
+		feature_to_match = FeatureMask(None,size_to_match,location_to_match,mask_to_match)
 		feature_returned = fac.next().next()[0]
 
 		assert feature_returned==feature_to_match
@@ -31,7 +31,7 @@ class MaskTwoHorizontalFactoryTestCase(unittest.TestCase):
 		size_to_match = (2,2)
 		location_to_match = (0,0)
 
-		feature_to_match = FeatureMask(mask_to_match,size_to_match,location_to_match)
+		feature_to_match = FeatureMask(None,size_to_match,location_to_match,mask_to_match)
 		feature_returned = fac.next().next()[0]
 
 		assert feature_returned==feature_to_match	
@@ -55,7 +55,7 @@ class MaskTwoVerticalFactoryTestCase(unittest.TestCase):
 		size_to_match = (2,2)
 		location_to_match = (0,0)
 
-		feature_to_match = FeatureMask(mask_to_match,size_to_match,location_to_match)
+		feature_to_match = FeatureMask(None,size_to_match,location_to_match,mask_to_match)
 		feature_returned = fac.next().next()[0]
 
 		assert feature_returned==feature_to_match	
@@ -70,7 +70,7 @@ class MaskTwoVerticalFactoryTestCase(unittest.TestCase):
 		size_to_match = (2,2)
 		location_to_match = (0,0)
 
-		feature_to_match = FeatureMask(mask_to_match,size_to_match,location_to_match)
+		feature_to_match = FeatureMask(None,size_to_match,location_to_match,mask_to_match)
 		feature_returned = fac.next().next()[0]
 
 		assert feature_returned==feature_to_match			
@@ -93,7 +93,7 @@ class MaskThreeHorizontalFactoryTestCase(unittest.TestCase):
 		size_to_match = (2,3)
 		location_to_match = (0,0)
 
-		feature_to_match = FeatureMask(mask_to_match,size_to_match,location_to_match)
+		feature_to_match = FeatureMask(None,size_to_match,location_to_match,mask_to_match)
 		feature_returned = fac.next().next()[0]
 
 		assert feature_returned==feature_to_match
@@ -108,7 +108,7 @@ class MaskThreeHorizontalFactoryTestCase(unittest.TestCase):
 		size_to_match = (2,3)
 		location_to_match = (0,0)
 
-		feature_to_match = FeatureMask(mask_to_match,size_to_match,location_to_match)
+		feature_to_match = FeatureMask(None,size_to_match,location_to_match,mask_to_match)
 		feature_returned = fac.next().next()[0]
 
 		assert feature_returned==feature_to_match						
@@ -132,7 +132,7 @@ class MaskThreeVerticalFactoryTestCase(unittest.TestCase):
 		size_to_match = (3,2)
 		location_to_match = (0,0)
 
-		feature_to_match = FeatureMask(mask_to_match,size_to_match,location_to_match)
+		feature_to_match = FeatureMask(None,size_to_match,location_to_match,mask_to_match)
 		feature_returned = fac.next().next()[0]
 
 		assert feature_returned==feature_to_match
@@ -147,7 +147,7 @@ class MaskThreeVerticalFactoryTestCase(unittest.TestCase):
 		size_to_match = (3,2)
 		location_to_match = (0,0)
 
-		feature_to_match = FeatureMask(mask_to_match,size_to_match,location_to_match)
+		feature_to_match = FeatureMask(None,size_to_match,location_to_match,mask_to_match)
 		feature_returned = fac.next().next()[0]
 
 		assert feature_returned==feature_to_match				
@@ -163,7 +163,7 @@ class MaskDiagonalFactoryTestCase(unittest.TestCase):
 		size_to_match = (2,2)
 		location_to_match = (0,0)
 
-		feature_to_match = FeatureMask(mask_to_match,size_to_match,location_to_match)
+		feature_to_match = FeatureMask(None,size_to_match,location_to_match,mask_to_match)
 		feature_returned = fac.next().next()[0]
 
 		assert feature_returned==feature_to_match
@@ -178,7 +178,7 @@ class MaskDiagonalFactoryTestCase(unittest.TestCase):
 		size_to_match = (2,2)
 		location_to_match = (0,0)
 
-		feature_to_match = FeatureMask(mask_to_match,size_to_match,location_to_match)
+		feature_to_match = FeatureMask(None,size_to_match,location_to_match,mask_to_match)
 		feature_returned = fac.next().next()[0]
 
 		assert feature_returned==feature_to_match
@@ -187,8 +187,32 @@ class MaskDiagonalFactoryTestCase(unittest.TestCase):
 def run_MaskDiagonalFactory_test_suite():
 	suite = unittest.makeSuite(MaskDiagonalFactoryTestCase,'test')
 	runner = unittest.TextTestRunner()
-	runner.run(suite)		
+	runner.run(suite)	
 
+
+class FeatureMasterTestCase(unittest.TestCase):
+	def test_A_simple_image(self):
+		im = Image.new("L",(4,4))
+		im.putdata([10,20,30,50,
+					60,70,80,90,
+					100,110,120,130,
+					140,150,160,170])
+
+		fm = FeatureMaster((4,4),1,1,1,2,2)
+		fm.add_image(im,True)
+		for i in fm.get_next_frs():
+			pass
+
+		assert fm.m2h_values[0] == 20
+		assert fm.m2v_values[0] == 100
+		assert fm.m3h_values[0] == 90
+		assert fm.m3v_values[0] == 110
+		assert fm.md_values[0] == 0
+
+def run_FeatureMaster_test_suite():
+	suite = unittest.makeSuite(FeatureMasterTestCase,'test')
+	runner = unittest.TextTestRunner()
+	runner.run(suite)
 
 def main():
 	print "MaskTwoHorizontal Test"
@@ -205,6 +229,9 @@ def main():
 
 	print "MaskDiagonalFactory Test"
 	run_MaskDiagonalFactory_test_suite()
+
+	print "FeatureMaster Test"
+	run_FeatureMaster_test_suite()	
 
 
 if __name__=='__main__':

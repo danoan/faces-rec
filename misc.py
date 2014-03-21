@@ -3,6 +3,7 @@
 import numpy as np
 import Image
 import img_lib as ilib
+import math
 
 '''
 Given a folder, reads all the files as Images, converts each of
@@ -173,3 +174,30 @@ def build_transpose_covariance_matrix(X):
 	C = coef*X.T.dot(X)
 
 	return C	
+
+
+def increment_list(factor,divisor,start,end):
+	'''
+		Given a start and end value, this function builds a list l of values such that
+		l[0] = first multiple of divisor after start or start
+		l[i] = first multiple of divisor after (l[i-1]*factor)
+
+		Example: 
+		>> increment_list(2,3,2,48)
+		>> [3,6,9,15,30] /*pivot [2,4,8,16,32]
+
+	'''
+	multiplos = [i*divisor for i in range(0,end/divisor+1)]
+	increment_list=[]
+	pivot = start
+	current_multiplo = int(math.ceil((start*1.0)/divisor))
+	current_multiplo =  current_multiplo if current_multiplo > 0 else 1
+	while current_multiplo < len(multiplos):
+		increment_list.append(multiplos[ current_multiplo ])
+		pivot = pivot*factor				
+		if current_multiplo < int(math.ceil(pivot/divisor)):
+			current_multiplo = int(math.ceil(pivot/divisor))
+		else:
+			current_multiplo+=1
+	return increment_list
+	

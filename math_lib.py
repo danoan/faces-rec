@@ -89,4 +89,3 @@ def find_all_heigen(A):
 
 def get_distance(v1,v2):
 	return np.linalg.norm(v1-v2)
-x
