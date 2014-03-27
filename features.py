@@ -68,7 +68,8 @@ class FMF():
 			self._w = i
 			for j in height_list:
 				self._h = j
-				yield (self._create_mask(),(self._h,self._w))
+				size = (self._h, self._w)
+				yield self._create_mask(size)
 			self._h = original_h
 
 		self._w = original_w
@@ -103,9 +104,9 @@ class FMF():
 			Given a resize, it will tries all the possible local combinations for that resize
 		'''
 		count = 0
-		for mask_and_size in self._resize():
+		for mask in self._resize():
 			for location in self._change_local():
-				yield ( FeatureMask( mask_and_size[0], mask_and_size[1], location), count)
+				yield ( FeatureMask( mask, location), count)
 				count+=1
 
 
@@ -126,23 +127,26 @@ class MaskTwoHorizontalFactory(FMF):
 			w+=1
 		FMF.__init__(self,ardis,shift_w,shift_h,resize_factor,w,h,resize_w_step=2,resize_h_step=1)
 
-	def _create_mask(self):
-		middle = self._w/2
+	def _create_mask(self,size):
+		h = size[FMF.HEIGHT]
+		w = size[FMF.WIDTH]
+
+		middle = w/2
 
 		white_a = (0,middle)
-		white_b = (0,self._w-1)
-		white_c = (self._h-1,middle)
-		white_d = (self._h-1,self._w-1)
+		white_b = (0,w-1)
+		white_c = (h-1,middle)
+		white_d = (h-1,w-1)
 
 		black_a = (0,0)
 		black_b = (0,middle-1)
-		black_c = (self._h-1,0)
-		black_d = (self._h-1,middle-1)
+		black_c = (h-1,0)
+		black_d = (h-1,middle-1)
 
 		white = MaskBlock( white_a, white_b, white_c, white_d )
 		black = MaskBlock( black_a, black_b, black_c, black_d )
 
-		m = Mask()
+		m = Mask(size,self)
 		m.add_white(white)
 		m.add_black(black)
 
@@ -166,23 +170,26 @@ class MaskTwoVerticalFactory(FMF):
 			h+=1
 		FMF.__init__(self,ardis,shift_w,shift_h,resize_factor,w,h,resize_w_step=1,resize_h_step=2)
 
-	def _create_mask(self):
-		middle = self._h/2
+	def _create_mask(self,size):
+		h = size[FMF.HEIGHT]
+		w = size[FMF.WIDTH]
+
+		middle = h/2
 
 		white_a = (middle,0)
-		white_b = (middle,self._w-1)
-		white_c = (self._h-1,0)
-		white_d = (self._h-1,self._w-1)
+		white_b = (middle,w-1)
+		white_c = (h-1,0)
+		white_d = (h-1,w-1)
 
 		black_a = (0,0)
-		black_b = (0,self._w-1)
+		black_b = (0,w-1)
 		black_c = (middle-1,0)
-		black_d = (middle-1,self._w-1)
+		black_d = (middle-1,w-1)
 
 		white = MaskBlock( white_a, white_b, white_c, white_d )
 		black = MaskBlock( black_a, black_b, black_c, black_d )
 
-		m = Mask()
+		m = Mask(size,self)
 		m.add_white(white)
 		m.add_black(black)
 
@@ -203,29 +210,41 @@ class MaskThreeHorizontalFactory(FMF):
 			w+= 3-w%3
 		FMF.__init__(self,ardis,shift_w,shift_h,resize_factor,w,h,resize_w_step=3,resize_h_step=1)
 
-	def _create_mask(self):
-		third = self._w/3
+	def _create_mask(self,size):
+		h = size[FMF.HEIGHT]
+		w = size[FMF.WIDTH]
+
+		third = w/3
+
+		'''
+			In case of h is not a multiple of 3. 
+			diff,extra_a: (2,1); (1,0)
+			This variables decided which strategy to adopt when rescaling.
+			This behavior should be tested. TODO
+		'''
+		diff = w%3		
+		extra_a = max(diff-1,0)		
 
 		white_1_a = (0,0)
-		white_1_b = (0,third-1)
-		white_1_c = (self._h-1,0)
-		white_1_d = (self._h-1,third-1)
+		white_1_b = (0,third-1+extra_a)
+		white_1_c = (h-1,0)
+		white_1_d = (h-1,third-1+extra_a)
 
 		white_2_a = (0,2*third)
-		white_2_b = (0,self._w-1)
-		white_2_c = (self._h-1,2*third)
-		white_2_d = (self._h-1,self._w-1)
+		white_2_b = (0,w-1)
+		white_2_c = (h-1,2*third)
+		white_2_d = (h-1,w-1)
 
-		black_a = (0,third)
-		black_b = (0,2*third-1)
-		black_c = (self._h-1,third)
-		black_d = (self._h-1,2*third-1)		
+		black_a = (0,third+extra_a)
+		black_b = (0,2*third-1+diff)
+		black_c = (h-1,third+extra_a)
+		black_d = (h-1,2*third-1+diff)		
 
 		white_1 = MaskBlock( white_1_a, white_1_b, white_1_c, white_1_d )
 		white_2 = MaskBlock( white_2_a, white_2_b, white_2_c, white_2_d )
 		black = MaskBlock( black_a, black_b, black_c, black_d )
 
-		m = Mask()
+		m = Mask(size,self)
 		m.add_white(white_1)
 		m.add_white(white_2)
 		m.add_black(black)
@@ -251,39 +270,36 @@ class MaskThreeVerticalFactory(FMF):
 			h+= 3-w%3		
 		FMF.__init__(self,ardis,shift_w,shift_h,resize_factor,w,h,resize_w_step=1,resize_h_step=3)	
 
-	def _create_mask(self):
-		_mask = np.ones( (self._h,self._w), di8 )
-		third = self._h/3
+	def _create_mask(self,size):
+		h = size[FMF.HEIGHT]
+		w = size[FMF.WIDTH]
+		third = h/3
+		
+		diff = h%3		
+		extra_a = max(diff-1,0)
 
-		for l in range(third,2*third):
-			_mask[l][0] = 0
-
-		for c in range(1,self._w):
-			_mask[:,c] = _mask[:,0].copy()
-
-
-		middle = self._h/3
+		middle = h/3
 
 		white_1_a = (0,0)
-		white_1_b = (0,self._w-1)
-		white_1_c = (third-1,0)
-		white_1_d = (third-1,self._w-1)
+		white_1_b = (0,w-1)
+		white_1_c = (third-1+extra_a,0)
+		white_1_d = (third-1+extra_a,w-1)
 
 		white_2_a = (2*third,0)
-		white_2_b = (2*third,self._w-1)
-		white_2_c = (self._h-1,0)
-		white_2_d = (self._h-1,self._w-1)
+		white_2_b = (2*third,w-1)
+		white_2_c = (h-1,0)
+		white_2_d = (h-1,w-1)
 
-		black_a = (third,0)
-		black_b = (third,self._w-1)
-		black_c = (2*third-1,0)
-		black_d = (2*third-1,self._w-1)		
+		black_a = (third+extra_a,0)
+		black_b = (third+extra_a,w-1)
+		black_c = (2*third-1+diff,0)
+		black_d = (2*third-1+diff,w-1)		
 
 		white_1 = MaskBlock( white_1_a, white_1_b, white_1_c, white_1_d )
 		white_2 = MaskBlock( white_2_a, white_2_b, white_2_c, white_2_d )
 		black = MaskBlock( black_a, black_b, black_c, black_d )
 
-		m = Mask()
+		m = Mask(size,self)
 		m.add_white(white_1)
 		m.add_white(white_2)
 		m.add_black(black)
@@ -335,16 +351,18 @@ class MaskDiagonalFactory(FMF):
 		width_list = misc.increment_list(self._resize_factor,self._resize_w_step,self._w,self._ardis[FMF.WIDTH])
 
 		for i in width_list:
-			self._w = i
-			self._h = i
-			yield (self._create_mask(),(self._w,self._h))
+			size = (i,i)
+			yield self._create_mask(size)
 
 		self._w = original_w
 		self._h = original_h
 
-	def _create_mask(self):
-		middle_h = self._h/2
-		middle_w = self._w/2
+	def _create_mask(self,size):
+		h = size[FMF.HEIGHT]
+		w = size[FMF.WIDTH]
+
+		middle_h = h/2
+		middle_w = w/2
 
 		black_1_a = (0,0)
 		black_1_b = (0,middle_w-1)			
@@ -352,26 +370,26 @@ class MaskDiagonalFactory(FMF):
 		black_1_d = (middle_h-1,middle_w-1)
 
 		black_2_a = (middle_h,middle_w)
-		black_2_b = (middle_h,self._w-1)
-		black_2_c = (self._h-1,middle_h)
-		black_2_d = (self._h-1,self._w-1)
+		black_2_b = (middle_h,w-1)
+		black_2_c = (h-1,middle_h)
+		black_2_d = (h-1,w-1)
 
 		white_1_a = (0,middle_w)
-		white_1_b = (0,self._w-1)
+		white_1_b = (0,w-1)
 		white_1_c = (middle_h-1,middle_w)
-		white_1_d = (middle_h-1,self._w-1)
+		white_1_d = (middle_h-1,w-1)
 
 		white_2_a = (middle_h,0)
 		white_2_b = (middle_h,middle_w-1)
-		white_2_c = (self._h-1,0)
-		white_2_d = (self._h-1,middle_w-1)
+		white_2_c = (h-1,0)
+		white_2_d = (h-1,middle_w-1)
 
 		white_1 = MaskBlock( white_1_a, white_1_b, white_1_c, white_1_d )
 		white_2 = MaskBlock( white_2_a, white_2_b, white_2_c, white_2_d )
 		black_1 = MaskBlock( black_1_a, black_1_b, black_1_c, black_1_d )		
 		black_2 = MaskBlock( black_2_a, black_2_b, black_2_c, black_2_d )		
 
-		m = Mask()
+		m = Mask(size,self)
 		m.add_white(white_1)
 		m.add_white(white_2)
 		m.add_black(black_1)
@@ -383,34 +401,8 @@ class MaskBlock():
 	def __init__(self,a,b,c,d):
 		self.points = [a,b,c,d]
 
-		self.w = b[FMF.WIDTH] - a[FMF.WIDTH]
-		self.h = c[FMF.HEIGHT] - a[FMF.HEIGHT]
-
-	def resize(self,ce):
-		'''
-			Given the scale coefficient (ce), resize the mask
-			a b
-			c d
-			Point a is kept fixed. 
-			Point b goes to left (diminish) or right (enlarge)
-			Point c goes up (diminish) or bottom (enlarge)
-			Point d goes up and left (diminish) or bottom and right (enlarge)
-		'''
-
-		new_w = int( round(self.w*ce) )
-		new_h = int( round(self.h*ce) )
-		if new_w==0: new_w=1.0
-		if new_h==0: new_h=1.0
-
-		diff_w = new_w-self.w
-		diff_h = new_h-self.h
-		self.points[FMF.B] = ( self.points[FMF.B][FMF.HEIGHT], self.points[FMF.B][FMF.WIDTH]+diff_w ) 
-		self.points[FMF.C] = ( self.points[FMF.C][FMF.HEIGHT]+diff_h, self.points[FMF.C][FMF.WIDTH] )
-		self.points[FMF.D] = ( self.points[FMF.D][FMF.HEIGHT]+diff_h, self.points[FMF.D][FMF.WIDTH]+diff_w )
-
-		self.w = new_w
-		self.h = new_h
-
+		self.w = b[FMF.WIDTH] - a[FMF.WIDTH] + 1
+		self.h = c[FMF.HEIGHT] - a[FMF.HEIGHT] + 1
 
 	def __getitem__(self,i):
 		return self.points[i]
@@ -420,15 +412,24 @@ class MaskBlock():
 			yield p
 
 class Mask():
-	def __init__(self):
+	def __init__(self,size,mf):
 		self.white = []
 		self.black = []	
+		self.size = size
+		self.mf = mf 	#FactoryMask
 
 	def add_white(self,block):
 		self.white.append(block)
 
 	def add_black(self,block):
 		self.black.append(block)		
+
+	def rescale(self,ce,original_size):
+		new_h = int(round(original_size[FMF.HEIGHT]*ce))
+		new_w = int(round(original_size[FMF.WIDTH]*ce))
+
+		self.size = (new_h,new_w)
+		return self.mf._create_mask(self.size)
 
 	def __getitem__(self,i):
 		return self.white if i==0 else self.black
@@ -439,18 +440,21 @@ class Mask():
 
 class FeatureMask():	
 
-	def __init__(self,mask,size,location,__hard_coded_mask=None):
-		
+	def __init__(self,mask,location,__hard_coded_mask=None):		
 		self.__original_mask = mask
 		self.__original_location = location
-		self.__original_size = size
+		self.__original_size = mask.size
 
-		self.size = size
 		self.mask = mask
 		self.location = location
 		self.__hard_coded_mask = __hard_coded_mask #Used for Test
 
+	@property
+	def size(self):
+		return self.mask.size	
+
 	def make_mask(self):
+		print "MAKE MASK"
 		if self.__hard_coded_mask!=None:
 			return self.__hard_coded_mask
 		built_mask = np.ones( self.size,di8 )
@@ -469,19 +473,15 @@ class FeatureMask():
 			(now called subwindows) would be located in different coordinates, that's why we
 			have to adjust it.
 		'''
-		self.location = (	subwindow.y,
-							subwindow.x)
-		self.size = subwindow.size
-		self.mask = copy.deepcopy(self.__original_mask)
+		self.location = (	self.__original_location[FMF.HEIGHT]+subwindow.y,
+							self.__original_location[FMF.WIDTH]+subwindow.x)
 
-		for block_type in self.mask:
-			for block in block_type:
-				block.resize(subwindow.ce)
-
+		self.mask = self.mask.rescale(subwindow.ce,self.__original_size)
 		#print "ORIGINAL",self.__original_mask.white[0].w
-		print "NEW LOCATION ", self.location, self.size,subwindow.x
+		# print "NEW LOCATION ", self.location, self.size,subwindow.x
 
 	def __make_block(self,built_mask,block,color):
+		print "MAKE BLOCK"
 		block_w_start = block[0][1]
 		block_w_end = block[1][1]
 
@@ -497,7 +497,7 @@ class FeatureMask():
 
 	def __eq__(self,comp):
 		if (self.make_mask()==comp.make_mask()).prod()==1:
-			if self.size==comp.size:
+			if self.mask.size==comp.mask.size:
 				if self.location==comp.location:
 					return True
 		return False

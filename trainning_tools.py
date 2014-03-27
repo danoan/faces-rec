@@ -1,4 +1,4 @@
-#coding:utf-8
+	#coding:utf-8
 
 import numpy as np
 import math
@@ -196,7 +196,7 @@ class IntegralImage():
 
 	def __init__(self,img):
 		self.img = img
-		self.size = img.size
+		self.size = (img.size[1],img.size[0])
 		self.__compute_integral_image()
 
 	def __compute_integral_image(self):
@@ -204,14 +204,14 @@ class IntegralImage():
 			Integral Image is a special data structure to increase the speed of filter computation.
 			ii[height][width] = Sum of all the pixels above and on the left of (height,width).
 		'''
-		self.__integral_image = np.zeros(self.img.size)
+		self.__integral_image = np.zeros(self.size)
 
 		line_index = 0
 		col_index = 0
 		line_sum = 0
 
 		for p in self.img.getdata():
-			if col_index==self.img.size[1]:
+			if col_index==self.size[1]:
 				line_index+=1
 				line_sum=0
 				col_index=0
@@ -440,9 +440,12 @@ class FeatureResultSet():
 
 		#Backward loop is better in this case
 		for i in range(len(self.all_results_sorted)-1,-1,-1):
-			e1 = s_plus + (self.t_minus() - s_minus)	#Everything below is a face
-			e2 = s_minus + (self.t_plus() - s_plus)		#Everything below is a non-face
-			self.errors_dir.append( (e1,e2) )
+			e1 = s_plus + (self.t_minus() - s_minus)	#Everything below is a non-face			
+			e2 = s_minus + (self.t_plus() - s_plus)		#Everything below is a face
+			
+			
+			if FeatureMaster.TEST:
+				self.errors_dir.append( (e1,e2) )
 
 			if e1<min_error[0]:
 				min_error = (e1,1,i)
@@ -455,28 +458,29 @@ class FeatureResultSet():
 			tsf = self.all_results_sorted[i]
 
 			#TEST PURPOSES
-			t1_line = (	tsf.image_name(),
-						tsf.filter_value,
-						tsf.label(),
-						self.t_plus(),
-						self.t_minus(),
-						s_plus,
-						s_minus,
-						e1,
-						e1==0)			
+			if FeatureMaster.TEST:
+				t1_line = (	tsf.image_name(),
+							tsf.filter_value,
+							tsf.label(),
+							self.t_plus(),
+							self.t_minus(),
+							s_plus,
+							s_minus,
+							e1,
+							e1==0)			
 
-			t2_line = (	tsf.image_name(),
-						tsf.filter_value,
-						tsf.label(),
-						self.t_plus(),
-						self.t_minus(),
-						s_plus,
-						s_minus,
-						e2,
-						e2==0)				
+				t2_line = (	tsf.image_name(),
+							tsf.filter_value,
+							tsf.label(),
+							self.t_plus(),
+							self.t_minus(),
+							s_plus,
+							s_minus,
+							e2,
+							e2==0)				
 
-			tables[0].append(t1_line)		
-			tables[1].append(t2_line)
+				tables[0].append(t1_line)		
+				tables[1].append(t2_line)
 
 			if tsf.is_face():
 				s_plus+=tsf.weight()
@@ -517,16 +521,29 @@ class FeatureResultSet():
 		self.t_minus(t_minus)
 	'''
 
-	def update_weights(self,beta,best_frs,fc):
+	def update_weights(self,beta,best_frs,fc,best_threshold):
+		t = best_threshold[0]
+		d = best_threshold[1]
+
 		t_plus = 0
 		t_minus = 0
 		for tsf in best_frs.all_results_sorted:
-			if fc.is_face(tsf=tsf):
-				#Classificado Corretamente
-				new_weight = tsf.weight()*beta
+
+			if (tsf.filter_value*d) < (t*d):
+				#Classifica como nao-face
+				if tsf.is_face():
+					#Classificado Incorretamente
+					new_weight = tsf.weight()*1.0
+				else:
+					new_weight = tsf.weight()*beta
 			else:
-				#Classificado Incorretamente
-				new_weight = tsf.weight()*1
+				#Classifica como face
+				if tsf.is_face():
+					#Classificado Corretamente
+					new_weight = tsf.weight()*beta
+				else:
+					new_weight = tsf.weight()*1.0
+
 
 			if tsf.is_face():
 				t_plus+=new_weight
@@ -587,10 +604,10 @@ class FeatureChooser():
 			e_t = best_threshold[2]
 			b_t = (e_t)/(1-e_t)
 
+			print e_t,b_t
 			if b_t <= 1e-8:
 				a_t = math.log( 1.0/(1e-8) )
-			else:
-				print b_t
+			else:				
 				a_t = math.log( 1.0/b_t )
 
 			#Filter_Value, Direction, Error_Value, FeatureMask, alpha
@@ -601,7 +618,7 @@ class FeatureChooser():
 					a_t)
 
 			fc.add_hypothesis(h_t)
-			best_frs.update_weights(b_t,best_frs,fc)
+			best_frs.update_weights(b_t,best_frs,fc,best_threshold)
 
 			cur_T+=1
 
@@ -621,7 +638,12 @@ class FinalClassifier():
 	def close_classifier(self):
 		self.final = True
 
-	def h_function(self,f,d,t):
+	def h_function(self,f,d,t):		
+		'''
+			When d=1, it means that everything below (filter_value greater than threshold)
+			is a non-face, and everything up and equal (filter_value lesser or equal than threshold)
+			is classified as a face.
+		'''
 		if (d*f)<(d*t):
 			return 1
 		else:
@@ -634,7 +656,7 @@ class FinalClassifier():
 		#tsf is used only with partial classifiers.
 		sx=0
 		sa=0
-		for h in self.hypothesis:
+		for h in self.hypothesis:			
 			t = h[0]	#threshold
 			d = h[1]	#direction
 			f = h[3]	#feature mask
@@ -647,6 +669,7 @@ class FinalClassifier():
 				sx+= a*self.h_function(tsf.filter(f),d,t)
 			sa+= a
 
+		# print sx,sa*0.5
 		if sx>=(0.5*sa):
 			return True
 		else:

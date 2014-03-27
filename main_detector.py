@@ -4,7 +4,7 @@ from trainning_tools import *
 from detector import *
 import os,pickle,random
 
-n=25
+n=10000
 
 folder_faces = "/home/daniel/Desktop/lfwcrop_grey/faces"
 folder_scenes = "/home/daniel/Desktop/training non-face images"
@@ -17,48 +17,43 @@ with open('classifier.pk','rb') as input:
 print classifier.hypothesis
 
 #Creating the Detector
-ng = 4
+ng = 1
 ref_ardis = (64,64)
 ref_mask = (8,8)
 
-shift_step=8
-fn=SubwindowGenerator.DYNAMIC_FACTOR
+shift_step=16
+fn=SubwindowGenerator.FIXED_FACTOR
 
 det = Detector(classifier,ng,ref_ardis,ref_mask,shift_step=shift_step,fn=fn)	
 
 def test_classifier():
 	face_filenames = random.sample(os.listdir(folder_faces),n)
-	scene_filenames = random.sample(os.listdir(folder_scenes),n)
 
-	faces = []
-	non_faces = []
-	for i in face_filenames:
-		faces.append(Image.open( "%s/%s" % (folder_faces,i) ) )
-	
-	for scene_window in get_next_random_image_window(folder_scenes,n):
-		im = scene_window.window_img
-		non_faces.append(im)
+	sw = Subwindow(0,0,(64,64))
 
 	true=0
-	for i in range(0,n):
-		sw = Subwindow(0,0,(64,64))
-		true = true+1 if det.is_face(faces[i],sw) else true
-
+	for i in face_filenames:
+		img = Image.open( "%s/%s" % (folder_faces,i) )
+		true = true+1 if det.is_face(img,sw) else true
+	
 	print "%d/%d" % (true,n)
 
 	true=0
-	for i in range(0,n):
-		sw = Subwindow(0,0,(64,64))
-		true = true+1 if det.is_face(non_faces[i],sw) else true		
+	for scene_window in get_next_random_image_window(folder_scenes,n):
+		img = scene_window.window_img
+		true = true+1 if det.is_face(img,sw) else true		
 
 	print "%d/%d" % (true,n)	
 
 def test_detector():
-	img = Image.open("%s/%s" % (folder_test_img,"2.pgm"))
-	det.detect_faces(img)
+	img1 = Image.open("%s/%s" % (folder_test_img,"1.pgm"))
+	det.detect_faces(img1)
+
+	# img2 = Image.open("%s/%s" % (folder_test_img,"3.pgm"))
+	# det.detect_faces(img2)
 
 # for h in classifier.hypothesis:
 # 	print h[0],h[1],h[2],h[4]
 
-# test_classifier()
-test_detector()
+test_classifier()
+# test_detector()

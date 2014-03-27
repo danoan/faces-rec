@@ -6,7 +6,7 @@ import os,pickle,random
 
 folder_faces = "/home/daniel/Desktop/lfwcrop_grey/faces"
 folder_scenes = "/home/daniel/Desktop/training non-face images"
-n = 25
+n = 15
 T = 2
 
 n_faces = n
@@ -38,8 +38,11 @@ for scene_window in get_next_random_image_window(folder_scenes,n):
 
 fc = FeatureChooser((64,64),fm,n_faces,n_non_faces)
 classifier = fc.find_hypothesis(T)
-with open('classifier.pk','wb') as output:
-	pickle.dump(classifier,output,pickle.HIGHEST_PROTOCOL)
+# with open('classifier.pk','wb') as output:
+# 	pickle.dump(classifier,output,pickle.HIGHEST_PROTOCOL)
+
+with open('%s_%d_%d' % ('classifier.pk',n,T),'wb') as output:
+	pickle.dump(classifier,output,pickle.HIGHEST_PROTOCOL)	
 
 print "FIM"
 

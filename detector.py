@@ -20,12 +20,15 @@ class SubwindowGenerator():
 	@staticmethod
 	def fixed_factor(ng,tg,ce0,cef,wr):
 		factor = 1.25
-		return 0.5*math.pow(1.25,ng)
+		if factor>cef:
+			factor=cef
+		return 1.0*math.pow(1.25,ng)
 
 	@staticmethod
 	def dynamic_factor(ng,tg,ce0,cef,wr):
 		factor = (cef - ce0)/(tg*1.0)
-		return 0.5 + factor*ng		
+		print ce0 + factor*ng
+		return ce0 + factor*ng		
 
 	FIXED_FACTOR = fixed_factor
 	DYNAMIC_FACTOR = dynamic_factor
@@ -41,12 +44,12 @@ class SubwindowGenerator():
 		
 
 	def __discover_min_mask(self,masks):
-		min_mask = [100,100]
+		min_mask = [0,0]
 		
 		for m in masks:
-			if m.MIN_MASK[0] < min_mask[0]:
+			if m.MIN_MASK[0] > min_mask[0]:
 				min_mask[0] = m.MIN_MASK[0]
-			if m.MIN_MASK[1] < min_mask[1]:
+			if m.MIN_MASK[1] > min_mask[1]:
 				min_mask[1] = m.MIN_MASK[1]
 
 		return (min_mask[0],min_mask[1])
@@ -69,11 +72,10 @@ class SubwindowGenerator():
 		subwindows = []
 		while cur_ng<ng:
 			ce = fn(cur_ng,ng,self.ce0,self.ce_max,self.wr)
-			print ce
-			subwindow_size = ( int( math.floor(self.wr[0]*ce) ),
-							   int( math.floor(self.wr[1]*ce) ) )
 
-			print "SIZE:",subwindow_size
+			subwindow_size = ( int( round(self.wr[0]*ce) ),
+							   int( round(self.wr[1]*ce) ) )
+
 
 			if subwindow_size[0] > self.img.size[0] or subwindow_size[1] > self.img.size[1]:
 				break
@@ -129,27 +131,29 @@ class Detector():
 										img,
 										self.shift_step).generate_subwindows(self.ng,self.fn)
 
-		draw = ImageDraw.Draw(img) 
+		color_img = img.convert("RGB")
+		draw = ImageDraw.Draw(color_img) 
+
 		cnt = 1
-		print len(subwindows)
+		rec_faces = 0
+		print "END GENERATE SUBWINDOWS :", len(subwindows)
 		for sw in subwindows:
 			if self.classifier.is_face(sw):		
-				draw.rectangle( sw.crop_box(),outline=0 )
+				draw.rectangle( sw.crop_box(),outline="green" )
+				rec_faces+=1
+			else:
+				# draw.rectangle( sw.crop_box(),outline="red" )
+				pass
 
 			if cnt%100==0:
 				# print cnt
 				pass
 			cnt+=1
 
-		img.show()	
+		color_img.show()	
+		print "REC FACES: %d/%d" % (rec_faces,len(subwindows))
 
 	def is_face(self,img,sw):
-		draw = ImageDraw.Draw(img) 		
 		self.classifier.set_image(img)
-
-		if self.classifier.is_face(sw):
-			draw.rectangle( sw.crop_box() )	
-		img.show()
-
 		return self.classifier.is_face(sw)
 
