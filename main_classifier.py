@@ -4,9 +4,9 @@ from trainning_tools import *
 from detector import *
 import os,pickle,random
 
-folder_faces = "/home/daniel/Desktop/lfwcrop_grey/faces"
-folder_scenes = "/home/daniel/Desktop/training non-face images"
-n = 15
+folder_faces = "dataset/lfwcrop_grey/faces"
+folder_scenes = "dataset/training non-face images"
+n = 2
 T = 2
 
 n_faces = n

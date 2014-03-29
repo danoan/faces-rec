@@ -4,11 +4,11 @@ from trainning_tools import *
 from detector import *
 import os,pickle,random
 
-n=10000
+n=10
 
-folder_faces = "/home/daniel/Desktop/lfwcrop_grey/faces"
-folder_scenes = "/home/daniel/Desktop/training non-face images"
-folder_test_img = "/home/daniel/Desktop/test_images"
+folder_faces = "dataset/lfwcrop_grey/faces"
+folder_scenes = "dataset/training non-face images"
+folder_test_img = "dataset/test_images"
 
 classifier = None
 with open('classifier.pk','rb') as input:
