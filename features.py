@@ -1,6 +1,6 @@
 #coding:utf-8
 
-import misc,copy
+import misc,copy,math
 import numpy as np
 
 
@@ -473,8 +473,15 @@ class FeatureMask():
 			(now called subwindows) would be located in different coordinates, that's why we
 			have to adjust it.
 		'''
-		self.location = (	self.__original_location[FMF.HEIGHT]+subwindow.y,
-							self.__original_location[FMF.WIDTH]+subwindow.x)
+		#Mask Location Rescale
+		mask_location = (	int( math.floor( self.__original_location[FMF.HEIGHT]*subwindow.ce ) ),
+							int( math.floor( self.__original_location[FMF.WIDTH]*subwindow.ce ) )
+						)
+
+		#Subwindow Location
+		self.location = (	mask_location[0]+subwindow.y,
+							mask_location[1]+subwindow.x)
+		
 
 		self.mask = self.mask.rescale(subwindow.ce,self.__original_size)
 		#print "ORIGINAL",self.__original_mask.white[0].w

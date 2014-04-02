@@ -11,17 +11,17 @@ folder_scenes = "dataset/training non-face images"
 folder_test_img = "dataset/test_images"
 
 classifier = None
-with open('classifier.pk','rb') as input:
+with open('classifiers/classifier_10_2.pk','rb') as input:
 	classifier = pickle.load(input)
 
 print classifier.hypothesis
 
 #Creating the Detector
-ng = 1
+ng = 4
 ref_ardis = (64,64)
 ref_mask = (8,8)
 
-shift_step=16
+shift_step=4
 fn=SubwindowGenerator.FIXED_FACTOR
 
 det = Detector(classifier,ng,ref_ardis,ref_mask,shift_step=shift_step,fn=fn)	
@@ -55,5 +55,5 @@ def test_detector():
 # for h in classifier.hypothesis:
 # 	print h[0],h[1],h[2],h[4]
 
-test_classifier()
-# test_detector()
+# test_classifier()
+test_detector()

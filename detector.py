@@ -22,7 +22,7 @@ class SubwindowGenerator():
 		factor = 1.25
 		if factor>cef:
 			factor=cef
-		return 1.0*math.pow(1.25,ng)
+		return ce0*math.pow(1.25,ng)
 
 	@staticmethod
 	def dynamic_factor(ng,tg,ce0,cef,wr):
@@ -87,7 +87,7 @@ class SubwindowGenerator():
 
 			for y in range(0,max_y_pos,self.shift_step):
 				for x in range(0,max_x_pos,self.shift_step):
-					subwindows.append( Subwindow(x,y,subwindow_size,ce) )
+					subwindows.append( Subwindow(x,y,subwindow_size,cur_ng,ce) )
 					# print "COORD: ",x,y
 
 			cur_ng+=1
@@ -96,10 +96,11 @@ class SubwindowGenerator():
 
 class Subwindow():
 
-	def __init__(self,x,y,size,ce=1.0):
+	def __init__(self,x,y,size,cur_ng=0,ce=1.0):
 		self.x = x
 		self.y = y
 		self.size = size
+		self.cur_ng = cur_ng
 		self.ce = ce
 
 	def crop_box(self):
@@ -139,7 +140,7 @@ class Detector():
 		print "END GENERATE SUBWINDOWS :", len(subwindows)
 		for sw in subwindows:
 			if self.classifier.is_face(sw):		
-				draw.rectangle( sw.crop_box(),outline="green" )
+				draw.rectangle( sw.crop_box(),outline=(15*sw.cur_ng,50+ 10*sw.cur_ng,20*sw.cur_ng) )
 				rec_faces+=1
 			else:
 				# draw.rectangle( sw.crop_box(),outline="red" )

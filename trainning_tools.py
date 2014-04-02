@@ -2,7 +2,7 @@
 
 import numpy as np
 import math
-import Image,random,os
+import Image,random,os,pickle,time
 from features import *
 
 '''
@@ -18,23 +18,29 @@ class ImageWindowGenerator():
 		ImageWindowGenerator.SAVED_COUNT+=1
 		return ImageWindowGenerator.SAVED_COUNT
 
-	def __init__(self,name,folder,window_size,shift_step=1):	
+	def __init__(self,name,folder,folder_to_save,window_size,shift_step=1):	
 		self.name = name
 		self.folder = folder
-		img_file_name = "%s/%s" %(self.folder,self.name)
-		self.img = Image.open(img_file_name)
+		self.img_filename = "%s/%s" %(self.folder,self.name)
+		self.folder_to_save = folder_to_save
 
 		self.window_size = window_size
 		
-		left_w = self.img.size[0] - window_size[0]
-		left_h = self.img.size[1] - window_size[1]
+		''' I open and close the file every time some image processing needs to be done,
+			otherwise, too many files would be opened.
+		'''
+		with open(self.img_filename,"rb") as img_file: 
+			img = Image.open(img_file)
 
-		self.windows = []
-		self.total_windows = 0
-		for x in range(0,left_w,shift_step):
-			for y in range(0,left_h,shift_step):
-				self.windows.append( (x,y) )
-				self.total_windows+=1
+			left_w = img.size[0] - window_size[0]
+			left_h = img.size[1] - window_size[1]
+
+			self.windows = []
+			self.total_windows = 0
+			for x in range(0,left_w,shift_step):
+				for y in range(0,left_h,shift_step):
+					self.windows.append( (x,y) )
+					self.total_windows+=1
 
 	def get_next_random_window(self):
 		windows_total = len(self.windows)
@@ -49,11 +55,14 @@ class ImageWindowGenerator():
 
 			w = self.windows[i]
 			crop_box = (w[0],w[1],w[0]+self.window_size[0],w[1]+self.window_size[1])
-			crop_window = self.img.crop( crop_box )
+
+			with open(self.img_filename,"rb") as img_file:
+				img = Image.open(img_file)
+				crop_window = img.crop( crop_box )
 
 			saved_name = "crop_%s.pgm" %(ImageWindowGenerator._get_next_count(),)
 
-			yield ImageWindow(self.name,self.folder,crop_window,w,n,saved_name)
+			yield ImageWindow(self.name,self.folder,self.folder_to_save,crop_window,w,n,saved_name)
 
 '''
 	Container retrieved by the get_next_random function of the ImageWindowGenerator.
@@ -61,22 +70,26 @@ class ImageWindowGenerator():
 	location related with the original image.
 '''
 class ImageWindow():
-	def __init__(self,original_name,folder,window_img,location,seq_number,saved_name):		
+	def __init__(self,original_name,folder,folder_to_save,window_img,location,seq_number,saved_name):		
 		self.window_img = window_img
 		self.original_name = original_name
 		self.saved_name = saved_name
 		self.folder = folder
 		self.location = location
 		self.seq_number = seq_number
+
+		#Need it to keep state
+		self.save(folder_to_save)
 		
 
-	def save(self):
-		path = "%s/crop" % (self.folder,)
+	def save(self,folder_to_save):
+		path = "%s/crop/%s" % (self.folder,folder_to_save)
 		if not os.path.exists(path):
 			os.mkdir(path)
 
 		crop_filename = "%s/%s" % (path,self.saved_name,)
-		iw.window_img.save(crop_filename)
+		self.window_img.save(crop_filename)
+		self.window_img.filename = crop_filename
 
 	def __str__(self):
 		return "Image: %s \t Saved: %s \t Location: %s \t Seq. Number: %d" % (self.original_name,self.saved_name,self.location,self.seq_number)
@@ -92,6 +105,7 @@ def get_next_random_image_window(folder,n):
 	#n: number of random window to be generated
 
 	file_names = os.listdir(folder)
+	folder_to_save = str( time.time() )
 	face_size = (64,64)
 
 	shift_step = 4
@@ -102,7 +116,7 @@ def get_next_random_image_window(folder,n):
 		if fn=="crop":
 			continue
 
-		iw = ImageWindowGenerator(fn,folder,face_size,shift_step)
+		iw = ImageWindowGenerator(fn,folder,folder_to_save,face_size,shift_step)
 		img_windows.append( iw )
 
 		windows_total+=iw.total_windows
@@ -124,14 +138,15 @@ class TrainningSample():
 		Class Container that holds a trainning image file name, its label: True for face and False for non-face
 		and support information like weight, s_plus and s_minus used by the adaboost algorithm
 	'''
-	def __init__(self,ts_index,img,label,ardis):
+	def __init__(self,ts_index,img_path,label,ardis):
 		self.index = ts_index
-		self.img = img
-		self.img_path = img.filename
-		self.img_filename = self.img_path.split(os.path.sep)[-1]		
+		self.img_path = img_path
+		self.img_filename = img_path.split(os.path.sep)[-1]		
 		self.label = label
 
-		self.ii = IntegralImage(img)
+		with open(img_path,"rb") as img_file:
+			img = Image.open(img_file)
+			self.ii = IntegralImage(img)
 
 		#Variables used for the minimization problem of finding the best feature.
 		self.__weight = 0
@@ -195,11 +210,10 @@ class TrainningSampleFeature():
 class IntegralImage():
 
 	def __init__(self,img):
-		self.img = img
 		self.size = (img.size[1],img.size[0])
-		self.__compute_integral_image()
+		self.__compute_integral_image(img)
 
-	def __compute_integral_image(self):
+	def __compute_integral_image(self,img):
 		'''
 			Integral Image is a special data structure to increase the speed of filter computation.
 			ii[height][width] = Sum of all the pixels above and on the left of (height,width).
@@ -210,7 +224,7 @@ class IntegralImage():
 		col_index = 0
 		line_sum = 0
 
-		for p in self.img.getdata():
+		for p in img.getdata():
 			if col_index==self.size[1]:
 				line_index+=1
 				line_sum=0
@@ -293,7 +307,7 @@ class FeatureMaster():
 		Class who will run the filter operations related to a TrainningSample and all the possible existing 
 		FeatureMask accordingly with the ardis and shifts.
 	'''
-	TEST=True
+	TEST=False
 	TS_SET = []
 	NON_FACE = -1
 	FACE = 1
@@ -330,12 +344,9 @@ class FeatureMaster():
 		self.m3v_values = []
 		self.md_values = []
 
-	def add_image(self,img,img_label):
-		if not hasattr(img,"filename"):
-			setattr(img,"filename","None")
-
+	def add_image(self,img_path,img_label):
 		ts_index = len(FeatureMaster.TS_SET)
-		FeatureMaster.TS_SET.append( TrainningSample(ts_index,img,img_label,self.ardis) )	
+		FeatureMaster.TS_SET.append( TrainningSample(ts_index,img_path,img_label,self.ardis) )	
 
 	def after_filter(self,ts_index,fm,filter_value,filter_list):
 		self.feature_number+=1
@@ -495,31 +506,6 @@ class FeatureResultSet():
 				 min_error[1],  
 				 min_error[0],
 				 self.all_results_sorted[ min_error[2] ].fm )			
-	'''
-	def update_weights(self,beta,best_frs,best_threshold):
-		t = best_threshold[0]
-		d = best_threshold[1]
-
-		t_plus = 0
-		t_minus = 0
-		for tsf in best_frs.all_results_sorted:
-			if (tsf.filter_value*d) > (t*d):
-				#Classificado Corretamente
-				new_weight = tsf.weight()*beta
-			else:
-				#Classificado Incorretamente
-				new_weight = tsf.weight()*1
-
-			if tsf.is_face():
-				t_plus+=new_weight
-			else:
-				t_minus+=new_weight
-
-			tsf.weight(new_weight)
-
-		self.t_plus(t_plus)
-		self.t_minus(t_minus)
-	'''
 
 	def update_weights(self,beta,best_frs,fc,best_threshold):
 		t = best_threshold[0]
@@ -580,6 +566,10 @@ class FeatureChooser():
 		print self._initial_weight_faces, self._initial_weight_non_faces
 
 
+	@staticmethod
+	def find_hypothesis_from_previous_state(filepath):		
+		variables = FeatureChooser.__load_state(filepath)
+		return variables[0].__find_hypothesis(variables[1],variables[2],variables[3],variables[4])
 
 	def find_hypothesis(self,T):
 		FeatureResultSet.initialize_weights(FeatureMaster.trainning_samples(),
@@ -588,7 +578,13 @@ class FeatureChooser():
 
 		cur_T = 0
 		max_alpha = 0
-		fc = FinalClassifier(self._ardis)
+		fc = FinalClassifier(self._ardis)		
+
+		return self.__find_hypothesis(cur_T,max_alpha,fc,T)
+
+
+	def __find_hypothesis(self,cur_T,max_alpha,fc,T):
+
 		while cur_T<T:
 			# print "UIUI"
 			#Find the best feature. The one with the lowest error.
@@ -604,7 +600,7 @@ class FeatureChooser():
 			e_t = best_threshold[2]
 			b_t = (e_t)/(1-e_t)
 
-			print e_t,b_t
+			print T,e_t,b_t
 			if b_t <= 1e-8:
 				a_t = math.log( 1.0/(1e-8) )
 			else:				
@@ -617,13 +613,85 @@ class FeatureChooser():
 					best_threshold[3],
 					a_t)
 
+
 			fc.add_hypothesis(h_t)
 			best_frs.update_weights(b_t,best_frs,fc,best_threshold)
 
 			cur_T+=1
+			if cur_T%3==0:
+				self.__save_state(cur_T,fc,max_alpha,T)
+
+				with open('classifiers/%s_(%d-%d).pk' % ('classifier',cur_T,T),'wb') as output:
+					fc.final=True
+					pickle.dump(fc,output,pickle.HIGHEST_PROTOCOL)									
+					fc.final=False
+
+			if e_t<1e-10:
+				#The error is already too small, doesn`t need to keep doing it.
+				break
 
 		fc.close_classifier()
 		return fc
+
+	def __save_state(self,cur_T,fc,max_alpha,T):
+		ts_state_collection = []
+		for ts in FeatureMaster.trainning_samples():
+			ts_state_obj = (ts.index,
+							ts.img_path,
+							ts.label,
+							ts.weight() )
+
+			ts_state_collection.append(ts_state_obj)
+
+		state_obj = (self._fm.ardis,
+					 self._fm.shift_w,
+					 self._fm.shift_h,
+					 self._fm.resize_factor,
+					 self._fm.start_w,
+					 self._fm.start_h,
+					 fc,
+					 cur_T,
+					 ts_state_collection,
+					 max_alpha,
+					 T)
+
+		with open("classifiers/states/featureChooser_%d.pk" % (cur_T,), "wb") as output:
+			pickle.dump(state_obj,output,pickle.HIGHEST_PROTOCOL)			
+
+
+	@staticmethod
+	def __load_state(filepath):	
+		state_obj = None
+		with open(filepath, "r") as input:
+			state_obj = pickle.load(input)		
+
+		FeatureMaster.init_training_set()
+		fm = FeatureMaster(state_obj[0],state_obj[1],state_obj[2],state_obj[3],state_obj[4],state_obj[5])
+		
+		ts_state_collection = state_obj[8]
+
+		n_faces = 0
+		n_non_faces = 0
+		t_plus = 0
+		t_minus = 0
+		for ts_state in ts_state_collection:
+			fm.add_image(ts_state[1],ts_state[2])
+			fm.trainning_samples()[-1].weight( ts_state[3] )
+
+			if ts_state[2]==FeatureMaster.FACE:
+				n_faces+=1
+				t_plus+= ts_state[3]
+			else:
+				n_non_faces+=1
+				t_minus+= ts_state[3]
+
+		FeatureResultSet.t_plus(t_plus)
+		FeatureResultSet.t_minus(t_minus)
+
+		chooser = FeatureChooser(state_obj[0],fm,n_faces,n_non_faces)
+
+		#Chooser, cur_T,max_alpha,fc,T
+		return ( chooser, state_obj[7],state_obj[9],state_obj[6],state_obj[10] )
 
 class FinalClassifier():
 	def __init__(self,ardis):
