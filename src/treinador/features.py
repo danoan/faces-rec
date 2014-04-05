@@ -16,21 +16,6 @@ class FMF():
 	WHITE_PIXEL = 1
 	IGNORE_PIXEL = 2
 
-	WIDTH=1
-	HEIGHT=0
-
-	'''
-		To avoid misunderstanding, points are stored as the same manner as matrix elements. Then, a point
-		is always in the form (y,x)
-	'''
-	X = 1
-	Y = 0
-
-	A=0
-	B=1
-	C=2
-	D=3
-
 	def __init__(self,ardis,shift_w,shift_h,resize_factor,w,h,resize_w_step,resize_h_step):
 		self._ardis = ardis
 		self._shift_w = shift_w
@@ -55,14 +40,14 @@ class FMF():
 			raise Exception("Ardis's size is less than the minimal")
 		
 
-		left_w = self._ardis[FMF.WIDTH] - self._w + 1
-		left_h = self._ardis[FMF.HEIGHT] - self._h + 1
+		left_w = self._ardis[misc.WIDTH] - self._w + 1
+		left_h = self._ardis[misc.HEIGHT] - self._h + 1
 
 		original_w = self._w
 		original_h = self._h
 
-		width_list = misc.increment_list(self._resize_factor,self._resize_w_step,self._w,self._ardis[FMF.WIDTH])
-		height_list = misc.increment_list(self._resize_factor,self._resize_h_step,self._h,self._ardis[FMF.HEIGHT])
+		width_list = misc.increment_list(self._resize_factor,self._resize_w_step,self._w,self._ardis[misc.WIDTH])
+		height_list = misc.increment_list(self._resize_factor,self._resize_h_step,self._h,self._ardis[misc.HEIGHT])
 
 		for i in width_list:
 			self._w = i
@@ -89,15 +74,15 @@ class FMF():
 
 		local = [0,0]
 
-		left_w = self._ardis[FMF.WIDTH] - self._w - local[FMF.WIDTH] + 1
-		left_h = self._ardis[FMF.HEIGHT] - self._h - local[FMF.HEIGHT] + 1
+		left_w = self._ardis[misc.WIDTH] - self._w - local[misc.WIDTH] + 1
+		left_h = self._ardis[misc.HEIGHT] - self._h - local[misc.HEIGHT] + 1
 
 		for i in range(0,left_w,self._shift_w):
-			local[FMF.WIDTH]=i
+			local[misc.WIDTH]=i
 			for j in range(0,left_h,self._shift_h):
-				local[FMF.HEIGHT]=j
-				yield (local[FMF.HEIGHT],local[FMF.WIDTH])
-			local[FMF.HEIGHT] = 0
+				local[misc.HEIGHT]=j
+				yield (local[misc.HEIGHT],local[misc.WIDTH])
+			local[misc.HEIGHT] = 0
 
 	def next(self):
 		'''
@@ -128,8 +113,8 @@ class MaskTwoHorizontalFactory(FMF):
 		FMF.__init__(self,ardis,shift_w,shift_h,resize_factor,w,h,resize_w_step=2,resize_h_step=1)
 
 	def _create_mask(self,size):
-		h = size[FMF.HEIGHT]
-		w = size[FMF.WIDTH]
+		h = size[misc.HEIGHT]
+		w = size[misc.WIDTH]
 
 		middle = w/2
 
@@ -171,8 +156,8 @@ class MaskTwoVerticalFactory(FMF):
 		FMF.__init__(self,ardis,shift_w,shift_h,resize_factor,w,h,resize_w_step=1,resize_h_step=2)
 
 	def _create_mask(self,size):
-		h = size[FMF.HEIGHT]
-		w = size[FMF.WIDTH]
+		h = size[misc.HEIGHT]
+		w = size[misc.WIDTH]
 
 		middle = h/2
 
@@ -211,8 +196,8 @@ class MaskThreeHorizontalFactory(FMF):
 		FMF.__init__(self,ardis,shift_w,shift_h,resize_factor,w,h,resize_w_step=3,resize_h_step=1)
 
 	def _create_mask(self,size):
-		h = size[FMF.HEIGHT]
-		w = size[FMF.WIDTH]
+		h = size[misc.HEIGHT]
+		w = size[misc.WIDTH]
 
 		third = w/3
 
@@ -271,8 +256,8 @@ class MaskThreeVerticalFactory(FMF):
 		FMF.__init__(self,ardis,shift_w,shift_h,resize_factor,w,h,resize_w_step=1,resize_h_step=3)	
 
 	def _create_mask(self,size):
-		h = size[FMF.HEIGHT]
-		w = size[FMF.WIDTH]
+		h = size[misc.HEIGHT]
+		w = size[misc.WIDTH]
 		third = h/3
 		
 		diff = h%3		
@@ -342,13 +327,13 @@ class MaskDiagonalFactory(FMF):
 			raise Exception("Ardis's size is less than the minimal")
 		
 
-		left_w = self._ardis[FMF.WIDTH] - self._w + 1
-		left_h = self._ardis[FMF.HEIGHT] - self._h + 1
+		left_w = self._ardis[misc.WIDTH] - self._w + 1
+		left_h = self._ardis[misc.HEIGHT] - self._h + 1
 
 		original_w = self._w
 		original_h = self._h
 
-		width_list = misc.increment_list(self._resize_factor,self._resize_w_step,self._w,self._ardis[FMF.WIDTH])
+		width_list = misc.increment_list(self._resize_factor,self._resize_w_step,self._w,self._ardis[misc.WIDTH])
 
 		for i in width_list:
 			size = (i,i)
@@ -358,8 +343,8 @@ class MaskDiagonalFactory(FMF):
 		self._h = original_h
 
 	def _create_mask(self,size):
-		h = size[FMF.HEIGHT]
-		w = size[FMF.WIDTH]
+		h = size[misc.HEIGHT]
+		w = size[misc.WIDTH]
 
 		middle_h = h/2
 		middle_w = w/2
@@ -401,8 +386,8 @@ class MaskBlock():
 	def __init__(self,a,b,c,d):
 		self.points = [a,b,c,d]
 
-		self.w = b[FMF.WIDTH] - a[FMF.WIDTH] + 1
-		self.h = c[FMF.HEIGHT] - a[FMF.HEIGHT] + 1
+		self.w = b[misc.WIDTH] - a[misc.WIDTH] + 1
+		self.h = c[misc.HEIGHT] - a[misc.HEIGHT] + 1
 
 	def __getitem__(self,i):
 		return self.points[i]
@@ -425,8 +410,8 @@ class Mask():
 		self.black.append(block)		
 
 	def rescale(self,ce,original_size):
-		new_h = int(round(original_size[FMF.HEIGHT]*ce))
-		new_w = int(round(original_size[FMF.WIDTH]*ce))
+		new_h = int(round(original_size[misc.HEIGHT]*ce))
+		new_w = int(round(original_size[misc.WIDTH]*ce))
 
 		self.size = (new_h,new_w)
 		return self.mf._create_mask(self.size)
@@ -439,6 +424,9 @@ class Mask():
 		yield self.black
 
 class FeatureMask():	
+	"""
+		A FeatureMask is a rectangle composed by a list of white and black MaskBlock.
+	"""
 
 	def __init__(self,mask,location,__hard_coded_mask=None):		
 		self.__original_mask = mask
@@ -457,6 +445,7 @@ class FeatureMask():
 		print "MAKE MASK"
 		if self.__hard_coded_mask!=None:
 			return self.__hard_coded_mask
+
 		built_mask = np.ones( self.size,di8 )
 		for block_white in self.mask['white']:
 			self.__make_block(built_mask,block_white,FMF.WHITE_PIXEL)
@@ -473,9 +462,9 @@ class FeatureMask():
 			(now called subwindows) would be located in different coordinates, that's why we
 			have to adjust it.
 		'''
-		#Mask Location Rescale
-		mask_location = (	int( math.floor( self.__original_location[FMF.HEIGHT]*subwindow.ce ) ),
-							int( math.floor( self.__original_location[FMF.WIDTH]*subwindow.ce ) )
+		#Mask's Subwindow Rescale		
+		mask_location = (	int( math.floor( self.__original_location[misc.HEIGHT]*subwindow.ce ) ),
+							int( math.floor( self.__original_location[misc.WIDTH]*subwindow.ce ) )
 						)
 
 		#Subwindow Location
@@ -483,6 +472,7 @@ class FeatureMask():
 							mask_location[1]+subwindow.x)
 		
 
+		#Mask Rescale
 		self.mask = self.mask.rescale(subwindow.ce,self.__original_size)
 		#print "ORIGINAL",self.__original_mask.white[0].w
 		# print "NEW LOCATION ", self.location, self.size,subwindow.x

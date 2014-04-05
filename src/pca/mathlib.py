@@ -89,3 +89,34 @@ def find_all_heigen(A):
 
 def get_distance(v1,v2):
 	return np.linalg.norm(v1-v2)
+
+
+def run_PCA(X,Y):
+	"""
+		X: Trainning DB
+		Y: Test DB
+	"""
+	CT = build_transpose_covariance_matrix(X)
+
+	S,U = find_all_heigen(CT)
+	U = X.dot(U)	#Eigenbasis
+
+	Px = U.T.dot(X)	#Projection of X on the EigenBasis
+	Py = U.T.dot(Y)
+
+	return (Px,Py)	
+
+def build_transpose_covariance_matrix(X):
+	'''
+		X has n^4 x n, then C.T has dimensions n x n, and his eigenvector are computed 
+		by X multiplied by the return matrix of the function find_all_heigen()
+		AVG - Average Image
+	'''
+	n = X.shape[0]
+	if n==0:
+		return
+
+	coef = 1.0/n
+	C = coef*X.T.dot(X)
+
+	return C		

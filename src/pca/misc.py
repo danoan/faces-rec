@@ -2,11 +2,11 @@
 
 import numpy as np
 import Image
-import img_lib as ilib
+import imglib
 import math
 
 '''
-Given a folder, reads all the files as Images, converts each of
+Given a folder, reads all the JPG files as Images, converts each of
 them in row vectors and returns a list with all the row vectors
 '''
 def create_image_database(folder,n):
@@ -15,9 +15,9 @@ def create_image_database(folder,n):
 	while k<=n:
 		img = Image.open("%s/img_%d.jpg" % (folder,k))
 		if X is None:
-			X = np.array( [ilib.img_to_rvector(img)] )
+			X = np.array( [imglib.img_to_rvector(img)] )
 		else:
-			X = np.append(X,[ilib.img_to_rvector(img)],axis=0)
+			X = np.append(X,[imglib.img_to_rvector(img)],axis=0)
 		k+=1
 
 	return X.T
@@ -53,15 +53,15 @@ def create_image_database_2(folder,p,n,tl):
 			if k in tl:
 				#Used as test Image
 				if Y is None:
-					Y = np.array( [ilib.img_to_rvector(img)] )
+					Y = np.array( [imglib.img_to_rvector(img)] )
 				else:
-					Y = np.append(Y,[ilib.img_to_rvector(img)],axis=0)
+					Y = np.append(Y,[imglib.img_to_rvector(img)],axis=0)
 			else:
 				#Used as Database Image
 				if X is None:
-					X = np.array( [ilib.img_to_rvector(img)] )
+					X = np.array( [imglib.img_to_rvector(img)] )
 				else:
-					X = np.append(X,[ilib.img_to_rvector(img)],axis=0)
+					X = np.append(X,[imglib.img_to_rvector(img)],axis=0)
 			k+=1
 
 	return X.T,Y.T
@@ -92,17 +92,17 @@ def create_image_database_3(folder,n,p_db,p_uk,tl):
 			img = Image.open(f_str)			
 			if k in tl:
 				#Used as test Image
-				vc = np.array( [ilib.img_to_rvector(img)] )
+				vc = np.array( [imglib.img_to_rvector(img)] )
 				rtcl.append( create_rtc(ti=f_str,po=p,ii=k,uk=False) ) 
 
 				if Y is None:
-					Y = np.array( [ilib.img_to_rvector(img)] )
+					Y = np.array( [imglib.img_to_rvector(img)] )
 				else:
-					Y = np.append(Y,[ilib.img_to_rvector(img)],axis=0)				
+					Y = np.append(Y,[imglib.img_to_rvector(img)],axis=0)				
 			else:				
 				#Used as Database Image
 				metadb.append( create_metadb(im=f_str,po=p,ii=k) )
-				img_v = ilib.img_to_rvector(img)
+				img_v = imglib.img_to_rvector(img)
 				if X is None:
 					X = np.array( [img_v] )
 				else:
@@ -128,13 +128,13 @@ def create_image_database_3(folder,n,p_db,p_uk,tl):
 			f_str = "%s/s%d/%d.pgm" % (folder,p,k)
 			img = Image.open(f_str)
 
-			vc = np.array( [ilib.img_to_rvector(img)] )			
+			vc = np.array( [imglib.img_to_rvector(img)] )			
 			rtcl.append( create_rtc(ti=f_str,po=p,ii=k,uk=True) ) 
 
 			if Y is None:
-				Y = np.array( [ilib.img_to_rvector(img)] )
+				Y = np.array( [imglib.img_to_rvector(img)] )
 			else:
-				Y = np.append(Y,[ilib.img_to_rvector(img)],axis=0)							
+				Y = np.append(Y,[imglib.img_to_rvector(img)],axis=0)							
 
 
 	return X.T,Y.T,AVG_X,AVG_Y,metadb,rtcl
@@ -146,58 +146,4 @@ def create_rtc(ti=None,mi=None,po=None,pi=None,ii=None,di=None,uk=None,vc=None):
 def create_metadb(im=None,po=None,ii=None):
 	return {"image_name":im,"person_owner":po,"image_index":ii}
 
-'''
-X has n^4 x n, then C has dimensions n^4 x n^4, and his eigenvector are computed 
-directly from the function find_all_heigen()
-'''
-def build_covariance_matrix(X):
-	n = X.shape[0]
-	if n==0:
-		return
-
-	coef = 1.0/n
-	C = coef*X.dot(X.T)
-
-	return C	
-
-'''
-X has n^4 x n, then C.T has dimensions n x n, and his eigenvector are computed 
-by X multiplied by the return matrix of the function find_all_heigen()
-AVG - Average Image
-'''
-def build_transpose_covariance_matrix(X):
-	n = X.shape[0]
-	if n==0:
-		return
-
-	coef = 1.0/n
-	C = coef*X.T.dot(X)
-
-	return C	
-
-
-def increment_list(factor,divisor,start,end):
-	'''
-		Given a start and end value, this function builds a list l of values such that
-		l[0] = first multiple of divisor after start or start
-		l[i] = first multiple of divisor after (l[i-1]*factor)
-
-		Example: 
-		>> increment_list(2,3,2,48)
-		>> [3,6,9,15,30] /*pivot [2,4,8,16,32]
-
-	'''
-	multiplos = [i*divisor for i in range(0,end/divisor+1)]
-	increment_list=[]
-	pivot = start
-	current_multiplo = int(math.ceil((start*1.0)/divisor))
-	current_multiplo =  current_multiplo if current_multiplo > 0 else 1
-	while current_multiplo < len(multiplos):
-		increment_list.append(multiplos[ current_multiplo ])
-		pivot = pivot*factor				
-		if current_multiplo < int(math.ceil(pivot/divisor)):
-			current_multiplo = int(math.ceil(pivot/divisor))
-		else:
-			current_multiplo+=1
-	return increment_list
 	

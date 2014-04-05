@@ -1,15 +1,18 @@
 #coding:utf-8
 
+import os,pickle,random,requests
+
+import windowgen,config
 from trainning_tools import *
 from detector import *
-import os,pickle,random,requests
+
 
 def init():
 
-	folder_faces = "dataset/lfwcrop_grey/faces"
-	folder_scenes = "dataset/training non-face images"
-	n = 2
-	T = 2
+	folder_faces = "%s/lfwcrop_grey/faces" % (config.DATASET_PATH,)
+	folder_scenes = "%s/training non-face images" % (config.DATASET_PATH,)
+	n = 20
+	T = 4
 
 	n_faces = n
 	n_non_faces = n
@@ -31,8 +34,8 @@ def init():
 		fm.add_image(img_path,FeatureMaster.FACE)
 
 	'''It does the same for the scene images'''
-	for scene_window in get_next_random_image_window(folder_scenes,n):
-		img_path = scene_window.window_img.filename
+	for scene_window in windowgen.get_next_random_image_window(folder_scenes,n):
+		img_path = scene_window.window_img_path
 		non_faces.append(img_path)
 		fm.add_image(img_path,FeatureMaster.NON_FACE)
 
@@ -41,7 +44,7 @@ def init():
 	fc = FeatureChooser((64,64),fm,n_faces,n_non_faces)
 	classifier = fc.find_hypothesis(T)
 
-	with open('classifiers/%s_%d_%d.pk' % ('classifier',n,T),'wb') as output:
+	with open('%s/%s_%d_%d.pk' % (config.CLASSIFIERS_PATH,'classifier',n,T),'wb') as output:
 		pickle.dump(classifier,output,pickle.HIGHEST_PROTOCOL)	
 
 	print "END STAGE 2"
@@ -53,28 +56,26 @@ def init():
 	ref_mask = (8,8)
 
 	shift_step=4
-	fn=SubwindowGenerator.FIXED_FACTOR
+	fn=windowgen.SubwindowGenerator.FIXED_FACTOR
 
 	det = Detector(classifier,ng,ref_ardis,ref_mask,shift_step=shift_step)	
 
 	true=0
 	for i in range(0,n):
-		sw = Subwindow(0,0,(64,64))
-		with open(faces[i],"rb") as img_file:
-			true = true+1 if det.is_face( Image.open(img_file),sw ) else true
+		sw = windowgen.Subwindow(0,0,(64,64))
+		true = true+1 if det.is_face( faces[i],sw ) else true
 
 	print "%d/%d" % (true,n)
 
 	true=0
 	for i in range(0,n):
-		sw = Subwindow(0,0,(64,64))
-		with open(non_faces[i],"rb") as img_file:
-			true = true+1 if det.is_face( Image.open(img_file),sw) else true		
+		sw = windowgen.Subwindow(0,0,(64,64))
+		true = true+1 if det.is_face( non_faces[i],sw) else true		
 
 	print "%d/%d" % (true,n)	
 
 def load_state():
-	return FeatureChooser.find_hypothesis_from_previous_state("classifiers/states/featureChooser_1.pk")
+	return FeatureChooser.find_hypothesis_from_previous_state("%s/featureChooser_3.pk" % (config.STATES_PATH,) )
 
 def send_message(subject,msg):
 	url = "https://mandrillapp.com/api/1.0/messages/send.json"
@@ -90,13 +91,14 @@ def send_message(subject,msg):
 
 	requests.post(url,data)	
 
-
-try:
-	init()
-except Exception as e:
-	send_message("Deu Erro no Algoritmo!!!",e.message)
-	raise e
-else:
-	send_message("O algoritmo terminou de rodar!!!","Corre Lah!!")
+init()
+# load_state()
+# try:
+# 	init()
+# except Exception as e:
+# 	send_message("Deu Erro no Algoritmo!!!",e.message)
+# 	raise e
+# else:
+# 	send_message("O algoritmo terminou de rodar!!!","Corre Lah!!")
 
 # print load_state().hypothesis
