@@ -11,7 +11,7 @@ def init():
 
 	folder_faces = "%s/lfwcrop_grey/faces" % (config.DATASET_PATH,)
 	folder_scenes = "%s/training non-face images" % (config.DATASET_PATH,)
-	n = 200
+	n = 300
 	T = 20
 
 	n_faces = n
@@ -92,12 +92,12 @@ def send_message(subject,msg):
 	requests.post(url,data)	
 
 
-# try:
-# 	init()
-# except Exception as e:
-# 	send_message("Deu Erro no Algoritmo!!!",e.message)
-# 	raise e
-# else:
-# 	send_message("O algoritmo terminou de rodar!!!","Corre Lah!!")
+try:
+	init()
+except Exception as e:
+	send_message("Deu Erro no Algoritmo!!!",e.message)
+	raise e
+else:
+	send_message("O algoritmo terminou de rodar!!!","Corre Lah!!")
 
-print load_state().hypothesis
+# print load_state().hypothesis
