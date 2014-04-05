@@ -12,7 +12,7 @@ def init():
 	folder_faces = "%s/lfwcrop_grey/faces" % (config.DATASET_PATH,)
 	folder_scenes = "%s/training non-face images" % (config.DATASET_PATH,)
 	n = 300
-	T = 20
+	T = 10
 
 	n_faces = n
 	n_non_faces = n
@@ -99,5 +99,6 @@ except Exception as e:
 	raise e
 else:
 	send_message("O algoritmo terminou de rodar!!!","Corre Lah!!")
+	pass
 
 # print load_state().hypothesis

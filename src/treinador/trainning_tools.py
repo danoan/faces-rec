@@ -232,7 +232,6 @@ class FeatureResultSet():
 		s_plus = 0
 		s_minus = 0
 		min_error = (100,0,0)	#Error_Value, Direction, TSF Index
-		tables = [ [],[] ]
 
 		#Backward loop is better in this case
 		for i in range(len(self.all_results_sorted)-1,-1,-1):
@@ -248,43 +247,14 @@ class FeatureResultSet():
 			elif e2<min_error[0]:
 				min_error = (e2,-1,i)
 
-			# print s_plus,self.t_minus(),s_minus,e1,min_error[0]==0,min_error
-			# print s_plus,self.t_minus(),s_minus,e2,min_error[0]==0,min_error
-
 			tsf = self.all_results_sorted[i]
-
-			#TEST PURPOSES
-			if FeatureMaster.TEST:
-				t1_line = (	tsf.image_name(),
-							tsf.filter_value,
-							tsf.label(),
-							self.t_plus(),
-							self.t_minus(),
-							s_plus,
-							s_minus,
-							e1,
-							e1==0)			
-
-				t2_line = (	tsf.image_name(),
-							tsf.filter_value,
-							tsf.label(),
-							self.t_plus(),
-							self.t_minus(),
-							s_plus,
-							s_minus,
-							e2,
-							e2==0)				
-
-				tables[0].append(t1_line)		
-				tables[1].append(t2_line)
 
 			if tsf.is_face():
 				s_plus+=tsf.weight()
 			else:
 				s_minus+=tsf.weight()
-			
-
-		#self.print_table(tables)
+		
+		# print s_plus,self.t_plus(),s_minus,self.t_minus(),min_error
 
 		#Filter_Value, Direction, Error_Value, FeatureMask
 		return ( self.all_results_sorted[ min_error[2] ].filter_value, 
@@ -300,7 +270,7 @@ class FeatureResultSet():
 		t_minus = 0
 		for tsf in best_frs.all_results_sorted:
 
-			if (tsf.filter_value*d) < (t*d):
+			if (tsf.filter_value*d) > (t*d):	#Se esta abaixo da tabela (filtro > threshold), eh classificado como nao-face
 				#Classifica como nao-face
 				if tsf.is_face():
 					#Classificado Incorretamente
