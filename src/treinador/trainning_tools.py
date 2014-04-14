@@ -204,28 +204,23 @@ class FeatureResultSet():
 		FeatureResultSet.t_minus(t_minus)			
 
 	def __init__(self):
-		self.face = []		#List of TrainningSampleFeature labeled as a face
-		self.non_face = []	#list of TrainningSampleFeature labeled as a scene
-
 		self.t_plus = FeatureResultSet.t_plus
 		self.t_minus = FeatureResultSet.t_minus
 
-		#There is no need to store this but tests purposes!!
-		self.errors_dir = []	#Pair with error in both directions
+		self.faces_count = 0
+		self.non_faces_count = 0
 
 		self.all_results_sorted = []
 
 	def add_item(self,item):
+		self.all_results_sorted.append(item)
+
 		if item.is_face():
-			self.face.append(item)
+			self.faces_count+=1
 		else:
-			self.non_face.append(item)	
+			self.non_faces_count+=1
 
 	def sort(self):
-		self.all_results_sorted.extend( self.face )
-		self.all_results_sorted.extend( self.non_face )
-		self.faces_count = len(self.face)
-		self.non_faces_count = len(self.non_face)
 		self.all_results_sorted.sort()		
 
 	def prepare_tables(self):
