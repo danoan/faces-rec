@@ -293,7 +293,6 @@ class FeatureResultSet():
 
 			tsf.weight(new_weight)
 
-		"NORMALIZATION"
 		norma=0
 		for tsf in best_frs.all_results_sorted:	
 			if tsf.is_face():
@@ -303,7 +302,7 @@ class FeatureResultSet():
 
 			norma+=tsf.weight()
 
-		print "NORMAL", norma,t_plus,t_minus,(t_plus+t_minus)
+		print "NORMA: %.4f \n T_PLUS: %.4f \n T_MINUS: %.4f \n T_PLUS+T_MINUS: %.4f" % (norma,t_plus,t_minus,(t_plus+t_minus))
 		self.t_plus(t_plus/(t_plus+t_minus))
 		self.t_minus(t_minus/(t_plus+t_minus))
 
@@ -328,6 +327,8 @@ class FeatureChooser():
 		self._fm = fm
 		self._initial_weight_faces = 1.0/(n_faces+n_non_faces)
 		self._initial_weight_non_faces = 1.0/(n_faces+n_non_faces)
+		self._n_faces = n_faces
+		self._state_prefix_name = "featureChooser_%d" % (n_faces,)
 
 		print self._initial_weight_faces, self._initial_weight_non_faces
 
@@ -366,7 +367,7 @@ class FeatureChooser():
 			e_t = best_threshold[2]
 			b_t = (e_t)/(1-e_t)
 
-			print T,e_t,b_t
+			print "IT: %d \n E_T: %.4f \n B_T: %.4f" % (cur_T,e_t,b_t)
 			if b_t <= 1e-8:
 				a_t = math.log( 1.0/(1e-8) )
 			else:				
@@ -387,7 +388,7 @@ class FeatureChooser():
 			if cur_T%3==0:
 				self.__save_state(cur_T,fc,max_alpha,T)
 
-				with open('%s/%s_(%d-%d).pk' % (config.CLASSIFIERS_PATH,'classifier',cur_T,T),'wb') as output:
+				with open('%s/%s_%d_(%d-%d).pk' % (config.CLASSIFIERS_PATH,'classifier',self._n_faces,cur_T,T),'wb') as output:
 					fc.final=True
 					pickle.dump(fc,output,pickle.HIGHEST_PROTOCOL)									
 					fc.final=False
@@ -421,7 +422,7 @@ class FeatureChooser():
 					 max_alpha,
 					 T)
 
-		with open("%s/featureChooser_%d.pk" % (config.STATES_PATH,cur_T,), "wb") as output:
+		with open("%s/%s_%d.pk" % (config.STATES_PATH,self._state_prefix_name,cur_T,), "wb") as output:
 			pickle.dump(state_obj,output,pickle.HIGHEST_PROTOCOL)			
 
 
@@ -504,7 +505,7 @@ class FinalClassifier():
 			sa+= a
 
 		# print sx,sa*0.5
-		if sx>=(0.5*sa):
+		if sx>=(0.75*sa):
 			return True
 		else:
 			return False

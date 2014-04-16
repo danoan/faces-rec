@@ -13,17 +13,17 @@ folder_scenes = "%s/training non-face images"  % (config.DATASET_PATH,)
 folder_test_img = "%s/test_images"  % (config.DATASET_PATH,)
 
 classifier = None
-with open('%s/%s' % (config.CLASSIFIERS_PATH,'classifier_2_2.pk'),'rb') as input:
+with open('%s/%s' % (config.CLASSIFIERS_PATH,'classifier_3500_(54-100).pk'),'rb') as input:
 	classifier = pickle.load(input)
 
 print classifier.hypothesis
 
 #Creating the Detector
-ng = 4
+ng = 6
 ref_ardis = (64,64)
 ref_mask = (8,8)
 
-shift_step=4
+shift_step=1
 fn=windowgen.SubwindowGenerator.FIXED_FACTOR
 
 det = Detector(classifier,ng,ref_ardis,ref_mask,shift_step=shift_step,fn=fn)	

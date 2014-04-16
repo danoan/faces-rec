@@ -11,8 +11,8 @@ def init():
 
 	folder_faces = "%s/lfwcrop_grey/faces" % (config.DATASET_PATH,)
 	folder_scenes = "%s/training non-face images" % (config.DATASET_PATH,)
-	n = 300
-	T = 10
+	n = 3500
+	T = 100
 
 	n_faces = n
 	n_non_faces = n
