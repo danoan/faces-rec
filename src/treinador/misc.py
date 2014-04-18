@@ -115,7 +115,6 @@ class IntegralImage():
 
 		return abs(black_sum-white_sum)			
 
-
 def increment_list(factor,divisor,start,end):
 	'''
 		Given a start and end value, this function builds a list l of values such that

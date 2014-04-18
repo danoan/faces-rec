@@ -500,7 +500,7 @@ class FinalClassifier():
 			sa+= a
 
 		# print sx,sa*0.5
-		if sx>=(0.75*sa):
+		if sx>=(0.5*sa):
 			return True
 		else:
 			return False
