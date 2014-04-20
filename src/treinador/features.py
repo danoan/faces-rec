@@ -442,7 +442,6 @@ class FeatureMask():
 		return self.mask.size	
 
 	def make_mask(self):
-		print "MAKE MASK"
 		if self.__hard_coded_mask!=None:
 			return self.__hard_coded_mask
 
@@ -478,7 +477,6 @@ class FeatureMask():
 		# print "NEW LOCATION ", self.location, self.size,subwindow.x
 
 	def __make_block(self,built_mask,block,color):
-		print "MAKE BLOCK"
 		block_w_start = block[0][1]
 		block_w_end = block[1][1]
 

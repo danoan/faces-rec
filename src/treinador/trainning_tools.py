@@ -85,7 +85,6 @@ class FeatureMaster():
 		Class who will run the filter operations related to a TrainningSampleFeature and all the possible existing 
 		FeatureMask accordingly with the ardis and shifts.
 	'''
-	TEST=False
 	TS_SET = []
 	NON_FACE = -1
 	FACE = 1
@@ -98,7 +97,7 @@ class FeatureMaster():
 	def tsi_collection():
 		return FeatureMaster.TS_SET
 
-	def __init__(self,ardis,shift_w,shift_h,resize_factor,start_w,start_h):
+	def __init__(self,ardis,shift_w,shift_h,resize_factor,start_w,start_h,test=False):
 		self.ardis = ardis
 		self.shift_w=shift_w
 		self.shift_h=shift_h
@@ -116,6 +115,7 @@ class FeatureMaster():
 		self.mdf = MaskDiagonalFactory(self.ardis,self.shift_w,self.shift_h,self.resize_factor,self.start_w,self.start_h)
 
 		#Test purposes
+		self.__test__ = test
 		self.m2h_values = []
 		self.m2v_values = []
 		self.m3h_values = []
@@ -128,7 +128,7 @@ class FeatureMaster():
 
 	def after_filter(self,tsi_index,fm,filter_value,filter_list):
 		self.feature_number+=1
-		if FeatureMaster.TEST:
+		if self.__test__:
 			filter_list.append(filter_value) 
 		return TrainningSampleFeature(tsi_index,self.feature_type,self.feature_number,filter_value,fm)
 
@@ -233,9 +233,6 @@ class FeatureResultSet():
 			e1 = s_plus + (self.t_minus() - s_minus)	#Everything below is a non-face			
 			e2 = s_minus + (self.t_plus() - s_plus)		#Everything below is a face
 			
-			
-			if FeatureMaster.TEST:
-				self.errors_dir.append( (e1,e2) )
 
 			if e1<min_error[0]:
 				min_error = (e1,1,i)
@@ -482,10 +479,11 @@ class FinalClassifier():
 	def set_image(self,img_path):
 		self.ii = misc.IntegralImage(img_path)
 
-	def __is_face(self,subwindow,tsf=None):
+	def __is_face(self,subwindow,tsf=None,ac=0.5):
 		#tsf is used only with partial classifiers.
 		sx=0
 		sa=0
+
 		for h in self.hypothesis:			
 			t = h[0]	#threshold
 			d = h[1]	#direction
@@ -499,17 +497,16 @@ class FinalClassifier():
 				sx+= a*self.h_function(tsf.filter(f),d,t)
 			sa+= a
 
-		# print sx,sa*0.5
-		if sx>=(0.5*sa):
+		if sx>=(ac*sa):
 			return True
 		else:
 			return False
 
 	def is_face(self,*args,**kwargs):
 		if not self.final:
-			return self.__is_face(None,tsf=kwargs["tsf"])
+			return self.__is_face(None,**kwargs)
 		else:
-			return self.__is_face(args[0])
+			return self.__is_face(*args,**kwargs)
 
 
 #FEATURE MASTER

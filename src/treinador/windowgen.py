@@ -158,15 +158,14 @@ class SubwindowGenerator():
 
 	@staticmethod
 	def fixed_factor(ng,tg,ce0,cef,wr):
-		factor = 1.25
+		factor = ce0*math.pow(1.25,ng)
 		if factor>cef:
 			factor=cef
-		return ce0*math.pow(1.25,ng)
+		return factor
 
 	@staticmethod
 	def dynamic_factor(ng,tg,ce0,cef,wr):
 		factor = (cef - ce0)/(tg*1.0)
-		print ce0 + factor*ng
 		return ce0 + factor*ng		
 
 	FIXED_FACTOR = fixed_factor
@@ -183,8 +182,12 @@ class SubwindowGenerator():
 		self.ce0 = self.__initial_scale_coef(ref_ardis,ref_mask,min_mask)
 		self.ce_max = self.__max_scale_coef()
 		
-
 	def __discover_min_mask(self,masks):
+		'''
+			Each FeatureMask has a minimum size to work. For example. TwoHorizontalMask
+			should be at least 2x2 and ThreeHorizontalMask should be at least 2x3.
+			This discovers the minimum mask that accomplishes all the Features.
+		'''
 		min_mask = [0,0]
 		
 		for m in masks:
@@ -196,15 +199,29 @@ class SubwindowGenerator():
 		return (min_mask[0],min_mask[1])
 
 	def __initial_scale_coef(self,ref_ardis,ref_mask,min_mask):
-		mask_coef = math.floor( 	max( ref_mask[0]/min_mask[0],
-				  				    		  ref_mask[1]/min_mask[1] )
-				  			  )
-		return 1.0/mask_coef
+		'''
+			All the features compute windows starting at 8x8 inside a 64x64. However, the subwindows
+			generated for a random image, could generate windows of 4x4, for example, because it is 
+			using the minimum_mask value. A better approach would be to choose the minimum generated
+			subwindow based on the size of the image, lets say 10%. For example, a image of 640x480 
+			starts detecting subwindows that have, 64x48
+		'''
+		# mask_coef = math.floor( 	max( ref_mask[0]/min_mask[0],
+		# 		  				    	 ref_mask[1]/min_mask[1] )
+		# 		  			  )
+
+		# return 1.0/mask_coef
+				
+		mask_coef = min( (self.img_size[0]*0.2)/self.wr[0],
+  				    	 (self.img_size[1]*0.2)/self.wr[1] )
+
+		#I can't have mask_coef<0.5, because this implies masks littler than tha minimum
+		return max(mask_coef,0.5)
 
 	def __max_scale_coef(self):
-		img_coef = math.floor(	min( self.img_size[0]/self.wr[0], 
-							  			  self.img_size[1]/self.wr[1] )
-						     )
+		img_coef = min(	self.img_size[0]/self.wr[0], 
+	  			  		self.img_size[1]/self.wr[1] )
+
 		return img_coef
 
 	def generate_subwindows(self,ng,fn):
@@ -213,23 +230,27 @@ class SubwindowGenerator():
 		subwindows = []
 		while cur_ng<ng:
 			ce = fn(cur_ng,ng,self.ce0,self.ce_max,self.wr)
+			# print "SUBW ",ce
 
 			subwindow_size = Subwindow.size(self.wr,ce)
-
 			if subwindow_size[0] > self.img_size[0] or subwindow_size[1] > self.img_size[1]:
 				break
 			
-			max_y_pos = self.img_size[1] - subwindow_size[1]
-			max_x_pos = self.img_size[0] - subwindow_size[1]
-
-			# print max_x_pos,max_y_pos
+			max_y_pos = self.img_size[1] - subwindow_size[1] +1
+			max_x_pos = self.img_size[0] - subwindow_size[1] +1
 
 			for y in range(0,max_y_pos,self.shift_step):
 				for x in range(0,max_x_pos,self.shift_step):
 					subwindows.append( Subwindow(x,y,self.wr,ce,cur_ng) )
 					# print "COORD: ",x,y
 
+			# print ce
+			if ce==self.ce_max:
+				break
+
 			cur_ng+=1
+
+		# print len(subwindows),self.ce0, self.ce_max
 
 		return subwindows
 
