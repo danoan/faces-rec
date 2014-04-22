@@ -70,12 +70,16 @@ def li_non_faces_validation(n):
 	return li_list	
 
 def li1():
-	li = LabeledImage("%s/%s" % (config.TEST_IMG_PATH,"1.pgm"))
+	li = LabeledImage("%s/%s" % (config.TEST_IMG_PATH,"seinfeld.pgm"))
 	li.label_face( (68,89,142,170) )
 	li.label_face( (188,129,267,210) )
 	li.label_face( (284,177,365,257) )
 	li.label_face( (367,130,453,215) )
 	return li
+
+def li2():
+	li = LabeledImage("%s/%s" % (config.TEST_IMG_PATH,"seinfeld_384_288.pgm"))
+	return li	
 
 def li4():
 	li = LabeledImage("%s/%s" % (config.TEST_IMG_PATH,"4.pgm"))

@@ -1,7 +1,7 @@
 #! usr/bin/python
 #coding:utf-8
 
-import Image,ImageDraw,math
+import Image,ImageDraw,math,time
 
 import windowgen
 from features import *
@@ -46,7 +46,7 @@ class Detector():
 
 	def is_face(self,img_path,sw):
 		self.classifier.set_image(img_path)
-		return self.classifier.is_face(sw)
+		return self.classifier.is_face(sw,ac=self.ac)
 
 
 class DetectorReport():
@@ -90,7 +90,6 @@ class DetectorReport():
 	def show_image(self):
 		img_display = Image.open(self.labeled_img.image_filepath()).convert("RGB")
 		draw = ImageDraw.Draw(img_display) 
-
 		for b in self.faces_boxes:
 			draw.rectangle( b,outline=(0,255,0) )
 		

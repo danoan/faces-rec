@@ -3,7 +3,6 @@
 import misc,copy,math
 import numpy as np
 
-
 di8 = np.dtype('int8')
 
 class FMF():
@@ -400,14 +399,25 @@ class Mask():
 	def __init__(self,size,mf):
 		self.white = []
 		self.black = []	
+		self.c_args = []
 		self.size = size
 		self.mf = mf 	#FactoryMask
 
 	def add_white(self,block):
 		self.white.append(block)
+		self.c_args.extend( [block.points[0][0],block.points[0][1],
+							  block.points[1][0],block.points[1][1],
+							  block.points[2][0],block.points[2][1],
+							  block.points[3][0],block.points[3][1],
+							  block.w,block.h] )
 
 	def add_black(self,block):
 		self.black.append(block)		
+		self.c_args.extend( [block.points[0][0],block.points[0][1],
+							  block.points[1][0],block.points[1][1],
+							  block.points[2][0],block.points[2][1],
+							  block.points[3][0],block.points[3][1],
+							  block.w,block.h] )
 
 	def rescale(self,ce,original_size):
 		new_h = int(round(original_size[misc.HEIGHT]*ce))

@@ -1,10 +1,12 @@
 #coding:utf-8
 
+import time
 import numpy as np
 import math
 import Image,os,pickle
 
 import misc,config
+import integral_image as testII
 from features import *
 
 class TrainningSampleImage():
@@ -18,7 +20,8 @@ class TrainningSampleImage():
 		self.img_filename = img_path.split(os.path.sep)[-1]		
 		self.label = label
 
-		self.ii = misc.IntegralImage(img_path)
+		# self.ii = misc.IntegralImage(img_path)
+		testII.setImage(img_path)
 
 		#Variables used for the minimization problem of finding the best feature.
 		self.__weight = 0
@@ -30,7 +33,8 @@ class TrainningSampleImage():
 			self.__weight=w
 
 	def filter(self,fm):
-		return self.ii.filter(fm)
+		# return self.ii.filter(fm)
+		return testII.integral(fm.location[1],fm.location[0],len(fm.mask.white),len(fm.mask.black),*fm.mask.c_args)		
 
 	def is_face(self):
 		return self.label==FeatureMaster.FACE
@@ -477,13 +481,15 @@ class FinalClassifier():
 			return 0
 
 	def set_image(self,img_path):
-		self.ii = misc.IntegralImage(img_path)
+		# self.ii = misc.IntegralImage(img_path)
+		testII.setImage(img_path)
 
 	def __is_face(self,subwindow,tsf=None,ac=0.5):
 		#tsf is used only with partial classifiers.
 		sx=0
 		sa=0
 
+		
 		for h in self.hypothesis:			
 			t = h[0]	#threshold
 			d = h[1]	#direction
@@ -491,11 +497,16 @@ class FinalClassifier():
 			a = h[4]	#alpha
 
 			if self.final:
-				f.adjust_mask(subwindow)
-				sx+= a*self.h_function(self.ii.filter(f),d,t)
+				# ii_time = time.time()
+				f.adjust_mask(subwindow)				
+				# print time.time() - ii_time
+				# sx+= a*self.h_function(self.ii.filter(f),d,t)			
+				sx+= a*self.h_function(testII.integral(f.location[1],f.location[0],len(f.mask.white),len(f.mask.black),*f.mask.c_args),d,t)
 			else:
 				sx+= a*self.h_function(tsf.filter(f),d,t)
 			sa+= a
+
+		
 
 		if sx>=(ac*sa):
 			return True

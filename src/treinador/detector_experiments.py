@@ -1,6 +1,6 @@
 #coding:utf-8
 
-import os,pickle,random
+import os,pickle,random,time
 from multiprocessing import Process, Pipe, Pool
 
 import windowgen,config
@@ -9,24 +9,34 @@ from detector import *
 import labeled_images,analyser
 import numpy as np
 
+def standard_detector():
+	classifier_filepath = '3500/new_classifier_3500_(3-100).pk'
+	n_gen = 6
+	ref_ardis = (64,64)
+	ref_mask = (8,8)
+	ss=1
+	window_strategy=windowgen.SubwindowGenerator.FIXED_FACTOR
+
+	with open('%s/%s' % (config.CLASSIFIERS_PATH,classifier_filepath),'rb') as input:
+		classifier = pickle.load(input)
+
+	det = Detector(classifier,n_gen,ref_ardis,ref_mask,shift_step=ss,fn=window_strategy,ac=0.5)				
+
+	return det
+
 class Experiment():	
-	def setup(self):
-		classifier_filepath = '3500/classifier_3500_(69-100).pk'
-		n_gen = 6
-		ref_ardis = (64,64)
-		ref_mask = (8,8)
-		ss=1
-		window_strategy=windowgen.SubwindowGenerator.FIXED_FACTOR
-
-		with open('%s/%s' % (config.CLASSIFIERS_PATH,classifier_filepath),'rb') as input:
-			classifier = pickle.load(input)
-
-		self.det = Detector(classifier,n_gen,ref_ardis,ref_mask,shift_step=ss,fn=window_strategy,ac=0.68)			
+	def setup(self,title):
+		self.time = 0
+		self.title = title
 
 		return self
 
 	def run(self):
-		pass
+		self.time = time.time()
+
+	def stop(self):
+		self.time = time.time() - self.time
+		print "END %s: %s" % (self.title,self.time)
 
 
 class Experiment1(Experiment):
@@ -35,12 +45,17 @@ class Experiment1(Experiment):
 	'''
 
 	def setup(self):
-		return Experiment.setup(self)
+		Experiment.setup(self,"Experiment1")
+		self.det = standard_detector()
+		return self
 
 	def run(self):
-		li = labeled_images.liKramer()
+		Experiment.run(self)
+		li = labeled_images.li2()
 		dr = DetectorReport(li,"EXPERIMENT 1")
-		return self.det.detect_faces(li.image_filepath(),dr)
+		ret = self.det.detect_faces(li.image_filepath(),dr)
+		self.stop()
+		return ret
 
 class Experiment2(Experiment):
 	'''
@@ -48,12 +63,15 @@ class Experiment2(Experiment):
 	'''
 
 	def setup(self):
-		Experiment.setup(self)
-		self.n_img = 10000
+		Experiment.setup(self,"Experiment2")
+		self.n_img = 1000
+		self.det = standard_detector()
 		return self
 
 	def run(self):
-		face_filenames = random.sample(os.listdir(config.FACES_PATH),self.n_img)
+		Experiment.run(self)
+		# face_filenames = random.sample(os.listdir(config.FACES_PATH),self.n_img)
+		face_filenames = os.listdir(config.FACES_PATH)[:self.n_img]
 
 		sw = windowgen.Subwindow(0,0,(64,64))
 
@@ -65,11 +83,13 @@ class Experiment2(Experiment):
 		print "%d/%d" % (true,self.n_img)
 
 		true=0
-		for scene_window in windowgen.get_next_random_image_window(config.SCENES_PATH,self.n_img):
+		for scene_window in windowgen.get_next_random_image_window(config.SCENES_PATH_VALIDATION,self.n_img):
 			img_path = scene_window.window_img_path
 			true = true+1 if self.det.is_face(img_path,sw) else true		
 
 		print "%d/%d" % (true,self.n_img)			
+
+		self.stop()
 
 
 class Experiment3(Experiment):
@@ -84,6 +104,7 @@ class Experiment3(Experiment):
 	'''
 
 	def setup(self):
+		Experiment.setup(self,"Experiment3")
 		self.n_gen = 6
 		self.ref_ardis = (64,64)
 		self.ref_mask = (8,8)
@@ -148,6 +169,7 @@ class Experiment3(Experiment):
 		self.anal.close_item()
 		
 	def run(self):
+		Experiment.run(self)
 		callback = self.update_analyser
 
 		procs = []
@@ -183,6 +205,7 @@ class Experiment3(Experiment):
 
 
 		self.join_and_free(procs,callback,pconn)
+		self.stop()
 
 class Experiment4(Experiment):
 	'''
@@ -198,6 +221,8 @@ class Experiment4(Experiment):
 	'''
 
 	def setup(self):
+		Experiment.setup(self,"Experiment4")
+
 		self.n_gen = 4
 		self.ref_ardis = (64,64)
 		self.ref_mask = (8,8)
@@ -205,15 +230,15 @@ class Experiment4(Experiment):
 		def fixed_factor(*args,**kwargs):
 			return 1.0
 
-		self.classifiers_files = os.listdir(config.CLASSIFIERS_3500_PATH)
-		# self.classifiers_files = ["classifier_3500_(30-100).pk","classifier_3500_(33-100).pk"]
+		# self.classifiers_files = os.listdir(config.CLASSIFIERS_3500_PATH)
+		self.classifiers_files = ["classifier_3500_(3-100).pk"]
 		self.ss_range = [1]
 		self.ws_range = [fixed_factor]
 		self.ac_range = np.linspace(0.5,1.0,25)
 
-		self.li_list = []
-		self.li_list.extend(labeled_images.li_faces(1000))
-		self.li_list.extend(labeled_images.li_non_faces(1000))
+		self.li_list = [labeled_images.li2(),labeled_images.liKramer(),labeled_images.liJerry(),labeled_images.liElaine()]
+		# self.li_list.extend(labeled_images.li_faces(1000))
+		# self.li_list.extend(labeled_images.li_non_faces(1000))
 
 		self.min_error = 1e6
 		self.min_error_ac = None
@@ -295,6 +320,7 @@ class Experiment4(Experiment):
 		self.min_error_ac = None		
 		
 	def run(self):
+		Experiment.run(self)
 		callback = self.update_analyser
 
 		procs = []
@@ -332,6 +358,7 @@ class Experiment4(Experiment):
 		self.join_and_free(procs,callback,pconn)
 		self.error_anal.display_results()
 		print self.error_anal.data()
+		self.stop()
 
 
 
@@ -349,6 +376,7 @@ class Experiment5(Experiment):
 	'''
 
 	def setup(self):
+		Experiment.setup(self,"Experiment5")
 		self.n_gen = 4
 		self.ref_ardis = (64,64)
 		self.ref_mask = (8,8)
@@ -446,6 +474,7 @@ class Experiment5(Experiment):
 		self.min_error_ac = None		
 		
 	def run(self):
+		Experiment.run(self)
 		callback = self.update_analyser
 
 		procs = []
@@ -483,16 +512,17 @@ class Experiment5(Experiment):
 		self.join_and_free(procs,callback,pconn)
 		self.error_anal.display_results()
 		print self.error_anal.data()
-
+		self.stop()
 
 
 if __name__=="__main__":
 	# r1 = Experiment1().setup().run()
+	# print r1
 	# r1.show_image()
-	# # print Experiment2().setup().run()
+	# print Experiment2().setup().run()
 	# Experiment3().setup().run()
-	# Experiment4().setup().run()
-	Experiment5().setup().run()
+	Experiment4().setup().run()
+	# Experiment5().setup().run()
 
 
 
