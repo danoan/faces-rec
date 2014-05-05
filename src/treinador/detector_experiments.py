@@ -10,8 +10,8 @@ import labeled_images,analyser
 import numpy as np
 
 def standard_detector():
-	classifier_filepath = '3500/new_classifier_3500_(3-100).pk'
-	n_gen = 6
+	classifier_filepath = '3500/classifier_3500_(3-100).pk'
+	n_gen = 5
 	ref_ardis = (64,64)
 	ref_mask = (8,8)
 	ss=1
@@ -51,7 +51,7 @@ class Experiment1(Experiment):
 
 	def run(self):
 		Experiment.run(self)
-		li = labeled_images.li2()
+		li = labeled_images.liK1()
 		dr = DetectorReport(li,"EXPERIMENT 1")
 		ret = self.det.detect_faces(li.image_filepath(),dr)
 		self.stop()
@@ -516,12 +516,12 @@ class Experiment5(Experiment):
 
 
 if __name__=="__main__":
-	# r1 = Experiment1().setup().run()
-	# print r1
+	r1 = Experiment1().setup().run()
+	print r1
 	# r1.show_image()
 	# print Experiment2().setup().run()
 	# Experiment3().setup().run()
-	Experiment4().setup().run()
+	# Experiment4().setup().run()
 	# Experiment5().setup().run()
 
 

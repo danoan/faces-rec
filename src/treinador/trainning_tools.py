@@ -148,24 +148,29 @@ class FeatureMaster():
 
 	def get_next_frs(self):	
 		self.feature_type = 0
-		for frs,count in self.__get_frs_by_mask(self.m2hf,self.m2h_values):
+		for frs,count in self.__get_frs_by_mask(self.m2hf,self.m2h_values):			
 			yield frs
+		print "M2H %d" % (count,)
 
 		self.feature_type = 1
 		for frs,count in self.__get_frs_by_mask(self.m2vf,self.m2v_values):
 			yield frs
+		print "M2V %d" % (count,)
 
 		self.feature_type = 2
 		for frs,count in self.__get_frs_by_mask(self.m3hf,self.m3h_values):
 			yield frs
+		print "M3H %d" % (count,)			
 
 		self.feature_type = 3
 		for frs,count in self.__get_frs_by_mask(self.m3vf,self.m3v_values):
 			yield frs
+		print "M3V %d" % (count,)
 
 		self.feature_type = 4
 		for frs,count in self.__get_frs_by_mask(self.mdf,self.md_values):
 			yield frs
+		print "MD %d" % (count,)
 
 class FeatureResultSet():
 	'''
@@ -507,7 +512,7 @@ class FinalClassifier():
 			sa+= a
 
 		
-
+		# print sx, subwindow.y, subwindow.x, subwindow.size
 		if sx>=(ac*sa):
 			return True
 		else:

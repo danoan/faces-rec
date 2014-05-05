@@ -6,6 +6,12 @@ import windowgen,config
 from trainning_tools import *
 from detector import *
 
+def silly_test():
+	FeatureMaster.init_training_set()
+	fm = FeatureMaster((10,10),1,1,1.25,8,8)
+
+	for i in fm.get_next_frs():
+		pass
 
 def init():
 
@@ -91,14 +97,15 @@ def send_message(subject,msg):
 
 	requests.post(url,data)	
 
+silly_test()
 
-try:
-	init()
-except Exception as e:
-	send_message("Deu Erro no Algoritmo!!!",e.message)
-	raise e
-else:
-	send_message("O algoritmo terminou de rodar!!!","Corre Lah!!")
-	pass
+# try:
+# 	init()
+# except Exception as e:
+# 	send_message("Deu Erro no Algoritmo!!!",e.message)
+# 	raise e
+# else:
+# 	send_message("O algoritmo terminou de rodar!!!","Corre Lah!!")
+# 	pass
 
 # print load_state().hypothesis

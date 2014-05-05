@@ -1,7 +1,6 @@
 #include <Python.h>
 #include <sys/time.h>
 #include <wand/MagickWand.h>
-#include <sys/time.h>
 
 #define NDEBUG
 #include <assert.h>

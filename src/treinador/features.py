@@ -251,7 +251,7 @@ class MaskThreeVerticalFactory(FMF):
 	def __init__(self,ardis,shift_w=1,shift_h=1,resize_factor=1,w=2,h=3):
 		#h must be divisible by 3
 		if h%3!=0:
-			h+= 3-w%3		
+			h+= 3-h%3		
 		FMF.__init__(self,ardis,shift_w,shift_h,resize_factor,w,h,resize_w_step=1,resize_h_step=3)	
 
 	def _create_mask(self,size):
@@ -336,6 +336,8 @@ class MaskDiagonalFactory(FMF):
 
 		for i in width_list:
 			size = (i,i)
+			self._w = i
+			self._h = i
 			yield self._create_mask(size)
 
 		self._w = original_w
@@ -483,8 +485,8 @@ class FeatureMask():
 
 		#Mask Rescale
 		self.mask = self.mask.rescale(subwindow.ce,self.__original_size)
-		#print "ORIGINAL",self.__original_mask.white[0].w
-		# print "NEW LOCATION ", self.location, self.size,subwindow.x
+
+		# print subwindow.ce, self.location, self.mask.size
 
 	def __make_block(self,built_mask,block,color):
 		block_w_start = block[0][1]
