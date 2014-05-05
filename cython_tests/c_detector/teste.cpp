@@ -127,7 +127,7 @@ void teste_deteccao(Classifier cl,std::string img_filename){
 
 
 int main(int argc, char* argv[]){
-	std::string cl_filename = "/home/daniel/Projects/faces-rec/classifiers/3500/novos/classifier_3500_(99-100).pk";
+	std::string cl_filename = "/home/daniel/Projects/faces-rec/classifiers/3500/novos/classifier_3500_(3-100).pk";
 	std::string img_filename = "/home/daniel/Projects/faces-rec/dataset/test_images/kramer1.pgm" ;
 
 	C_Classifier c_cl = loadC_Classifier(cl_filename.c_str());	

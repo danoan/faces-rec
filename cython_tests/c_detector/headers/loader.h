@@ -2,13 +2,14 @@
 #include <stdlib.h>
 
 #include "c_basic.h"
+#include "c_loader.h"
 #include "basic.h"
 #include "classifier.h"
 
 Classifier load_Classifier(const char* filename);
 
-C_Classifier loadC_Classifier(const char* filename);
-void printC_Block(C_Block* b, ulong len);
-void printC_FeatureMask(C_FeatureMask fm);
-void printC_Hypothesy(C_Hypothesy h);
-void printC_Classifier(C_Classifier cl);
+Point cppPoint(C_Point cp);
+void cppAddBlocks(C_Block* c_blocks, ulong c_len, Mask* m, int blockType);
+
+
+

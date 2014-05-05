@@ -1,15 +1,14 @@
 #coding:utf-8
 
 import pickle,os
-import c_converter as cc
-import c_loader as cl
+import pyToCClassifier as cc
 
 def test_converter():
 	cc.init( True, [23,24], 2)
 
 	cc.init_hypothesis( 100,200,300 )
 	cc.init_feature( (400,500) )
-	cc.init_mask( (600,700),2,2 )
+	cc.init_mask( "MaskTwoHorizontalFactory", (600,700),2,2 )
 	cc.add_block("white",[1,1,2,2,3,3,4,4,10,20])
 	cc.add_block("white",[5,5,6,6,7,7,8,8,30,40])
 	cc.add_block("black",[9,9,10,10,11,11,12,12,50,60])
@@ -20,7 +19,7 @@ def test_converter():
 
 	cc.init_hypothesis( 100,200,300 )
 	cc.init_feature( (400,500) )
-	cc.init_mask( (600,700),2,2 )
+	cc.init_mask( "MaskTwoHorizontalFactory", (600,700),2,2 )
 	cc.add_block("white",[1,1,2,2,3,3,4,4,10,20])
 	cc.add_block("white",[5,5,6,6,7,7,8,8,30,40])
 	cc.add_block("black",[9,9,10,10,11,11,12,12,50,60])
@@ -29,7 +28,7 @@ def test_converter():
 	cc.close_feature();
 	cc.close_hypothesis();	
 
-	cc.close_classifier("3500_cl");	
+	cc.close_classifier("/home/daniel/Projects/faces-rec/cython_tests/c_detector/pyToC/3500_teste_cl");	
 
 def add_block(block_type,bw):
 	args = []
@@ -70,65 +69,64 @@ def convert_classifier(filenamePy,filenameC):
 	cc.close_classifier(filenameC)
 
 def compare_classifiers(filenamePy,filenameC):
-	cl.load_classifier(filenameC)
+	cc.load_classifier(filenameC)
 	py_classifier = None
 	with open(filenamePy,"rb") as input:
 		py_classifier = pickle.load(input)
 
-	assert cl.get_attribute("FINAL")==(1 if py_classifier.final else 0) 
-	assert cl.get_attribute("ARDIS")[0]==py_classifier.ardis[0]
-	assert cl.get_attribute("ARDIS")[1]==py_classifier.ardis[1]
+	assert cc.get_attribute("FINAL")==(1 if py_classifier.final else 0) 
+	assert cc.get_attribute("ARDIS")[0]==py_classifier.ardis[0]
+	assert cc.get_attribute("ARDIS")[1]==py_classifier.ardis[1]
 
 	for i in range(0,len(py_classifier.hypothesis)):
 		h = py_classifier.hypothesis[i]
 		fm = h[3]
 
-		assert cl.get_attribute("THRESHOLD",i)==h[0]
-		assert cl.get_attribute("DIRECTION",i)==h[1]
-		assert cl.get_attribute("ALPHA",i)==h[4]
+		assert cc.get_attribute("THRESHOLD",i)==h[0]
+		assert cc.get_attribute("DIRECTION",i)==h[1]
+		assert cc.get_attribute("ALPHA",i)==h[4]
 
-		assert cl.get_attribute("ORIGINAL_LOCATION",i)[0]==fm.location[0]
-		assert cl.get_attribute("ORIGINAL_LOCATION",i)[1]==fm.location[1]
+		assert cc.get_attribute("ORIGINAL_LOCATION",i)[0]==fm.location[0]
+		assert cc.get_attribute("ORIGINAL_LOCATION",i)[1]==fm.location[1]
 
-		assert cl.get_attribute("ORIGINAL_SIZE",i)[0]==fm.size[0]
-		assert cl.get_attribute("ORIGINAL_SIZE",i)[1]==fm.size[1]
+		assert cc.get_attribute("ORIGINAL_SIZE",i)[0]==fm.size[0]
+		assert cc.get_attribute("ORIGINAL_SIZE",i)[1]==fm.size[1]
 
-		assert cl.get_attribute("LOCATION",i)[0]==fm.location[0]
-		assert cl.get_attribute("LOCATION",i)[1]==fm.location[1]
+		assert cc.get_attribute("LOCATION",i)[0]==fm.location[0]
+		assert cc.get_attribute("LOCATION",i)[1]==fm.location[1]
 
 		for bw in range(0,len(fm.mask.white)):			
-			points = cl.get_attribute("WHITE_POINTS",i,bw)			
+			points = cc.get_attribute("WHITE_POINTS",i,bw)			
 
 			for k in range(0,4):				
 				assert points[k*2]==fm.mask.white[bw].points[k][0]
 				assert points[k*2+1]==fm.mask.white[bw].points[k][1]
 
-			assert cl.get_attribute("WHITE_W",i,bw)==fm.mask.white[bw].w
-			assert cl.get_attribute("WHITE_H",i,bw)==fm.mask.white[bw].h
+			assert cc.get_attribute("WHITE_W",i,bw)==fm.mask.white[bw].w
+			assert cc.get_attribute("WHITE_H",i,bw)==fm.mask.white[bw].h
 
 
 		for bb in range(0,len(fm.mask.black)):			
-			points = cl.get_attribute("BLACK_POINTS",i,bb)			
+			points = cc.get_attribute("BLACK_POINTS",i,bb)			
 
 			for k in range(0,4):				
 				assert points[k*2]==fm.mask.black[bb].points[k][0]
 				assert points[k*2+1]==fm.mask.black[bb].points[k][1]
 
-			assert cl.get_attribute("BLACK_W",i,bb)==fm.mask.black[bb].w
-			assert cl.get_attribute("BLACK_H",i,bb)==fm.mask.black[bb].h			
+			assert cc.get_attribute("BLACK_W",i,bb)==fm.mask.black[bb].w
+			assert cc.get_attribute("BLACK_H",i,bb)==fm.mask.black[bb].h			
 
 
-		assert cl.get_attribute("SIZE",i)[0]==fm.mask.size[0]
-		assert cl.get_attribute("SIZE",i)[1]==fm.mask.size[1]
+		assert cc.get_attribute("SIZE",i)[0]==fm.mask.size[0]
+		assert cc.get_attribute("SIZE",i)[1]==fm.mask.size[1]
 
 
 if __name__=='__main__':	
 	filenamePy = "/home/daniel/Projects/faces-rec/classifiers/3500/classifier_3500_(3-100).pk"
-	filenameC = "3500_3_100_cl"
+	filenameC = "/home/daniel/Projects/faces-rec/cython_tests/c_detector/pyToC/3500_3_100_cl"
 
-	# convert_classifier(filenamePy,filenameC)
-	# test_converter()
+	convert_classifier(filenamePy,filenameC)
+	test_converter()
 
-	cl.print_classifier( cl.load_classifier(filenameC) )
-
+	cc.print_classifier( cc.load_classifier(filenameC) )
 	compare_classifiers(filenamePy,filenameC)
