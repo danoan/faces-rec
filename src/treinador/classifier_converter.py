@@ -18,8 +18,8 @@ def convert_everything(folder,newfolder):
 
 
 if __name__=="__main__":
-	folder = "%s" % (config.CLASSIFIERS_3500_PATH,)
-	new_folder = "%s/%s" % (config.CLASSIFIERS_3500_PATH,"novos")
+	folder = "%s" % (config.CLASSIFIERS_10000_PATH,)
+	new_folder = "%s/%s" % (config.CLASSIFIERS_10000_PATH,"novos")
 
 	# pyToc.convert_classifier( ("%s/%s" % (folder,"classifier_3500_(51-100).pk")),("%s/%s" % (folder,"classifier_3500_(51-100).cl")) )
 	convert_everything(folder,new_folder)

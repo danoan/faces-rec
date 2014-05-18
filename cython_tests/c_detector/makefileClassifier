@@ -1,0 +1,25 @@
+magick_left:=`MagickWand-config --cflags`
+magick_right:=`MagickWand-config --ldflags`
+
+source:=source
+object:=object
+lib:=lib
+
+module:=classifier
+
+object_path:=$(object)/$(module)
+source_path:=$(source)/$(module)
+lib_path:=$(lib)
+
+
+all: classifier.o integralImage.o loader.o
+	ar rc $(lib_path)/libclassifier.a $(object_path)/classifier.o $(object_path)/integralImage.o $(object_path)/loader.o
+
+classifier.o:
+	g++  $(magick_left) -o $(object_path)/classifier.o -c $(source_path)/classifier.cpp $(magick_right) -Llib -lfeature -O3 -w
+
+integralImage.o:
+	g++ $(magick_left) -o $(object_path)/integralImage.o -c $(source_path)/integralImage.cpp $(magick_right) -Llib -lfeature -O3 -w
+
+loader.o:
+	g++ $(magick_left) -o $(object_path)/loader.o -c $(source_path)/loader.cpp $(magick_right) -O3 -w

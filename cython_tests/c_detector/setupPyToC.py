@@ -2,7 +2,7 @@
 
 from distutils.core import setup, Extension
 
-path = "source"
+path = "source/pyToC"
 s1 = "%s/%s" %(path,"pyToCClassifier.c")
 s2 = "%s/%s" %(path,"c_loader.c")
 s3 = "%s/%s" %(path,"pyApiBasic.c")

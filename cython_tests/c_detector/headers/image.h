@@ -1,5 +1,5 @@
-#ifndef __C_IMAGE
-#define __C_IMAGE
+#ifndef __C_IMAGE__
+#define __C_IMAGE__
 
 #include <stdio.h>
 #include <stdlib.h>

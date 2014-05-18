@@ -10,5 +10,9 @@
 # window_gen
 # detector
 
-g++ `MagickWand-config --cflags` teste.cpp source/basic.cpp source/c_loader.c source/detector.cpp source/window_gen.cpp source/loader.cpp source/classifier.cpp source/integral.cpp  source/featureMask.cpp source/featureFactory.cpp source/image.c  `MagickWand-config --ldflags` -lm -O3 -w
-./a.out
+make -f makefileFeature
+make -f makefilePyToC
+make -f makefileClassifier
+make -f makefileDetector
+
+g++ `MagickWand-config --cflags` source/teste.cpp source/basic.cpp source/image.c -Llib -lpytoc -lfeature -lpytoc -ldetector -lclassifier `MagickWand-config --ldflags` -O3 -w
