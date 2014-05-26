@@ -18,6 +18,8 @@ void loadImage(ulong*** data, const char* filepath,Point* size){
 	size->y = MagickGetImageHeight(image_wand);
 	size->x = MagickGetImageWidth(image_wand);
 
+	// printf("MAGICK %lu %lu\n",size->y,size->x);
+
 	if(data==NULL){
 		return;
 	}
@@ -44,4 +46,6 @@ void loadImage(ulong*** data, const char* filepath,Point* size){
 	    	// printf("%lu\n",(*data)[y][x]);
     	}	
     }
+    DestroyPixelIterator(iterator);
+    DestroyMagickWand(image_wand);	    
 }

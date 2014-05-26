@@ -13,6 +13,7 @@
 */
 class MaskThreeVerticalFactory: public FMF{
 public:
+    MaskThreeVerticalFactory(){};
     MaskThreeVerticalFactory(Point ardis,ulong shift_w=1,ulong shift_h=1,double resize_factor=1.0,ulong w=2,ulong h=3);
 };
 

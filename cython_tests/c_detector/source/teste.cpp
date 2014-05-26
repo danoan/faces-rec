@@ -1,6 +1,5 @@
 #include <cstdio>
 #include <cstdlib>
-#include <sys/time.h>
 
 #include "../headers/basic.h"
 
@@ -9,24 +8,10 @@
 #include "../headers/feature/libfeature.h"
 #include "../headers/detector/libdetector.h"
 
-struct timeval stop,start;
-
-void startClock(){
-	gettimeofday(&start,NULL);
-}
-
-void stopClock(std::string testName){
-	gettimeofday(&stop,NULL);
-	ulong seg = (stop.tv_sec-start.tv_sec);	
-	ulong useg = (stop.tv_usec-start.tv_usec);	
-
-	printf("TEMPO EXECUCAO (%s): %lu.%lu seg\n",testName.c_str(), seg,useg);		
-}
-
 void testFactory(std::string name, FMF factory){
 	ulong c=0;
 
-	while(factory.hasNext()){
+	while(factory.hasNext()==1){
 		factory.next();
 		c++;
 	}
@@ -41,8 +26,8 @@ void testeFMF(){
 	}
 
 	Point ardis;
-	ardis.y = 10;
-	ardis.x = 10;
+	ardis.y = 64;
+	ardis.x = 64;
 
 	MaskTwoHorizontalFactory m2h = MaskTwoHorizontalFactory(ardis,1,1,1.25,8,8);
 	MaskTwoVerticalFactory m2v =  MaskTwoVerticalFactory(ardis,1,1,1.25,8,8);
@@ -136,9 +121,9 @@ int main(int argc, char* argv[]){
 
 	printf("%d %d %d\n",c_cl.hypothesis[0].fm.mask.maskType,c_cl.hypothesis[1].fm.mask.maskType,c_cl.hypothesis[2].fm.mask.maskType);
 
-	teste_deteccao(cl,img_filename);
+	// teste_deteccao(cl,img_filename);
 	// teste_integral();
-	// testeFMF();
+	testeFMF();
 
 	return 0;
 }

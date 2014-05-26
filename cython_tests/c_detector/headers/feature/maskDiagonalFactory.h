@@ -15,6 +15,7 @@
 */
 class MaskDiagonalFactory: public FMF{
 public:
+    MaskDiagonalFactory(){};
     MaskDiagonalFactory(Point ardis,ulong shift_w=1,ulong shift_h=1,double resize_factor=1.0,ulong w=2,ulong h=2);
     /*
     Resize the current template mask. For each horizontal stretch, it tries all the possible combinations

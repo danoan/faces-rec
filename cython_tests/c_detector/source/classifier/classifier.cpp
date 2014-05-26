@@ -1,13 +1,5 @@
 #include "../../headers/classifier/classifier.h"
 
-inline int Classifier::h_function(long filter, long direction, long threshold){
-	if( (direction*filter)<(direction*threshold) ){
-		return 1;
-	}else{
-		return 0;
-	}
-}
-
 int Classifier::isFace(IntegralImage &ii, Subwindow &sw, double ac){
 	ulong t;
 	long d;
@@ -29,7 +21,7 @@ int Classifier::isFace(IntegralImage &ii, Subwindow &sw, double ac){
 		fm.adjustMask(sw);
 		sx+= a*h_function(ii.filter(fm),d,t);		
 
-		// printf("%lu %ld %lu\n",ii.filter(fm),d,t);
+		// printf("%d %lf %lu %ld %lu\n",h_function(ii.filter(fm),d,t), a,ii.filter(fm),d,t);
 		sa+= a;
 	}
 

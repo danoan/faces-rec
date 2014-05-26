@@ -3,8 +3,14 @@
 
 #include <cstdio>
 #include <cmath>
+#include <string>
 
-typedef unsigned long ulong;
+#include <sys/time.h>
+
+typedef unsigned long int ulong;
+
+void startClock();
+void stopClock(std::string testName);
 
 typedef struct{
 	ulong x;

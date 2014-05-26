@@ -4,9 +4,10 @@ IntegralImage::IntegralImage(std::string img_path){
 	int y,x;
 	ulong line_sum;
 	loadImage(&(_data),img_path.c_str(),&(_size));
+	// printf("INT IM %d %d\n",_size.y,_size.x);
 }
 
-inline int IntegralImage::outsideLimits(Point p){
+inline int IntegralImage::outsideLimits(Point& p){
 	return (p.y>=_size.y) || (p.y<0) || (p.x>=_size.x) || (p.x<0);
 }
 
@@ -40,7 +41,7 @@ long IntegralImage::computeBlock(std::vector<MaskBlock> &b, Point location){
 	return block_sum;
 }
 
-long IntegralImage::getFromData(Point points[4]){
+long IntegralImage::getFromData(Point* points){
 	long sum[4]={0,0,0,0};
 
 	for(register int i=0;i<4;++i){
@@ -60,7 +61,7 @@ ulong IntegralImage::filter(FeatureMask &fm){
 		return 0;
 	}
 
-	// printf("%d\n",abs(black_sum-white_sum));
+	// printf("%d\n", abs( computeBlock(fm._mask._black,fm._location)  - computeBlock(fm._mask._white,fm._location) ) );
 
 	return abs( computeBlock(fm._mask._black,fm._location)  - computeBlock(fm._mask._white,fm._location) );
 }

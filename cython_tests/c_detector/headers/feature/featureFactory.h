@@ -64,7 +64,8 @@ public:
 	std::vector<Point> changeLocal();
 	FeatureMask next();
 
-	inline int hasNext(){ return _rit==this->_resizeList.size()?0:1; };
+	inline int hasNext(){ return _rit>=this->_resizeList.size()?-1:1; };
+	inline void restart(){ _rit=0; _lit=0; };
 };
 
 #endif

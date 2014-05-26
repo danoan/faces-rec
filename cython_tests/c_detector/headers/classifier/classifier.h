@@ -14,6 +14,7 @@ public:
 	FeatureMask _fm;
 
 	Hypothesy(){};
+	Hypothesy(ulong t, long d, double a, FeatureMask fm): _threshold(t), _direction(d), _alpha(a), _fm(fm){};
 	
 	ulong threshold(){return _threshold; };
 	void threshold(ulong t){ _threshold = t; };
@@ -32,12 +33,13 @@ class Classifier{
 public:
 	ulong _final;
 	Point _ardis;
+	double _ac;
 	std::vector<Hypothesy> _hypothesis;
 
 	Classifier(){};
 
-	inline int h_function(long filter, long direction, long threshold);
 	int isFace(IntegralImage &ii, Subwindow &sw, double ac);
+	int isFace(IntegralImage &ii, Subwindow &sw) {return isFace(ii,sw,_ac);};
 
 	inline ulong final(){return _final;};
 	inline void final(ulong f){_final=f; };
@@ -48,5 +50,13 @@ public:
 	inline std::vector<Hypothesy> hypothesis(){return _hypothesis;};
 	inline void addHypothesy(Hypothesy &h){_hypothesis.push_back(h);};
 };
+
+inline int h_function(long filter, long direction, long threshold){
+	if( (direction*filter)>(direction*threshold) ){
+		return 0;
+	}else{
+		return 1;
+	}
+}
 
 #endif

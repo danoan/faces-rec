@@ -6,6 +6,10 @@ import math,random,os,time
 '''
 	Given an image, this class computes all the possible image windows
 	with dimensions window_size could exist in the image
+
+	256x256 ss=70
+	(0,0) (0,70) (0,140) (0,210)
+	(24,70) (94,70) ...
 '''
 class ImageWindowGenerator():
 
@@ -21,46 +25,59 @@ class ImageWindowGenerator():
 		self.folder = folder
 		self.img_filename = "%s/%s" %(self.folder,self.name)
 		self.folder_to_save = folder_to_save
+		self.shift_step = shift_step
 
 		self.window_size = window_size
-		
 		''' I open and close the file every time some image processing needs to be done,
 			otherwise, too many files would be opened.
 		'''
-		with open(self.img_filename,"rb") as img_file: 
-			img = Image.open(img_file)
+		self.img_w=0
+		self.img_h=0
 
-			left_w = img.size[0] - window_size[0]
-			left_h = img.size[1] - window_size[1]
+		img = Image.open(self.img_filename)
+		print self.img_filename
+		self.img_w = img.size[0] - self.shift_step
+		self.img_h = img.size[1] - self.shift_step
+		print self.img_w,self.img_h
 
-			self.windows = []
-			self.total_windows = 0
-			for x in range(0,left_w,shift_step):
-				for y in range(0,left_h,shift_step):
-					self.windows.append( (x,y) )
-					self.total_windows+=1
+		self.total_windows = (self.img_w*self.img_h)/(self.shift_step*self.shift_step)
+		self.iter = self.get_next_random_window()
+		print self.total_windows
+
+	def get_next_window(self,i):
+		print i
+		i = i*self.shift_step
+		x = i%self.img_w
+		y = (i/self.img_w)*self.shift_step
+		
+		return (x,y)
 
 	def get_next_random_window(self):
-		windows_total = len(self.windows)
-		index_to_sort = [i for i in range(0,windows_total) ]
+		index_to_sort = [i for i in xrange(0,self.total_windows) ]
 
-		for n in range(0,windows_total):
-			windows_left = windows_total-n
+		for n in xrange(0,self.total_windows):			
+			windows_left = self.total_windows-n
 			r = random.randint(0,windows_left-1)
 			i = index_to_sort[r]
 
 			index_to_sort = index_to_sort[:r]+index_to_sort[r+1:]
 
-			w = self.windows[i]
+			w = self.get_next_window(i)
 			crop_box = (w[0],w[1],w[0]+self.window_size[0],w[1]+self.window_size[1])
 
-			with open(self.img_filename,"rb") as img_file:
-				img = Image.open(img_file)
-				crop_window = img.crop( crop_box )
+			img = Image.open(self.img_filename)
+			crop_window = img.crop( crop_box )
 
 			saved_name = "crop_%s.pgm" %(ImageWindowGenerator._get_next_count(),)
 
+			# yield saved_name
 			yield ImageWindow(self.name,self.folder,self.folder_to_save,crop_window,w,n,saved_name)
+
+	def next(self):
+		try:
+			return self.iter.next()
+		except:
+			return None
 
 '''
 	Container retrieved by the get_next_random function of the ImageWindowGenerator.
@@ -105,29 +122,34 @@ def get_next_random_image_window(folder,n):
 	folder_to_save = str( time.time() )
 	face_size = (64,64)
 
-	shift_step = 4
+	shift_step = 64
 	img_windows = []
 
 	windows_total = 0
+	a=0
 	for fn in file_names:		
 		if fn=="crop":
-			continue
-
+			continue		
 		iw = ImageWindowGenerator(fn,folder,folder_to_save,face_size,shift_step)
-		img_windows.append( iw )
-
+		img_windows.append( iw )	
 		windows_total+=iw.total_windows
+
+	print "TOTAL WINDOWS %d (%d)" % (windows_total,n)
 
 	#windows_total = 223922
 	if n > windows_total:
 		raise Exception("The number of windows asked for is greater than the available windows. Please increase the number os scene images or decrease the shift step value")
 
 
-	for a in range(0,n):
-		r = random.randint(0,len(img_windows)-1)
-		iw = img_windows[r]
+	for a in xrange(0,n):
+		window = None
+		while(window==None):
+			r = random.randint(0,len(img_windows)-1)		
+			iw = img_windows[r]
+			window = iw.next()
 
-		yield iw.get_next_random_window().next()
+		yield window
+
 
 
 #GET_NEXT_RANDOM_IMAGE_WINDOW
