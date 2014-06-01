@@ -7,8 +7,26 @@ function domath(){
 
 
 count=0
-path=SUN2012/Images/files
+path=SUN2012/Images
+destiny=SUN2012/AllImages
 for i in `ls $path`
 do
-    `mv $path/$i/*.* $path/`
+    #1o Nivel de profundidade
+    `mv $path/$i/*.* $destiny/`
+
+    path_2=$path/$i
+    for j in `ls $path_2`
+    do
+        #2o Nivel de profundidade
+        `mv $path_2/$j/*.* $destiny/`
+        path_3=$path_2/$j
+
+        for k in `ls $path_3`
+        do
+            #3o Nivel de profundidade
+            `mv $path_3/$k/*.* $destiny/`
+        done
+
+    done
+    
 done
