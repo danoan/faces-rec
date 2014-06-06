@@ -1,6 +1,8 @@
 #ifndef __TRAINING_IMAGE__
 #define __TRAINING_IMAGE__
 
+#include <vector>
+
 #include "../feature/libfeature.h"
 #include "integralImage.h"
 
@@ -11,7 +13,10 @@ public:
     TrainingType _tt;
     IntegralImage* _ii;
 
-    TrainingImage(std::string imagePath, TrainingType tt);
+    bool _has_buffer;
+    std::vector<ulong> _ii_buffer;  //if has_buffer is true, it puts the integral values here
+
+    TrainingImage(std::string imagePath, TrainingType tt, bool has_buffer);
     ~TrainingImage(){
         printf("DESTROY TRAINNING\n");
         delete _ii;

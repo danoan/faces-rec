@@ -41,10 +41,12 @@ protected:
 	std::vector<Mask> _resizeList;
 	std::vector<Point> _localList;
 
+	static int _counter;
+
 	Mask(* _fn_create)(Point);
 
 	ulong _rit;
-	ulong _lit;
+	ulong _lit;	
 
 public:
 	FMF(){};
@@ -64,8 +66,12 @@ public:
 	std::vector<Point> changeLocal();
 	FeatureMask next();
 
-	inline int hasNext(){ return _rit>=this->_resizeList.size()?-1:1; };
-	inline void restart(){ _rit=0; _lit=0; };
+	inline int hasNext(){ 
+		return _rit>=this->_resizeList.size()?-1:1;
+	};
+
+	inline void restart(){ _rit=0; _lit=0; };	//TODO: It would be better it this was a private function
+	inline static void resetCounter(){ _counter=0; };
 };
 
 #endif

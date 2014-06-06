@@ -28,7 +28,7 @@ void TrainingImageRepository::loadImages(){
     clearTrainingImages();
     for(int i=_rangeOnMemory;i<(_rangeOnMemory + _imageLimit);i++){
         if(i>=_imageCount) break;
-        _trainingImages.push_back( new TrainingImage(_imagesPath[i].first, _imagesPath[i].second) );
+        _trainingImages.push_back( new TrainingImage(_imagesPath[i].first, _imagesPath[i].second, false) );
     }
     _it = _trainingImages.begin();    
 }

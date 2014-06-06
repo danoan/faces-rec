@@ -11,6 +11,7 @@
 #include "../headers/config.h"
 #include "../headers/basic.h"
 
+#include "../headers/feature/maskTwoHorizontalFactory.h"
 
 #include "../headers/detector/detector.h"
 
@@ -35,7 +36,7 @@ int detectFaces(std::string img_dir, CascadeClassifier cl){
 }
 
 int readInput(int argc, char* argv[]){
-    char* options = "s:r:w:h:f:d:m:t:n:v:a:b:";
+    char* options = "s:r:w:h:f:d:m:t:n:v:a:b:i:uz";
     int c=0;
     while(1){
         c = getopt(argc,argv,options);
@@ -43,7 +44,6 @@ int readInput(int argc, char* argv[]){
         switch(c){
             case 's':   //SHIFT_STEP
                 Config::CLASSIFIER_SHIFT_STEP = atoi(optarg);
-                printf("%d\n",Config::CLASSIFIER_SHIFT_STEP);
                 break;
             case 'r':   //RESIZE FACTOR
                 Config::CLASSIFIER_RESIZE_FACTOR = atof(optarg);
@@ -78,6 +78,15 @@ int readInput(int argc, char* argv[]){
             case 'b':   //ARDIS_HEIGHT
                 Config::ARDIS_HEIGHT = atoi(optarg);
                 break;                             
+            case 'i':   //II Buffer Size
+                Config::INTEGRAL_IMAGE_BUFFER_SIZE = atoi(optarg);
+                break;     
+            case 'u':
+                Config::HAS_BUFFER = true;
+                break;           
+            case 'z':
+                Config::TEST_EXECUTION = true;
+                break;                           
 
         }
     }
@@ -86,10 +95,38 @@ int readInput(int argc, char* argv[]){
 }
 
 int main(int argc, char* argv[]){
+    // Point p;
+    // p.x = 64;
+    // p.y = 64;
+
+    // MaskTwoHorizontalFactory _m2hf = MaskTwoHorizontalFactory(p,1,1,1.25,8,8);    
+    // FeatureMask fm1 = _m2hf.next();
+    // FeatureMask fm2 = _m2hf.next();
+
+    // printf("ID %d\n",fm1._id);
+    // printf("ID %d\n",fm2._id);
+
     if(readInput(argc,argv)!=1) return 0;
 
-    ValidationSet vs(Config::VALIDATION_FACES_PATH, Config::VALIDATION_SCENES_PATH);
-    TrainingSet ts(Config::TRAINING_FACES_PATH, Config::TRAINING_SCENES_PATH);
+    std::string vs_face_path, vs_scene_path;
+    std::string ts_face_path, ts_scene_path;
+
+    if(Config::TEST_EXECUTION){
+        vs_face_path = Config::VALIDATION_FACES_TEST_PATH;
+        vs_scene_path = Config::VALIDATION_SCENES_TEST_PATH;
+
+        ts_face_path = Config::TRAINING_FACES_TEST_PATH;
+        ts_scene_path = Config::TRAINING_SCENES_TEST_PATH;
+    }else{
+        vs_face_path = Config::VALIDATION_FACES_PATH;
+        vs_scene_path = Config::VALIDATION_SCENES_PATH;
+
+        ts_face_path = Config::TRAINING_FACES_PATH;
+        ts_scene_path = Config::TRAINING_SCENES_PATH;
+    }
+
+    ValidationSet vs(vs_face_path,vs_scene_path);
+    TrainingSet ts(ts_face_path,ts_scene_path);
 
     Logger::debug->log("Image Sets TS_FACES %d\nTS_SCENES %d\n",ts._faces.size(),ts._scenes.size());
 
@@ -105,4 +142,12 @@ int main(int argc, char* argv[]){
 /*
 64,64 (6,6) 3 = 97039
 64,64 (8,8) 2 = 146065
+*/
+
+/*
+    ./a.out -a 64 -b 64 -s 3 -r 1.25 -w 6 -h 6 -i 1000 -n 3 -u -z
+
+    u: Use estrategia de buffer
+    z: Use o banco de teste
+    i: Buffer Size
 */

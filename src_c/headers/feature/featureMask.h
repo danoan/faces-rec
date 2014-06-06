@@ -18,8 +18,10 @@ public:
 	Mask _mask;
 	Point _location;
 
+	int _id; //this id it would represent the position of this feature in the _ii_buffer of a TrainingImage
+
 	FeatureMask(){};
-	FeatureMask(Mask,Point);
+	FeatureMask(Mask mask,Point location,int id=0);
 
 	/*	
 	When FeatureMask is created, its locations is based on the ardis used on the

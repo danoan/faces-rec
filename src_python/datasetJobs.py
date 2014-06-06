@@ -79,6 +79,8 @@ def createTestSet(scene_source,face_source,face_train_number,scene_train_number,
     # src_to_match = "%s/%s" % ( "/".join( scene_source.split("/")[:-1] ),"com_faces")
     # imageMatching(src_to_match,scene_source)
 
+    nome_instancia = "Instancia SUN_Teste"
+
     face_train_number = int(face_train_number)
     face_valid_number = int(face_valid_number)
     scene_train_number = int(scene_train_number)
@@ -105,7 +107,7 @@ def createTestSet(scene_source,face_source,face_train_number,scene_train_number,
     print "MONTANDO FACES DE TREINAMENTO"
     for f in face_train_files:
         save_src = "%s/%s" % (face_source,f)
-        save_dest_dir = "%s/Instancia SUN/training_images/faces" % (salvar_em,)
+        save_dest_dir = "%s/%s/training_images/faces" % (salvar_em,nome_instancia)
         save_dest = "%s/%s" % (save_dest_dir,f)
         createDirIfNotExist(save_dest_dir)
         shutil.copyfile(save_src,save_dest)
@@ -114,7 +116,7 @@ def createTestSet(scene_source,face_source,face_train_number,scene_train_number,
     print "MONTANDO FACES DE VALIDACAO"
     for f in face_valid_files:
         save_src = "%s/%s" % (face_source,f)
-        save_dest_dir = "%s/Instancia SUN/validation_images/faces" % (salvar_em,)
+        save_dest_dir = "%s/%s/validation_images/faces" % (salvar_em,nome_instancia)
         save_dest = "%s/%s" % (save_dest_dir,f)
         createDirIfNotExist(save_dest_dir)
         shutil.copyfile(save_src,save_dest)        
@@ -123,49 +125,49 @@ def createTestSet(scene_source,face_source,face_train_number,scene_train_number,
     #Arquivos de treinamento de cenas sao divididos em 38 grupos de igual numero,
     #pois cada estagio de treinamento usa cenas diferentes
 
-    # print "MONTANDO CENAS DE TREINAMENTO"
-    # group = 0
-    # factor_group = ( len(scene_train_files)/38 )
-    # per_group = [factor_group + (1 if i>=18 else 0) for i in xrange(0,38)]
-    # per_group.append( len(scene_train_files) - factor_group*38 )
-    # for f in scene_train_files:
-    #     if per_group[0]==0:
-    #         crop( "%s/Instancia SUN/training_images/non_faces/group_%s" % (salvar_em,group), crop_train_number )
-    #         per_group = per_group[1:]
-    #         group+=1
+    print "MONTANDO CENAS DE TREINAMENTO"
+    group = 0
+    factor_group = ( len(scene_train_files)/38 )
+    per_group = [factor_group + (1 if i>=18 else 0) for i in xrange(0,38)]
+    per_group.append( len(scene_train_files) - factor_group*38 )
+    for f in scene_train_files:
+        if per_group[0]==0:
+            crop( "%s/%s/training_images/non_faces/group_%s" % (salvar_em,nome_instancia,group), crop_train_number )
+            per_group = per_group[1:]
+            group+=1
 
-    #     save_src = "%s/%s" % (scene_source,f)
-    #     save_dest_dir = "%s/Instancia SUN/training_images/non_faces/group_%s" % (salvar_em,group)
-    #     save_dest = "%s/%s" % (save_dest_dir,f)
-    #     createDirIfNotExist(save_dest_dir)
-    #     shutil.copyfile(save_src,save_dest)    
+        save_src = "%s/%s" % (scene_source,f)
+        save_dest_dir = "%s/%s/training_images/non_faces/group_%s" % (salvar_em,nome_instancia,group)
+        save_dest = "%s/%s" % (save_dest_dir,f)
+        createDirIfNotExist(save_dest_dir)
+        shutil.copyfile(save_src,save_dest)    
 
-    #     per_group[0]-=1
+        per_group[0]-=1
 
-    # crop( "%s/Instancia SUN/training_images/non_faces/group_%s" % (salvar_em,group), crop_train_number )
+    crop( "%s/%s/training_images/non_faces/group_%s" % (salvar_em, nome_instancia, group), crop_train_number )
 
     # #Arquivos de validacao ficam em um mesmo diretorio, porem, na mesma estrutura de grupos
 
-    # print "MONTANDO CENAS DE VALIDACAO"
-    # group = 0
-    # factor_group = ( len(scene_valid_files)/38 )
-    # per_group = [factor_group + (1 if i>=18 else 0) for i in xrange(0,38)]
-    # per_group.append( len(scene_valid_files) - factor_group*38 )    
-    # for f in scene_valid_files:
-    #     if per_group[0]==0:
-    #         crop( "%s/Instancia SUN/validation_images/non_faces/group_%s" % (salvar_em,group), crop_valid_number )
-    #         per_group = per_group[1:]
-    #         group+=1
+    print "MONTANDO CENAS DE VALIDACAO"
+    group = 0
+    factor_group = ( len(scene_valid_files)/38 )
+    per_group = [factor_group + (1 if i>=18 else 0) for i in xrange(0,38)]
+    per_group.append( len(scene_valid_files) - factor_group*38 )    
+    for f in scene_valid_files:
+        if per_group[0]==0:
+            crop( "%s/%s/validation_images/non_faces/group_%s" % (salvar_em, nome_instancia, group), crop_valid_number )
+            per_group = per_group[1:]
+            group+=1
 
-    #     save_src = "%s/%s" % (scene_source,f)
-    #     save_dest_dir = "%s/Instancia SUN/validation_images/non_faces/group_%s" % (salvar_em,group)
-    #     save_dest = "%s/%s" % (save_dest_dir,f)
-    #     createDirIfNotExist(save_dest_dir)
-    #     shutil.copyfile(save_src,save_dest)  
+        save_src = "%s/%s" % (scene_source,f)
+        save_dest_dir = "%s/%s/validation_images/non_faces/group_%s" % (salvar_em,nome_instancia,group)
+        save_dest = "%s/%s" % (save_dest_dir,f)
+        createDirIfNotExist(save_dest_dir)
+        shutil.copyfile(save_src,save_dest)  
 
-    #     per_group[0]-=1
+        per_group[0]-=1
 
-    # crop( "%s/Instancia SUN/validation_images/non_faces/group_%s" % (salvar_em,group), crop_valid_number )
+    crop( "%s/%s/validation_images/non_faces/group_%s" % (salvar_em,nome_instancia,group), crop_valid_number )
 
 
 if __name__=='__main__':

@@ -24,6 +24,11 @@ public:
     static int ARDIS_WIDTH;
     static int ARDIS_HEIGHT;
 
+    static int INTEGRAL_IMAGE_BUFFER_SIZE;
+    static bool HAS_BUFFER;
+
+    static bool TEST_EXECUTION;
+
     static std::string PROJECT_PATH;
 
     static std::string LOG_PATH;
@@ -36,6 +41,8 @@ public:
     static std::string TRAINING_IMG_PATH;
     static std::string VALIDATION_IMG_PATH;
     
+    static std::string TRAINING_TEST_IMG_PATH;
+    static std::string VALIDATION_TEST_IMG_PATH;    
     
     static std::string TRAINING_FACES_PATH;
     static std::string TRAINING_SCENES_PATH;

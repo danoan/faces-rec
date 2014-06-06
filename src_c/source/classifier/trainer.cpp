@@ -7,6 +7,7 @@ ulong countFeatures(FMF factory){
         factory.next();
         c++;
     }
+    factory.restart();
 
     return c;
 }
@@ -26,6 +27,8 @@ void Trainer::inputInfo(){
     int cm3h = countFeatures(_m3hf);
     int cm3v = countFeatures(_m3vf);
     int cd = countFeatures(_mdf);
+
+    FMF::resetCounter(); //Reset the FeatureMask id counter
 
     Logger::logger->log("Two Horizontal: %d\n",cm2h);
     Logger::logger->log("Two Vertical: %d\n",cm2v);
@@ -73,11 +76,11 @@ void Trainer::prepareTrainer(){
     }
 
     for(register int j=0;j<_ts._scenes.size();j++){
-        addTrainingImage( _ts._scenes[j], SCENE);
+        addTrainingImage( _ts._scenes[j], SCENE );
     }    
 }
 
-void Trainer::addTrainingImage(std::string imagePath, TrainingType imageType ){
+void Trainer::addTrainingImage(std::string imagePath, TrainingType imageType){
     _ct->addTrainingImage( imagePath,imageType );
 }
 
@@ -86,13 +89,14 @@ void Trainer::getBestFromFeature(TableItem& theBest, FMF& factory){
     int i=0;
     while( factory.hasNext()==1 ){
         fm=factory.next();
+        // printf("GET BEST %d\n",fm._id);
+
         TableItem partialBest = _ct->getBestTableItem(fm);
         if(partialBest._error<theBest._error){
             theBest = partialBest;
         }
         i++;
     }
-    // printf("%d\n",i);
     factory.restart();
 }
 
@@ -133,7 +137,9 @@ CascadeClassifier Trainer::startTrainingCascade(){
 
         while(!checkClassifier(fc,&ac,&fi,&di)){
             for(int i=0;i<features_to_check;i++){
+                startClock();       
                 keepTraining(fc);
+                stopClock("KEEP TRAINING");
             }            
         }
         features_to_check = _stage_number*16;
@@ -165,6 +171,7 @@ void Trainer::keepTraining(Classifier& cl){
     getBestFromFeature(theBest,_m3vf);
     getBestFromFeature(theBest,_mdf);
 
+    FMF::resetCounter(); //Reset the FeatureMask id counter
 
     double e_t = theBest._error;
     double b_t = (e_t)/(1-e_t);

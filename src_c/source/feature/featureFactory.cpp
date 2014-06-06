@@ -90,13 +90,8 @@ std::vector<Point> FMF::changeLocal(){
 }
 
 FeatureMask FMF::next(){
-    int count=0;    
 
-    // if(this->hasNext()==-1){
-    //     return NULL;
-    // }
-
-    FeatureMask fm ( this->_resizeList[_rit], this->_localList[_lit++]);
+    FeatureMask fm ( this->_resizeList[_rit], this->_localList[_lit++], _counter++);
     // printf("(%lu %lu) (%lu %lu)\n",_resizeList[_rit].size().y, _resizeList[_rit].size().x,_localList[_lit-1].y,_localList[_lit-1].x);
 
     if(_lit==this->_localList.size()){      
@@ -136,3 +131,5 @@ std::vector<ulong> incrementList(double factor, ulong divisor, ulong start, ulon
 
     return il;
 }
+
+int FMF::_counter = 0;

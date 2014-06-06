@@ -9,7 +9,14 @@ ClassificationTable::ClassificationTable(){
 
 void ClassificationTable::addTrainingImage(std::string imagePath, TrainingType tit){
     // _tir->addTrainingImage(imagePath,tit);
-    _images.push_back(new TrainingImage(imagePath,tit));
+
+    if(_images.size()<Config::INTEGRAL_IMAGE_BUFFER_SIZE){
+        _images.push_back(new TrainingImage(imagePath,tit,Config::HAS_BUFFER)); 
+    }else{
+        _images.push_back(new TrainingImage(imagePath,tit,false)); 
+    }
+
+    
     if(tit==FACE) _positive+=1;
     else          _negative+=1;
 }
@@ -44,7 +51,6 @@ void ClassificationTable::initTable(){
 TableItem ClassificationTable::getBestTableItem(FeatureMask& fm){
     _s_plus=0;
     _s_minus=0;
-
     // TrainingImage* t;
     int i=0;
     std::vector<TrainingImage*>::iterator it;

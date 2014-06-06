@@ -1,12 +1,14 @@
 #include "../../headers/feature/featureMask.h"
 
-FeatureMask::FeatureMask(Mask mask,Point location){
+FeatureMask::FeatureMask(Mask mask,Point location,int id){
     this->_original_mask = mask;
     this->_original_location = location;
     this->_original_size = mask._size;
 
     this->_mask = mask;
     this->_location = location;
+
+    this->_id = id;
 }
 
 void FeatureMask::adjustMask(Subwindow &sw){
