@@ -73,33 +73,38 @@ def imageMatching(src_to_match, src_to_find):
 #Cria um conjunto de teste e validacao utlizando os arquivos em db_source
 def createTestSet(scene_source,face_source,face_train_number,scene_train_number,
                   face_valid_number,scene_valid_number,crop_train_number,
-                  crop_valid_number,salvar_em):
+                  crop_valid_number,max_stages,salvar_em, face_test_number=0, scene_test_number=0):
     #Limpa o database da SUN (db_source), retirando as imagens que contem faces.
     print "LIMPANDO SUN DATABASE"
     # src_to_match = "%s/%s" % ( "/".join( scene_source.split("/")[:-1] ),"com_faces")
     # imageMatching(src_to_match,scene_source)
 
     nome_instancia = "Instancia SUN_Teste"
+    max_stages = int(max_stages)
 
     face_train_number = int(face_train_number)
     face_valid_number = int(face_valid_number)
+    face_test_number = int(face_test_number)
     scene_train_number = int(scene_train_number)
     scene_valid_number = int(scene_valid_number)
+    scene_test_number = int(scene_test_number)
 
     face_files = os.listdir( face_source )
     scene_files = os.listdir( scene_source )
 
-    total_face = face_train_number+face_valid_number
-    total_scene = scene_train_number+scene_valid_number
+    total_face = face_train_number+face_valid_number+face_test_number
+    total_scene = scene_train_number+scene_valid_number+scene_test_number
 
     used_face_files = random.sample( face_files, total_face )
     used_scene_files = random.sample( scene_files, total_scene )
 
     face_train_files = used_face_files[:face_train_number]
-    face_valid_files = used_face_files[face_train_number:]
+    face_valid_files = used_face_files[face_train_number:(face_train_number+face_valid_number)]
+    face_test_files = used_face_files[(face_train_number+face_valid_number):]
 
     scene_train_files = used_scene_files[:scene_train_number]
-    scene_valid_files = used_scene_files[scene_train_number:]
+    scene_valid_files = used_scene_files[scene_train_number:(scene_train_number+scene_test_number)]
+    scene_test_files = used_scene_files[(scene_train_number+scene_test_number):]
 
     #Arquivos de treinamento de face ficam em um unico diretorio
     #Arquivos de validacao de face ficam em um unico diretorio
@@ -122,14 +127,14 @@ def createTestSet(scene_source,face_source,face_train_number,scene_train_number,
         shutil.copyfile(save_src,save_dest)        
 
 
-    #Arquivos de treinamento de cenas sao divididos em 38 grupos de igual numero,
+    #Arquivos de treinamento de cenas sao divididos em max_stages grupos de igual numero,
     #pois cada estagio de treinamento usa cenas diferentes
 
     print "MONTANDO CENAS DE TREINAMENTO"
     group = 0
-    factor_group = ( len(scene_train_files)/38 )
-    per_group = [factor_group + (1 if i>=18 else 0) for i in xrange(0,38)]
-    per_group.append( len(scene_train_files) - factor_group*38 )
+    factor_group = ( len(scene_train_files)/max_stages )
+    per_group = [factor_group + (1 if i>=(max_stages/2) else 0) for i in xrange(0,max_stages)]
+    per_group.append( len(scene_train_files) - factor_group*max_stages )
     for f in scene_train_files:
         if per_group[0]==0:
             crop( "%s/%s/training_images/non_faces/group_%s" % (salvar_em,nome_instancia,group), crop_train_number )
@@ -150,9 +155,9 @@ def createTestSet(scene_source,face_source,face_train_number,scene_train_number,
 
     print "MONTANDO CENAS DE VALIDACAO"
     group = 0
-    factor_group = ( len(scene_valid_files)/38 )
-    per_group = [factor_group + (1 if i>=18 else 0) for i in xrange(0,38)]
-    per_group.append( len(scene_valid_files) - factor_group*38 )    
+    factor_group = ( len(scene_valid_files)/max_stages )
+    per_group = [factor_group + (1 if i>=(max_stages/2) else 0) for i in xrange(0,max_stages)]
+    per_group.append( len(scene_valid_files) - factor_group*max_stages )    
     for f in scene_valid_files:
         if per_group[0]==0:
             crop( "%s/%s/validation_images/non_faces/group_%s" % (salvar_em, nome_instancia, group), crop_valid_number )
@@ -169,6 +174,21 @@ def createTestSet(scene_source,face_source,face_train_number,scene_train_number,
 
     crop( "%s/%s/validation_images/non_faces/group_%s" % (salvar_em,nome_instancia,group), crop_valid_number )
 
+    print "MONTANDO IMAGENS DE TESTE"
+    for f in face_test_files:
+        save_dest_dir = "%s/%s/test_images/faces" % (salvar_em,nome_instancia)
+	save_dest = "%s/%s" % (save_dest_dir,f)
+	save_src = "%s/%s" % (face_source,f)
+        createDirIfNotExist(save_dest_dir)
+	shutil.copyfile(save_src,save_dest)
+
+    for f in scene_test_files:
+        save_dest_dir = "%s/%s/test_images/non_faces" % (salvar_em,nome_instancia)
+	save_dest = "%s/%s" % (save_dest_dir,f)
+	save_src = "%s/%s" % (scene_source,f)
+        createDirIfNotExist(save_dest_dir)
+	shutil.copyfile(save_src,save_dest)
+
 
 if __name__=='__main__':
     if( len(sys.argv)==4 ):
@@ -178,13 +198,13 @@ if __name__=='__main__':
             crop(sys.argv[2],sys.argv[3])
         elif ( sys.argv[1]=="match"):
             imageMatching(sys.argv[2],sys.argv[3]) 
-    elif( len(sys.argv)==11):
+    elif( len(sys.argv)>=12):
         if( sys.argv[1]=="createTestSet"):
             createTestSet( *(sys.argv[2:]) )           
 
 
 ####CREATE TEST SET
-# python src_python/datasetJobs.py createTestSet /home/daniel/Projects/faces-rec/dataset/sun/SUN2012 /home/daniel/Projects/faces-rec/dataset/lfw_faces 300 300 100 100 500 200 /home/daniel/Projects/faces-rec/dataset
+# python src_python/datasetJobs.py createTestSet /home/daniel/Projects/faces-rec/dataset/sun/SUN2012 /home/daniel/Projects/faces-rec/dataset/lfw_faces 300 300 100 100 500 200 38 /home/daniel/Projects/faces-rec/dataset
 
 
 ####MATCH

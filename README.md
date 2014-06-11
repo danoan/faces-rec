@@ -1,6 +1,13 @@
 faces-rec
 =========
 
+Exemplo:
+
+python src_python/datasetJobs.py createTestSet /home/users/danielantunes/Documentos/faces-rec/dataset/sun/SUN2012 /home/users/danielantunes/Documentos/faces-rec/dataset/lfw_faces 700 6000 140 5000 1400 280 10 /home/users/danielantunes/Documentos/faces-rec/dataset 200 300
+
+python src_python/datasetJobs.py createTestSet /home/users/danielantunes/Documentos/faces-rec/dataset/sun/SUN2012 /home/users/danielantunes/Documentos/faces-rec/dataset/lfw_faces 700 100 14 100 200 10 10 /home/users/danielantunes/Documentos/faces-rec/dataset 100 200
+
+
 datasetJobs.py
 =============
     Seleção de scripts para automação de tarefas comuns na criação de conjuntos de dados
