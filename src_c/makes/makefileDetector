@@ -1,9 +1,9 @@
 magick_left:=`MagickWand-config --cflags`
 magick_right:=`MagickWand-config --ldflags`
 
-source:=source
-object:=object
-lib:=lib
+source:=../source
+object:=../object
+lib:=../lib
 
 module:=detector
 

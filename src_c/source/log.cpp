@@ -3,13 +3,17 @@
 #define STRING_LENGTH 240                    /* something 'safe'             */
 
 void FilePrint::init_log(char *file){
+  return init_log(file,"w");
+}
+
+void FilePrint::init_log(char *file, char* mode){
   char filepath[STRING_LENGTH];
   sprintf(filepath,"%s/%s",Config::LOG_PATH.c_str(),file);
 
   printf("%s\n",filepath);
 
   char error[STRING_LENGTH];
-  if (!(log_file = fopen(filepath, "w"))) {     /* open file for mode           */
+  if (!(log_file = fopen(filepath, mode))) {     /* open file for mode           */
     sprintf(error, "init_log() failed to open %s.\n", filepath);
     perror(error);
     exit(666);                               /* message and exit on fail     */

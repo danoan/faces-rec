@@ -1,6 +1,6 @@
-source:=source
-object:=object
-lib:=lib
+source:=../source
+object:=../object
+lib:=../lib
 
 module:=pyToC
 

@@ -27,4 +27,5 @@ void stopClock(std::string testName){
 FilePrint* Logger::logger = new FilePrint("log.txt");
 FilePrint* Logger::error = new FilePrint("error.txt");
 FilePrint* Logger::debug = new FilePrint("debug.txt");
+FilePrint* Logger::feat_anal = new FilePrint("feat_anal.txt");
 
