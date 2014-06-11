@@ -18,6 +18,8 @@ public:
     static FilePrint* logger;
     static FilePrint* error;
     static FilePrint* debug;
+
+    static FilePrint* feat_anal;
 };
 
 typedef struct{

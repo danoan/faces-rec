@@ -21,6 +21,8 @@ public:
   FilePrint(char *file){init_log(file);};
 
   void init_log(char *file);
+  void init_log(char *file, char* mode);
+
   int log(char *fmt, ...);
 };
 
