@@ -20,6 +20,7 @@ public:
     static double CLASSIFIER_BETA_MIN_VALUE;
 
     static int MAX_LENGHT_VALIDATION_SET;
+    static int MAX_HYPOTHESIS_PER_STAGE;
 
     static int ARDIS_WIDTH;
     static int ARDIS_HEIGHT;
@@ -36,14 +37,15 @@ public:
     static std::string DATASET_PATH;
 
     static std::string ATT_FACES_PATH;
-    static std::string TEST_IMG_PATH;
 
     static std::string TRAINING_IMG_PATH;
     static std::string VALIDATION_IMG_PATH;
-    
+
+    static std::string TEST_IMG_PATH;    
     static std::string TRAINING_TEST_IMG_PATH;
     static std::string VALIDATION_TEST_IMG_PATH;    
     
+    static std::string TEST_FACES_PATH;
     static std::string TRAINING_FACES_PATH;
     static std::string TRAINING_SCENES_PATH;
     

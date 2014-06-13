@@ -29,9 +29,16 @@ public:
 	void fm(FeatureMask f){ _fm = f;};
 };
 
-class Classifier{
+class ClassifierInterface{
 public:
-	ulong _final;
+	virtual int isFace(IntegralImage &ii, Subwindow &sw, double ac) = 0;
+	virtual int isFace(IntegralImage &ii, double ac) = 0;
+	virtual int isFace(IntegralImage &ii, Subwindow &sw) = 0;
+	virtual int isFace(IntegralImage &ii) = 0;	
+};
+
+class Classifier:public ClassifierInterface{
+public:
 	Point _ardis;
 	double _ac;
 	std::vector<Hypothesy> _hypothesis;
@@ -43,15 +50,19 @@ public:
 	int isFace(IntegralImage &ii, Subwindow &sw) {return isFace(ii,sw,_ac);};
 	int isFace(IntegralImage &ii);
 
-	inline ulong final(){return _final;};
-	inline void final(ulong f){_final=f; };
-
 	inline Point ardis(){return _ardis;};
 	inline void ardis(Point p){_ardis=p;};
 
 	inline std::vector<Hypothesy> hypothesis(){return _hypothesis;};
 	inline void addHypothesy(Hypothesy &h){_hypothesis.push_back(h);};
+
 };
+
+std::ostream& operator<<(std::ostream& os, const Hypothesy& h);
+std::istream& operator>>(std::istream& is, Hypothesy& h);
+
+std::ostream& operator<<(std::ostream& os, const Classifier& c);
+std::istream& operator>>(std::istream& is, Classifier& c);
 
 inline int h_function(long filter, long direction, long threshold){
 	if( (direction*filter)>(direction*threshold) ){

@@ -1,6 +1,7 @@
 #ifndef __BASIC__
 #define __BASIC__
 
+#include <iostream>
 #include <cstdio>
 #include <cmath>
 #include <string>

@@ -27,3 +27,40 @@ void FeatureMask::adjustMask(Subwindow &sw){
 
     // printf("%.5f (%lu, %lu) (%lu, %lu)\n",sw._ce,_location.y,_location.x,_mask._size.y,_mask._size.x);
 }
+
+std::ostream& operator<<(std::ostream& os, const FeatureMask& fm){
+    os << fm._id << '\n';
+    
+    os << fm._original_location.x << '\n';
+    os << fm._original_location.y << '\n';
+
+    os << fm._original_size.x << '\n';
+    os << fm._original_size.y << '\n';
+
+    os << fm._location.x << '\n';
+    os << fm._location.y << '\n';
+
+    os << fm._mask;
+    os << fm._original_mask;
+
+    return os;
+}
+
+std::istream& operator>>(std::istream& is, FeatureMask& fm){
+    is >> fm._id;
+
+    is >> fm._original_location.x;
+    is >> fm._original_location.y;
+
+    is >> fm._original_size.x;
+    is >> fm._original_size.y;
+
+    is >> fm._location.x;
+    is >> fm._location.y;
+
+    is >> fm._mask;
+    is >> fm._original_mask;
+
+    return is;
+
+}

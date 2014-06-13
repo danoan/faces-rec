@@ -15,7 +15,7 @@
 
 #include "../headers/detector/detector.h"
 
-int detectFaces(std::string img_dir, CascadeClassifier cl){
+int detectSimpleFaces(std::string img_dir, CascadeClassifier cl){
     std::vector<std::string> files;
 
     getAllFiles(img_dir,files);
@@ -36,7 +36,7 @@ int detectFaces(std::string img_dir, CascadeClassifier cl){
 }
 
 int readInput(int argc, char* argv[]){
-    char* options = "s:r:w:h:f:d:m:t:n:v:a:b:i:uz";
+    char* options = "s:r:w:h:f:d:m:t:n:v:a:b:i:uzx:";
     int c=0;
     while(1){
         c = getopt(argc,argv,options);
@@ -87,6 +87,9 @@ int readInput(int argc, char* argv[]){
             case 'z':
                 Config::TEST_EXECUTION = true;
                 break;                           
+            case 'x':
+                Config::MAX_HYPOTHESIS_PER_STAGE = atoi(optarg);
+                break;                                           
 
         }
     }
@@ -94,18 +97,7 @@ int readInput(int argc, char* argv[]){
     return 1;
 }
 
-int main(int argc, char* argv[]){
-    // Point p;
-    // p.x = 64;
-    // p.y = 64;
-
-    // MaskTwoHorizontalFactory _m2hf = MaskTwoHorizontalFactory(p,1,1,1.25,8,8);    
-    // FeatureMask fm1 = _m2hf.next();
-    // FeatureMask fm2 = _m2hf.next();
-
-    // printf("ID %d\n",fm1._id);
-    // printf("ID %d\n",fm2._id);
-
+int train(int argc, char* argv[]){
     if(readInput(argc,argv)!=1) return 0;
 
     std::string vs_face_path, vs_scene_path;
@@ -133,9 +125,31 @@ int main(int argc, char* argv[]){
     Trainer* t = new Trainer(ts,vs);
     CascadeClassifier cl = t->startTrainingCascade();    
 
-    // detectFaces(Config::VALIDATION_FACES_PATH,cl);
-    // detectFaces(Config::VALIDATION_SCENES_PATH,cl);
+    cl.save(Config::CLASSIFIERS_PATH + "/classifier_final");
 
+    detectSimpleFaces(Config::TEST_FACES_PATH,cl);
+    // detectSimpleFaces(Config::VALIDATION_SCENES_PATH,cl);
+}
+
+void detectFaces(){
+    CascadeClassifier cc;
+    cc.load(Config::CLASSIFIERS_PATH + "/classifier_final");
+
+    Point wr;
+    wr.x = Config::CLASSIFIER_SUBWINDOW_START_WIDTH;
+    wr.y = Config::CLASSIFIER_SUBWINDOW_START_HEIGHT;
+    
+    Point ardis;
+    ardis.x = Config::ARDIS_WIDTH;
+    ardis.y = Config::ARDIS_HEIGHT;
+
+    Detector d(3,wr,ardis,Config::CLASSIFIER_SHIFT_STEP);
+    d.detectFaces(&cc,Config::DATASET_PATH+"/seinfeld.pgm");
+}
+
+int main(int argc, char* argv[]){
+    // train(argc,argv);
+    detectFaces();
     return 0;
 }
 
@@ -150,4 +164,9 @@ int main(int argc, char* argv[]){
     u: Use estrategia de buffer
     z: Use o banco de teste
     i: Buffer Size
+    n: Max Stages
+    v: Max Length Validation Set
+    m: Stage Max FP
+    t: Stage Min Det
+
 */

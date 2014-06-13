@@ -34,4 +34,7 @@ public:
 	inline Point location(){return _location;};
 };
 
+std::ostream& operator<<(std::ostream& os, const FeatureMask& fm);
+std::istream& operator>>(std::istream& is, FeatureMask& fm);
+
 #endif

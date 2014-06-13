@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "../basic.h"
+#include "../image.h"
 #include "../classifier/libclassifier.h"
 
 #include "subwindowGenerator.h"
@@ -14,20 +15,19 @@
 
 class Detector{
 private:
-	Classifier _cl;
 	int _ng;
 	
-	Point _wr;
-	Point _ref_mask;
+	Point _wr;			//Smallest feature subwindow
+	Point _ref_mask;	//Window size of the training set
 
 	int _shift_step;
-	double _ac;
 
 public:
 	Detector(){};
-	Detector(Classifier cl, int ng, Point wr, Point ref_mask, int shift_step, double ac);
+	Detector(int ng, Point wr, Point ref_mask, int shift_step);
 
-	void detectFaces(std::string img_path);	
+	void detectFaces(ClassifierInterface* ci, const std::string img_path);
+	void detectFaces(ClassifierInterface* ci, const std::string img_path, double ac);	
 };
 
 #endif

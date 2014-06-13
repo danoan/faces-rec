@@ -5,18 +5,23 @@ Mask::Mask(Point size, int maskType){
     switch(maskType){
         case 0:
             this->_createMask = &(createMaskM2H);
+            this->_createMaskId = 0;
             break;
         case 1:
             this->_createMask = &(createMaskM2V);
+            this->_createMaskId = 1;
             break;
         case 2:
             this->_createMask = &(createMaskM3H);
+            this->_createMaskId = 2;
             break;
         case 3:
             this->_createMask = &(createMaskM3V);
+            this->_createMaskId = 3;
             break;
         case 4:
             this->_createMask = &(createMaskMD);
+            this->_createMaskId = 4;
             break;
     }
 }
@@ -345,4 +350,66 @@ Mask createMaskMD(Point size){
     m.addBlack(black_2);
 
     return m;
+}
+
+std::ostream& operator<<(std::ostream& os, const Mask& m){
+    os << m._size.x << '\n';
+    os << m._size.y << '\n';
+    
+    os << m._white.size() << '\n';
+    for(register int i=0;i<m._white.size();i++){
+        os << m._white[i];
+    }
+
+    os << m._black.size() << '\n';
+    for(register int i=0;i<m._black.size();i++){
+        os << m._black[i];
+    }        
+
+    os << m._createMaskId << '\n';
+
+    return os;
+}
+
+std::istream& operator>>(std::istream& is, Mask& m){
+    is >> m._size.x;
+    is >> m._size.y;
+
+    int s_white;
+    is >> s_white;
+    for(register int i=0;i<s_white;i++){
+        MaskBlock mb;
+        is >> mb;
+        m._white.push_back(mb);
+    }
+
+    int s_black;
+    is >> s_black;
+    for(register int i=0;i<s_black;i++){
+        MaskBlock mb;
+        is >> mb;
+        m._black.push_back(mb);
+    }
+
+    is >> m._createMaskId;
+
+    switch(m._createMaskId){
+        case 0:
+            m._createMask = &(createMaskM2H);
+            break;
+        case 1:
+            m._createMask = &(createMaskM2V);
+            break;
+        case 2:
+            m._createMask = &(createMaskM3H);
+            break;
+        case 3:
+            m._createMask = &(createMaskM3V);
+            break;
+        case 4:
+            m._createMask = &(createMaskMD);
+            break;
+    }
+
+    return is;
 }

@@ -14,6 +14,7 @@ public:
     std::vector<MaskBlock> _black;
 
     Point _size;
+    int _createMaskId;  //When saving the object, I can`t save the function pointer
     Mask(* _createMask)(Point);
 
     Mask(){};
@@ -29,6 +30,9 @@ public:
 
     inline Point size(){return this->_size;};
 };
+
+std::ostream& operator<<(std::ostream& os, const Mask& m);
+std::istream& operator>>(std::istream& is, Mask& m);
 
 Mask createMaskM2H(Point size);
 Mask createMaskM2V(Point size);

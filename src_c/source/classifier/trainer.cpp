@@ -69,6 +69,7 @@ Trainer::Trainer(TrainingSet& ts, ValidationSet& vs){
 }
 
 void Trainer::prepareTrainer(){
+    delete _ct;
     _ct = new ClassificationTable();
 
     for(register int j=0;j<_ts._faces.size();j++){
@@ -135,14 +136,14 @@ CascadeClassifier Trainer::startTrainingCascade(){
         keepTraining(fc);
         stopClock("KEEP TRAINING");
 
-        while(!checkClassifier(fc,&ac,&fi,&di)){
+        while(!checkClassifier(fc,&ac,&fi,&di) && _feature_number < Config::MAX_HYPOTHESIS_PER_STAGE){
             for(int i=0;i<features_to_check;i++){
                 startClock();       
                 keepTraining(fc);
                 stopClock("KEEP TRAINING");
-            }            
+            }                        
         }
-        features_to_check = _stage_number*16;
+        features_to_check *= 1.5;    //*_stage_number*4
 
         _fp_rate*=fi;
         _det_rate*=di;
@@ -151,6 +152,11 @@ CascadeClassifier Trainer::startTrainingCascade(){
 
         fc._ac = ac;
         cascade.addClassifier(fc);
+
+        char path[128];
+        sprintf(path,"%s/classifier_%d_%d",Config::STATES_PATH.c_str(), _ts._faces.size()+_ts._scenes.size(), _feature_number);
+        printf("%s\n",path);
+        cascade.save(std::string(path));
 
         if(_ts.resetScenesSet(fc,_vs,_stage_number)==-1) break;                
         if(_vs.resetScenesSet(_stage_number)==-1) break;         
@@ -188,6 +194,7 @@ void Trainer::keepTraining(Classifier& cl){
     Logger::debug->log("HYPOTHESY %lu %d %lf\n",h._threshold,h._direction,h._alpha);
 
     cl.addHypothesy(h);
+    cl._ardis = _ardis;
     _ct->updateWeights(b_t,h);
     _feature_number+=1;
 }

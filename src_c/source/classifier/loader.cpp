@@ -25,7 +25,6 @@ Classifier load_Classifier(const char* filename){
 	C_Classifier c_cl = loadC_Classifier(filename);
 	Classifier cl;
 
-	cl.final(c_cl.final);
 	cl.ardis(cppPoint(c_cl.ardis));
 
 	for(int i=0;i<c_cl.len_hypothesis;++i){

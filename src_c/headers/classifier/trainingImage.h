@@ -18,7 +18,7 @@ public:
 
     TrainingImage(std::string imagePath, TrainingType tt, bool has_buffer);
     ~TrainingImage(){
-        printf("DESTROY TRAINNING\n");
+        // printf("DESTROY TRAINNING\n");
         delete _ii;
     }
     unsigned long int filter(FeatureMask& fm);

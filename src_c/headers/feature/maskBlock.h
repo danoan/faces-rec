@@ -9,6 +9,7 @@ public:
     Point _points[4];
     ulong _w,_h;
 
+    MaskBlock(){};
     MaskBlock(Point a, Point b, Point c, Point d);
 
     inline Point a(){ return this->_points[0]; };
@@ -23,5 +24,8 @@ public:
     inline void h(ulong h){this->_h=h;};
 
 };
+
+std::ostream& operator<<(std::ostream& os, const MaskBlock& mb);
+std::istream& operator>>(std::istream& is, MaskBlock& mb);
 
 #endif

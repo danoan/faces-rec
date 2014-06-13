@@ -3,9 +3,13 @@ faces-rec
 
 Exemplo:
 
-python src_python/datasetJobs.py createTestSet /home/users/danielantunes/Documentos/faces-rec/dataset/sun/SUN2012 /home/users/danielantunes/Documentos/faces-rec/dataset/lfw_faces 700 6000 140 5000 1400 280 10 /home/users/danielantunes/Documentos/faces-rec/dataset 200 300
+python src_python/datasetJobs.py createTestSet /home/daniel/Projects/faces-rec/dataset/sun/SUN2012 /home/daniel/Projects/faces-rec/dataset/lfw_faces 700 1000 140 500 1400 280 10 /home/daniel/Projects/faces-rec/dataset 100 200
 
-python src_python/datasetJobs.py createTestSet /home/users/danielantunes/Documentos/faces-rec/dataset/sun/SUN2012 /home/users/danielantunes/Documentos/faces-rec/dataset/lfw_faces 700 100 14 100 200 10 10 /home/users/danielantunes/Documentos/faces-rec/dataset 100 200
+python src_python/datasetJobs.py createTestSet /home/daniel/Projects/faces-rec/dataset/sun/SUN2012 /home/daniel/Projects/faces-rec/dataset/lfw_faces 2400 6000 600 2000 3000 800 20 /home/daniel/Projects/faces-rec/dataset/outro 500 800
+
+
+
+python src_python/datasetJobs.py createTestSet /home/users/danielantunes/Documentos/faces-rec/dataset/sun/SUN2012 /home/users/danielantunes/Documentos/faces-rec/dataset/lfw_faces 2400 6000 600 2000 3000 800 20 /home/users/danielantunes/Documentos/faces-rec/dataset/outro 500 800
 
 
 datasetJobs.py
@@ -34,7 +38,7 @@ datasetJobs.py
         match: Caminho da imagem candidata a matching
 
     -createTestSet [scene_source] [face_source] [face_train_number] [scene_train_number] [face_valid_number] 
-                   [scene_valid_number] [crop_train_number] [crop_valid_number] [salvar_em]
+                   [scene_valid_number] [crop_train_number] [crop_valid_number] [max_stages] [salvar_em] {face_test} {scene_test}
 
         Cria um conjunto de dados para teste e validação usando uma mesma fonte de dados. A estrutura resultante
         possui a seguinte estrutura. Caso a base de cenários seja a da SUN, como pré-processamento são retiradas

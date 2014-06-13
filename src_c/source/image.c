@@ -49,3 +49,38 @@ void loadImage(ulong*** data, const char* filepath,Point* size){
     DestroyPixelIterator(iterator);
     DestroyMagickWand(image_wand);	    
 }
+
+void drawRectangles(const char* filepath,int num_boxes,int** boxes, const char* color){
+	MagickWand* image_wand;
+	DrawingWand* d_wand;
+	PixelWand* c_wand;
+
+	MagickBooleanType status;
+	MagickPixelPacket pixel;
+
+	long x,y;
+	ulong line_sum;
+
+	// printf("%d\n",num_boxes);
+
+	image_wand = NewMagickWand();
+	d_wand = NewDrawingWand();
+	c_wand = NewPixelWand();
+
+	PixelSetColor(c_wand,color);
+	DrawSetFillOpacity(d_wand,0.0);
+	DrawSetStrokeColor(d_wand,c_wand);
+	DrawSetStrokeWidth(d_wand,1);
+
+	// printf("BEFORE DRAW\n");
+
+	int i;
+	for(i=0;i<num_boxes;i++){
+		DrawRectangle(d_wand,boxes[i][0],boxes[i][1],boxes[i][2],boxes[i][3]);	
+	}	
+
+	status=MagickReadImage(image_wand,filepath);	
+	MagickDrawImage(image_wand,d_wand);		
+
+	MagickDisplayImage(image_wand,"");
+}

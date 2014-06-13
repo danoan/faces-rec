@@ -24,8 +24,8 @@ void stopClock(std::string testName){
     printf("TEMPO EXECUCAO (%s): %lu.%lu seg\n",testName.c_str(), seg,useg);        
 }
 
-FilePrint* Logger::logger = new FilePrint("log.txt");
-FilePrint* Logger::error = new FilePrint("error.txt");
-FilePrint* Logger::debug = new FilePrint("debug.txt");
-FilePrint* Logger::feat_anal = new FilePrint("feat_anal.txt");
+FilePrint* Logger::logger = new FilePrint("log_d.txt");
+FilePrint* Logger::error = new FilePrint("error_d.txt");
+FilePrint* Logger::debug = new FilePrint("debug_d.txt");
+FilePrint* Logger::feat_anal = new FilePrint("feat_anal_d.txt");
 
