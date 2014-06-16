@@ -67,13 +67,16 @@ int readInput(int argc, char* argv[]){
             case 'x':
                 Config::MAX_HYPOTHESIS_PER_STAGE = atoi(optarg);
                 break;        
-            case 'p':
-                Config::TRAINING_IMG_PATH = Config::DATASET_PATH + optarg + "/training_images";
-                Config::VALIDATION_IMG_PATH = Config::DATASET_PATH + optarg + "/validation_images";
+            case 'p':                
+                Config::TEST_IMG_PATH = Config::DATASET_PATH + "/" + optarg + "/test_images";
+                Config::TRAINING_TEST_IMG_PATH = Config::DATASET_PATH + "/" + optarg + "/training_images";
+                Config::VALIDATION_TEST_IMG_PATH = Config::DATASET_PATH + "/" + optarg + "/validation_images";                                   
 
-                Config::TEST_IMG_PATH = Config::DATASET_PATH + optarg + "/test_images";
-                Config::TRAINING_TEST_IMG_PATH = Config::DATASET_PATH + optarg + "/training_images";
-                Config::VALIDATION_TEST_IMG_PATH = Config::DATASET_PATH + optarg + "/validation_images";                                   
+                Config::TRAINING_FACES_TEST_PATH =  Config::TRAINING_TEST_IMG_PATH + "/faces";    
+                Config::TRAINING_SCENES_TEST_PATH = Config::TRAINING_TEST_IMG_PATH + "/non_faces";
+
+                Config::VALIDATION_FACES_TEST_PATH = Config::VALIDATION_TEST_IMG_PATH + "/faces";
+                Config::VALIDATION_SCENES_TEST_PATH = Config::VALIDATION_TEST_IMG_PATH + "/non_faces";                  
                 break;
         }
     }
@@ -107,7 +110,7 @@ int train(){
     Trainer* t = new Trainer(ts,vs);
     CascadeClassifier cl = t->startTrainingCascade();    
 
-    cl.save(Config::CLASSIFIERS_PATH + "/classifier_final");
+    // cl.save(Config::CLASSIFIERS_PATH + "/classifier_final");
 }
 
 int main(int argc, char* argv[]){

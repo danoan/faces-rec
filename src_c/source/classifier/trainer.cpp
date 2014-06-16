@@ -69,7 +69,6 @@ Trainer::Trainer(TrainingSet& ts, ValidationSet& vs){
 }
 
 void Trainer::prepareTrainer(){
-    delete _ct;
     _ct = new ClassificationTable();
 
     for(register int j=0;j<_ts._faces.size();j++){
@@ -122,6 +121,7 @@ CascadeClassifier Trainer::startTrainingCascade(){
     double di;
 
     int features_to_check = 1;  //Number of features to create before check classifier
+    int total_features = 0;
     while( _fp_rate>_final_fp_rate && _stage_number < Config::CLASSIFIER_MAX_STAGES ){          
         prepareTrainer(); 
         Logger::debug->log("End Preparation \n\n");
@@ -154,12 +154,15 @@ CascadeClassifier Trainer::startTrainingCascade(){
         cascade.addClassifier(fc);
 
         char path[128];
-        sprintf(path,"%s/classifier_%d_%d",Config::STATES_PATH.c_str(), _ts._faces.size()+_ts._scenes.size(), _feature_number);
+        total_features += _feature_number;
+        sprintf(path,"%s/classifier_%d_%d_%d",Config::STATES_PATH.c_str(), _ts._faces.size()+_ts._scenes.size(), _stage_number, _feature_number);
         printf("%s\n",path);
         cascade.save(std::string(path));
 
         if(_ts.resetScenesSet(fc,_vs,_stage_number)==-1) break;                
-        if(_vs.resetScenesSet(_stage_number)==-1) break;         
+        if(_vs.resetScenesSet(_stage_number)==-1) break;  
+
+        endTrainer();       
     }
     
 

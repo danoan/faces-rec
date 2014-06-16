@@ -52,6 +52,7 @@ public:
     void getBestFromFeature(TableItem& theBest, FMF& factory);
 
     void prepareTrainer();
+    inline void endTrainer(){delete _ct;};
     Classifier startTraining();
     CascadeClassifier startTrainingCascade();
     void keepTraining(Classifier& cl);
