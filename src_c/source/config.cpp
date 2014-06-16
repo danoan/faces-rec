@@ -27,7 +27,8 @@ bool Config::HAS_BUFFER = false;
 
 bool Config::TEST_EXECUTION = false;
 
-std::string Config::PROJECT_PATH = "/home/daniel/Projects/faces-rec";
+std::string Config::PROJECT_PATH = "/home/users/danielantunes/Documentos/faces-rec";
+//std::string Config::PROJECT_PATH = "/home/daniel/Projects/faces-rec";
 
 std::string Config::LOG_PATH = PROJECT_PATH + "/log";
 

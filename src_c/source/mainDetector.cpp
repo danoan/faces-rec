@@ -37,7 +37,7 @@ int detectSimpleFaces(std::string img_dir, CascadeClassifier cl){
 void detectFaces(std::string classifier_path){
     printf("Detection started for: %s\n\n", classifier_path.c_str());
     CascadeClassifier cc;
-    cc.load(Config::CLASSIFIERS_PATH + "/" + classifier_path);
+    cc.load(classifier_path);
 
     Point wr;
     wr.x = Config::CLASSIFIER_SUBWINDOW_START_WIDTH;
@@ -51,8 +51,13 @@ void detectFaces(std::string classifier_path){
     d.detectFaces(&cc,Config::DATASET_PATH+"/seinfeld.pgm");
 }
 
+void detectFaces(std::string folder_classifiers, std::string classifier_path){
+    detectFaces( folder_classifiers + "/" + classifier_path );
+}
+
 void testClassifiers(std::string classifier_folder_path){
     std::vector<std::string> files;
+    classifier_folder_path = Config::CLASSIFIERS_PATH + "/" + classifier_folder_path;
     getAllFiles(classifier_folder_path,files);
     for(register int i=0;i<files.size();i++){
         detectFaces(files[i]);
@@ -60,7 +65,7 @@ void testClassifiers(std::string classifier_folder_path){
 }
 
 int readInput(int argc, char* argv[]){
-    char* options = "s:w:h:g:a:b";
+    char* options = "s:w:h:g:a:b:";
     int c = 0;
     while(1){
         c=getopt(argc,argv,options);
@@ -99,7 +104,7 @@ int main(int argc, char* argv[]){
     Logger::init("detector");
 
     if(b_detectFaces){
-        detectFaces(classifier_path);    
+        detectFaces(Config::CLASSIFIERS_PATH, classifier_path);    
     }else if(b_testClassifiers){
         testClassifiers(classifier_folder_path);
     }
