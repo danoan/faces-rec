@@ -2,11 +2,11 @@
 
 #define STRING_LENGTH 240                    /* something 'safe'             */
 
-void FilePrint::init_log(char *file){
+void FilePrint::init_log(const char *file){
   return init_log(file,"w");
 }
 
-void FilePrint::init_log(char *file, char* mode){
+void FilePrint::init_log(const char *file, char* mode){
   char filepath[STRING_LENGTH];
   sprintf(filepath,"%s/%s",Config::LOG_PATH.c_str(),file);
 

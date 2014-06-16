@@ -21,6 +21,8 @@ public:
     static FilePrint* debug;
 
     static FilePrint* feat_anal;
+
+    static void init(std::string folder);
 };
 
 typedef struct{

@@ -20,5 +20,7 @@ make -f makefileDetector
 
 # g++ `MagickWand-config --cflags` source/teste.cpp source/basic.cpp source/image.c -Llib -lpytoc -lfeature -lpytoc -ldetector -lclassifier `MagickWand-config --ldflags` -O3 -w
 
-g++ `MagickWand-config --cflags` $source_path/config.cpp $source_path/log.cpp $source_path/mainTrainer.cpp $source_path/basic.cpp $source_path/image.c -L$lib_path -lpytoc -lpytoc -ldetector -lclassifier -lfeature `MagickWand-config --ldflags` -O3 -w -o main.out
+g++ `MagickWand-config --cflags` $source_path/config.cpp $source_path/log.cpp $source_path/mainTrainer.cpp $source_path/basic.cpp $source_path/image.c -L$lib_path -lpytoc -ldetector -lclassifier -lfeature `MagickWand-config --ldflags` -O3 -w -o trainer.out
+
+g++ `MagickWand-config --cflags` $source_path/config.cpp $source_path/log.cpp $source_path/mainDetector.cpp $source_path/basic.cpp $source_path/image.c -L$lib_path -lpytoc -ldetector -lclassifier -lfeature `MagickWand-config --ldflags` -O3 -w -o detector.out
 

@@ -20,6 +20,8 @@ int Config::MAX_HYPOTHESIS_PER_STAGE = 300;
 int Config::ARDIS_WIDTH = 64;
 int Config::ARDIS_HEIGHT = 64;
 
+int Config::DETECTOR_GENERATIONS = 3;
+
 int Config::INTEGRAL_IMAGE_BUFFER_SIZE = 5000;
 bool Config::HAS_BUFFER = false;
 
@@ -37,8 +39,8 @@ std::string Config::TRAINING_IMG_PATH = DATASET_PATH + "/Instancia SUN/training_
 std::string Config::VALIDATION_IMG_PATH = DATASET_PATH + "/Instancia SUN/validation_images";
 
 std::string Config::TEST_IMG_PATH = DATASET_PATH + "/Instancia SUN_700_1400/test_images";
-std::string Config::TRAINING_TEST_IMG_PATH = DATASET_PATH + "/Instancia SUN_700_1400/training_images";
-std::string Config::VALIDATION_TEST_IMG_PATH = DATASET_PATH + "/Instancia SUN_700_1400/validation_images";
+std::string Config::TRAINING_TEST_IMG_PATH = DATASET_PATH + "/Instancia SUN_2400_3000/training_images";
+std::string Config::VALIDATION_TEST_IMG_PATH = DATASET_PATH + "/Instancia SUN_2400_3000/validation_images";
 
 
 

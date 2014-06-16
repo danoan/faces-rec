@@ -14,14 +14,16 @@
 #include <stdlib.h>
 #include <ctype.h>
 
+#include <string>
+
 class FilePrint{
 private:
   FILE *log_file;
 public:
-  FilePrint(char *file){init_log(file);};
+  FilePrint(const std::string file){init_log(file.c_str());};
 
-  void init_log(char *file);
-  void init_log(char *file, char* mode);
+  void init_log(const char *file);
+  void init_log(const char *file, char* mode);
 
   int log(char *fmt, ...);
 };

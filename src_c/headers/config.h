@@ -25,6 +25,8 @@ public:
     static int ARDIS_WIDTH;
     static int ARDIS_HEIGHT;
 
+    static int DETECTOR_GENERATIONS;
+
     static int INTEGRAL_IMAGE_BUFFER_SIZE;
     static bool HAS_BUFFER;
 

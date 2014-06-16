@@ -11,32 +11,9 @@
 #include "../headers/config.h"
 #include "../headers/basic.h"
 
-#include "../headers/feature/maskTwoHorizontalFactory.h"
-
-#include "../headers/detector/detector.h"
-
-int detectSimpleFaces(std::string img_dir, CascadeClassifier cl){
-    std::vector<std::string> files;
-
-    getAllFiles(img_dir,files);
-
-    Point wr;
-    wr.x=64;
-    wr.y=64;
-
-    Subwindow sw (0,0,wr,1,1);
-    int faces_count=0;
-
-    for(int i=0;i<files.size();i++){
-        IntegralImage ii ( files[i] );
-        faces_count+= cl.isFace(ii,sw);
-    }
-
-    Logger::debug->log("FACES DETECTED %d/%d\n",faces_count,files.size());
-}
 
 int readInput(int argc, char* argv[]){
-    char* options = "s:r:w:h:f:d:m:t:n:v:a:b:i:uzx:";
+    char* options = "s:r:w:h:f:d:m:t:n:v:a:b:i:uzx:p:";
     int c=0;
     while(1){
         c = getopt(argc,argv,options);
@@ -89,17 +66,22 @@ int readInput(int argc, char* argv[]){
                 break;                           
             case 'x':
                 Config::MAX_HYPOTHESIS_PER_STAGE = atoi(optarg);
-                break;                                           
+                break;        
+            case 'p':
+                Config::TRAINING_IMG_PATH = Config::DATASET_PATH + optarg + "/training_images";
+                Config::VALIDATION_IMG_PATH = Config::DATASET_PATH + optarg + "/validation_images";
 
+                Config::TEST_IMG_PATH = Config::DATASET_PATH + optarg + "/test_images";
+                Config::TRAINING_TEST_IMG_PATH = Config::DATASET_PATH + optarg + "/training_images";
+                Config::VALIDATION_TEST_IMG_PATH = Config::DATASET_PATH + optarg + "/validation_images";                                   
+                break;
         }
     }
 
     return 1;
 }
 
-int train(int argc, char* argv[]){
-    if(readInput(argc,argv)!=1) return 0;
-
+int train(){
     std::string vs_face_path, vs_scene_path;
     std::string ts_face_path, ts_scene_path;
 
@@ -126,30 +108,12 @@ int train(int argc, char* argv[]){
     CascadeClassifier cl = t->startTrainingCascade();    
 
     cl.save(Config::CLASSIFIERS_PATH + "/classifier_final");
-
-    detectSimpleFaces(Config::TEST_FACES_PATH,cl);
-    // detectSimpleFaces(Config::VALIDATION_SCENES_PATH,cl);
-}
-
-void detectFaces(){
-    CascadeClassifier cc;
-    cc.load(Config::CLASSIFIERS_PATH + "/classifier_final");
-
-    Point wr;
-    wr.x = Config::CLASSIFIER_SUBWINDOW_START_WIDTH;
-    wr.y = Config::CLASSIFIER_SUBWINDOW_START_HEIGHT;
-    
-    Point ardis;
-    ardis.x = Config::ARDIS_WIDTH;
-    ardis.y = Config::ARDIS_HEIGHT;
-
-    Detector d(3,wr,ardis,Config::CLASSIFIER_SHIFT_STEP);
-    d.detectFaces(&cc,Config::DATASET_PATH+"/seinfeld.pgm");
 }
 
 int main(int argc, char* argv[]){
-    // train(argc,argv);
-    detectFaces();
+    if(readInput(argc,argv)!=1) return 1;
+    Logger::init("trainer");
+    train();
     return 0;
 }
 
@@ -168,5 +132,6 @@ int main(int argc, char* argv[]){
     v: Max Length Validation Set
     m: Stage Max FP
     t: Stage Min Det
+    p: Dataset folder name
 
 */
