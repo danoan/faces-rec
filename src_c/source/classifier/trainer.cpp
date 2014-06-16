@@ -155,7 +155,7 @@ CascadeClassifier Trainer::startTrainingCascade(){
 
         char path[128];
         total_features += _feature_number;
-        sprintf(path,"%s/classifier_%d_%d_%d",Config::STATES_PATH.c_str(), _ts._faces.size()+_ts._scenes.size(), _stage_number, _feature_number);
+        sprintf(path,"%s/classifier_%d_%d_%d",Config::STATES_PATH.c_str(), _ts._faces.size()+_ts._scenes.size(), _stage_number, total_features);
         printf("%s\n",path);
         cascade.save(std::string(path));
 
