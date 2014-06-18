@@ -14,8 +14,13 @@ std::string classifier_path;
 bool b_testClassifiers = false;
 std::string classifier_folder_path;
 
-int detectSimpleFaces(std::string img_dir, CascadeClassifier cl){
+bool b_simpleFaces = false;
+std::string img_dir;
+
+int detectSimpleFaces(std::string img_dir, std::string classifier_path){
     std::vector<std::string> files;
+    CascadeClassifier cl;
+    cl.load(classifier_path);    
 
     getAllFiles(img_dir,files);
 
@@ -31,7 +36,7 @@ int detectSimpleFaces(std::string img_dir, CascadeClassifier cl){
         faces_count+= cl.isFace(ii,sw);
     }
 
-    Logger::debug->log("FACES DETECTED %d/%d\n",faces_count,files.size());
+    printf("FACES DETECTED %d/%d\n",faces_count,files.size());
 }
 
 void detectFaces(std::string classifier_path){
@@ -39,16 +44,16 @@ void detectFaces(std::string classifier_path){
     CascadeClassifier cc;
     cc.load(classifier_path);
 
-    Point wr;
-    wr.x = Config::CLASSIFIER_SUBWINDOW_START_WIDTH;
-    wr.y = Config::CLASSIFIER_SUBWINDOW_START_HEIGHT;
+    Point ref_mask;
+    ref_mask.x = Config::CLASSIFIER_SUBWINDOW_START_WIDTH;
+    ref_mask.y = Config::CLASSIFIER_SUBWINDOW_START_HEIGHT;
     
     Point ardis;
     ardis.x = Config::ARDIS_WIDTH;
     ardis.y = Config::ARDIS_HEIGHT;
 
-    Detector d(Config::DETECTOR_GENERATIONS,wr,ardis,Config::CLASSIFIER_SHIFT_STEP);
-    d.detectFaces(&cc,Config::DATASET_PATH+"/seinfeld.pgm");
+    Detector d(Config::DETECTOR_GENERATIONS,ardis,ref_mask,Config::CLASSIFIER_SHIFT_STEP);
+    d.detectFaces(&cc,Config::DATASET_PATH+"/seinfeld4.pgm");
 }
 
 void detectFaces(std::string folder_classifiers, std::string classifier_path){
@@ -65,7 +70,7 @@ void testClassifiers(std::string classifier_folder_path){
 }
 
 int readInput(int argc, char* argv[]){
-    char* options = "s:w:h:g:a:b:";
+    char* options = "s:w:h:g:a:b:c:d:";
     int c = 0;
     while(1){
         c=getopt(argc,argv,options);
@@ -86,13 +91,25 @@ int readInput(int argc, char* argv[]){
             case 'a':
                 b_detectFaces = true;
                 b_testClassifiers = false;
+                b_simpleFaces = false;
                 classifier_path = std::string(optarg);
                 break;                
             case 'b':
                 b_detectFaces = false;
                 b_testClassifiers = true;
+                b_simpleFaces = false;
                 classifier_folder_path = std::string(optarg);
-                break;                                
+                break;         
+            case 'c':
+                b_detectFaces = false;
+                b_testClassifiers = false;
+                b_simpleFaces = true;
+
+                img_dir = std::string(optarg);
+                break;    
+            case 'd':
+                classifier_path = std::string(optarg);
+                break;     
         }    
     }
 
@@ -107,6 +124,8 @@ int main(int argc, char* argv[]){
         detectFaces(Config::CLASSIFIERS_PATH, classifier_path);    
     }else if(b_testClassifiers){
         testClassifiers(classifier_folder_path);
+    }else{
+        detectSimpleFaces(img_dir,classifier_path);
     }
     
     return 0;
