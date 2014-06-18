@@ -5,13 +5,19 @@ TrainingImage::TrainingImage(std::string imagePath, TrainingType tt, bool has_bu
     _ii = new IntegralImage(imagePath);
     _has_buffer = has_buffer;
     // printf("%s\n",imagePath.c_str());
+
+    if(_has_buffer){    
+        for(int i=0;i<FEATURES_NUMBER;i++){
+          _ii_buffer.push_back( MAX_FEATURE_VALUE );  
+        } 
+    }
 }
 
 unsigned long int TrainingImage::filter(FeatureMask& fm){
     //Check if has_buffer and pick the value for this feature mask or compute the integral image
     if(_has_buffer){
-        if(_ii_buffer.size()<=fm._id){
-            _ii_buffer.push_back(_ii->filter(fm));        
+        if(_ii_buffer[fm._id] == MAX_FEATURE_VALUE){
+            _ii_buffer[fm._id] = _ii->filter(fm);        
         }           
 
         return _ii_buffer[fm._id];
@@ -19,4 +25,4 @@ unsigned long int TrainingImage::filter(FeatureMask& fm){
         return _ii->filter(fm);
     }    
     
-}
+}   

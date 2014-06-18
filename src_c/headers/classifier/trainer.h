@@ -2,6 +2,7 @@
 #define __TRAINER__
 
 #include <string>
+#include <pthread.h>
 #include "trainingImage.h"
 #include "classificationTable.h"
 #include "cascadeClassifier.h"
@@ -11,6 +12,8 @@
 #include "../feature/libfeature.h"
 #include "../basic.h"
 #include "../config.h"
+
+#define THREADS_NUMBER 4
 
 class Trainer{
 private:
@@ -30,34 +33,41 @@ private:
     int _stage_number = 0;
     int _feature_number = 0;
 
-    Point _ardis;
-
-    MaskTwoHorizontalFactory _m2hf;
-    MaskTwoVerticalFactory _m2vf;
-    MaskThreeHorizontalFactory _m3hf;
-    MaskThreeVerticalFactory _m3vf;
-    MaskDiagonalFactory _mdf;
+    Point _ardis;    
 
     TrainingSet _ts;
     ValidationSet _vs;
 
+    pthread_t _threads[THREADS_NUMBER];
+
     void inputInfo();
+    ulong addFeatureMasks(FMF factory);
 
 public:
-    ClassificationTable* _ct;
+    ClassificationTable* _ct[THREADS_NUMBER];
+    std::vector<FeatureMask> _featureMasks;
 
     Trainer(TrainingSet& ts, ValidationSet& vs);
 
-    void addTrainingImage(std::string imagePath, TrainingType imageType );
-    void getBestFromFeature(TableItem& theBest, FMF& factory);
-
     void prepareTrainer();
-    inline void endTrainer(){delete _ct;};
+    void endTrainer(){ for(int i=0;i<THREADS_NUMBER;i++) delete _ct[i];};
+    
     Classifier startTraining();
     CascadeClassifier startTrainingCascade();
     void keepTraining(Classifier& cl);
 
     bool checkClassifier(Classifier& cc, double* ac, double* fi, double* di);
 };
+
+typedef struct{
+    Trainer* t;
+    int thread_number;
+    int factor;
+    TableItem best;
+    int final;
+} elem_params;
+
+void* getBestFromFeature(void* params);
+
 
 #endif

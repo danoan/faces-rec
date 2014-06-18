@@ -6,6 +6,9 @@
 #include "../feature/libfeature.h"
 #include "integralImage.h"
 
+#define MAX_FEATURE_VALUE 1048576 //64*64*256 Para um ardis de 64x64
+#define FEATURES_NUMBER 97039
+
 enum TrainingType {SCENE, FACE};
 
 class TrainingImage{

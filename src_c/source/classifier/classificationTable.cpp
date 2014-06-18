@@ -3,23 +3,9 @@
 ClassificationTable::ClassificationTable(){
     // _tir = new TrainingImageRepository();
 
-    _positive=0;
-    _negative=0;
+    _positive = TrainingImageRepository::_faces.size();
+    _negative = TrainingImageRepository::_scenes.size();
 };
-
-void ClassificationTable::addTrainingImage(std::string imagePath, TrainingType tit){
-    // _tir->addTrainingImage(imagePath,tit);
-
-    if(_images.size()<Config::INTEGRAL_IMAGE_BUFFER_SIZE){
-        _images.push_back(new TrainingImage(imagePath,tit,Config::HAS_BUFFER)); 
-    }else{
-        _images.push_back(new TrainingImage(imagePath,tit,false)); 
-    }
-
-    
-    if(tit==FACE) _positive+=1;
-    else          _negative+=1;
-}
 
 void ClassificationTable::initTable(){
     double ipw = 1.0/(2*_positive);;
@@ -30,11 +16,11 @@ void ClassificationTable::initTable(){
     _t_plus=0;
     _t_minus=0;
 
-    // TrainingImage* t;
-    std::vector<TrainingImage*>::iterator it;
     int element_order=0;
-    for( it=_images.begin();it!=_images.end();it++ ){
-        if( (*it)->_tt==FACE){            
+    for(int i=0;i<TrainingImageRepository::size();i++){
+        TrainingImage* ti = TrainingImageRepository::get(i);
+
+        if( ti->_tt==FACE){            
             _elements.push_back( new TableItem(ipw,0.0,FACE,1.0,1,element_order++) );
             _weights.push_back(ipw);
             _t_plus+=ipw;
@@ -53,13 +39,13 @@ TableItem ClassificationTable::getBestTableItem(FeatureMask& fm){
     _s_minus=0;
     // TrainingImage* t;
     int i=0;
-    std::vector<TrainingImage*>::iterator it;
-    for( it=_images.begin();it!=_images.end();it++ ){
-        *(_elements[i]) = TableItem(_weights[i],  (*it)->filter(fm),  (*it)->_tt, 0, 1,i); 
-        i++;
+    for(int i=0;i<TrainingImageRepository::size();i++){
+        TrainingImage* ti = TrainingImageRepository::get(i);
+
+        *(_elements[i]) = TableItem(_weights[i],  ti->filter(fm),  ti->_tt, 0, 1,i); 
     }
     // printf("WEIGHT 1: %.12lf\n",_elements[0]->_weight);
-
+    // printf("PRE-SORT\n");
     std::sort( _elements.begin(),_elements.end(),TableItemComparator() );
     // printf("ORDER %lu %lu %lu\n",_elements[0]->_filter_value,_elements[1]->_filter_value,_elements[2]->_filter_value);
 
@@ -109,11 +95,13 @@ void ClassificationTable::updateWeights(double b_t, Hypothesy& h){
     _t_minus=0;
     std::vector<TrainingImage*>::iterator it;
     // printf("UPDATE WEIGHTS %d %lu\n",h._direction,h._threshold);
-    for(int i=0;i<_images.size();i++){
-        if( h_function( _images[i]->filter(h._fm), h._direction, h._threshold )==1 ){
+    for(int i=0;i<TrainingImageRepository::size();i++){
+        TrainingImage* ti = TrainingImageRepository::get(i);
+
+        if( h_function( ti->filter(h._fm), h._direction, h._threshold )==1 ){
             // printf("IMG %d IS FACE (%lu) \n", i,(*it)->filter(h._fm));
             //Classified as Face
-            if( _images[i]->_tt!=FACE ){
+            if( ti->_tt!=FACE ){
                 //Uncorrectly Classified                
                 // printf("UNCORRECTLY\n");
                 _t_minus+=_weights[ i ];
@@ -126,7 +114,7 @@ void ClassificationTable::updateWeights(double b_t, Hypothesy& h){
         }else{
             // printf("IMG %d IS SCENE (%lu) \n", i,(*it)->filter(h._fm));
             //Classified as Non-Face
-            if( _images[i]->_tt!=SCENE ){
+            if( ti->_tt!=SCENE ){
                 //Uncorrectly classified                
                 // printf("UNCORRECTLY\n");
                 _t_plus+=_weights[ i ];
@@ -141,7 +129,7 @@ void ClassificationTable::updateWeights(double b_t, Hypothesy& h){
 
     //Now normalize the weights
     double normal_factor = 1.0/(_t_plus+_t_minus);
-    for(int i=0;i<_images.size();i++){
+    for(int i=0;i<TrainingImageRepository::size();i++){
         _weights[ i ] *=  normal_factor;
     }
 
