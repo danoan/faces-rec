@@ -41,7 +41,7 @@ void Detector::detectFaces(ClassifierInterface* ci, const std::string img_path, 
 	for(register int i=0;i<faces_boxes.size();i++){
 		boxes_array[i] = faces_boxes[i];
 	}
-	//drawRectangles(img_path.c_str(),faces_boxes.size(),boxes_array,"green");
+	drawRectangles(img_path.c_str(),faces_boxes.size(),boxes_array,"green");
 	free(boxes_array);
 
 	// int** boxes_array = (int**) malloc(scenes_boxes.size()*sizeof(int*));
