@@ -1,16 +1,5 @@
 #include "../../headers/classifier/trainer.h"
 
-ulong Trainer::addFeatureMasks(FMF factory){
-    ulong c=0;
-
-    while(factory.hasNext()==1){
-        _featureMasks.push_back( factory.next() );
-        c++;
-    }
-
-    return c;
-}
-
 void Trainer::inputInfo(){
     Logger::logger->log("INPUT INFO\n\n");
     Logger::logger->log("ARDIS_WIDTH: %d\nARDIS_HEIGHT: %d\n",_ardis.x,_ardis.y);
@@ -21,7 +10,7 @@ void Trainer::inputInfo(){
 
     Logger::logger->log("FEATURES INFO\n\n");
 
-    Logger::logger->log("Total Features: %d\n",_featureMasks.size());    
+    Logger::logger->log("Total Features: %d\n",_facesFactory._facesFeatures.size());    
 }
 
 Trainer::Trainer(TrainingSet& ts, ValidationSet& vs){
@@ -40,24 +29,13 @@ Trainer::Trainer(TrainingSet& ts, ValidationSet& vs){
     _max_fp_rate = Config::CLASSIFIER_STAGE_MAX_FALSE_POSITIVE_RATE;
     _min_det_rate = Config::CLASSIFIER_STAGE_MIN_DETECTION_RATE;    
 
-
-    MaskTwoHorizontalFactory m2hf(_ardis,_shift_w,_shift_h,_resize_factor,_start_w,_start_h);    
-    MaskTwoVerticalFactory m2vf(_ardis,_shift_w,_shift_h,_resize_factor,_start_w,_start_h);    
-    MaskThreeHorizontalFactory m3hf(_ardis,_shift_w,_shift_h,_resize_factor,_start_w,_start_h);    
-    MaskThreeVerticalFactory m3vf(_ardis,_shift_w,_shift_h,_resize_factor,_start_w,_start_h);    
-    MaskDiagonalFactory mdf(_ardis,_shift_w,_shift_h,_resize_factor,_start_w,_start_h);        
-
-    addFeatureMasks(m2hf);
-    addFeatureMasks(m2vf);
-    addFeatureMasks(m3hf);
-    addFeatureMasks(m3vf);
-    addFeatureMasks(mdf);
-
     _ts = ts;
     _vs = vs;
 
+    _tir.init(_facesFactory._facesFeatures.size());
+
     for(register int j=0;j<_ts._faces.size();j++){
-        TrainingImageRepository::addFace( _ts._faces[j], FACE );
+        _tir.addFace( _ts._faces[j], FACE );
     }    
 
     inputInfo();
@@ -65,9 +43,10 @@ Trainer::Trainer(TrainingSet& ts, ValidationSet& vs){
 
 void Trainer::prepareTrainer(){
     printf("PREPARE TRAINER\n");
-    TrainingImageRepository::clearScenes();
+
+    _tir.clearScenes();
     for(register int j=0;j<_ts._scenes.size();j++){
-        TrainingImageRepository::addScene( _ts._scenes[j], SCENE );
+        _tir.addScene( _ts._scenes[j], SCENE );
     }    
     printf("END TRAINER\n");
 
@@ -75,7 +54,7 @@ void Trainer::prepareTrainer(){
 }
 
 Classifier Trainer::startTraining(){
-    for(int i=0;i<THREADS_NUMBER;i++) _ct[i]->initTable();
+    for(int i=0;i<THREADS_NUMBER;i++) _ct[i]->initTable(_tir);
     Logger::debug->log("Start Training Stage %d\n\n", _stage_number++);
     _feature_number=0;
 
@@ -100,7 +79,7 @@ CascadeClassifier Trainer::startTrainingCascade(){
         prepareTrainer(); 
         Logger::debug->log("End Preparation \n\n");
         
-        for(int i=0;i<THREADS_NUMBER;i++) _ct[i]->initTable();
+        for(int i=0;i<THREADS_NUMBER;i++) _ct[i]->initTable(_tir);
 
         Logger::debug->log("Start Training Stage %d\n\n", _stage_number++);
         _feature_number=0;
@@ -151,7 +130,7 @@ void* getBestFromFeature(void* params){
     int to = ep->factor*(ep->thread_number+1);
 
     if(ep->final==1){
-        to = ep->t->_featureMasks.size()-1;
+        to = ep->t->_facesFactory._facesFeatures.size()-1;
     }
 
     // printf("OK %d %d %d %d\n", from, to, ep->factor, ep->t->_featureMasks.size());    
@@ -159,7 +138,7 @@ void* getBestFromFeature(void* params){
     TableItem partialBest;
     for(int i=from;i<to;i++){
         // printf("GO %d\n", i);
-        partialBest = ep->t->_ct[ep->thread_number]->getBestTableItem( (ep->t->_featureMasks)[i] );
+        partialBest = ep->t->_ct[ep->thread_number]->getBestTableItem( (ep->t->_facesFactory._facesFeatures)[i], ep->t->_tir );
         // printf("STOP\n");
 
         if(partialBest._error<ep->best._error){
@@ -178,7 +157,7 @@ void Trainer::keepTraining(Classifier& cl){
 
     elem_params ep[THREADS_NUMBER];
 
-    int factor = (int) floor(_featureMasks.size()/THREADS_NUMBER);
+    int factor = (int) floor(_facesFactory._facesFeatures.size()/THREADS_NUMBER);
 
     for(register int t=0;t<THREADS_NUMBER;t++){
         ep[t].t = this;
@@ -213,12 +192,12 @@ void Trainer::keepTraining(Classifier& cl){
     Logger::debug->log( "IT: %d-%d \n E_T: %.12f \n B_T: %.12f \n A_T %.12f \n\n",_stage_number,_feature_number,e_t,b_t,a_t);
 
     Hypothesy h (theBest._filter_value, theBest._direction, a_t, theBest._fm );
-    Logger::debug->log("HYPOTHESY %lu %d %lf\n",h._threshold,h._direction,h._alpha);
+    Logger::debug->log("HYPOTHESY %lu %d %lf %d \n",h._threshold,h._direction,h._alpha,h._fm._id);
 
     cl.addHypothesy(h);
     cl._ardis = _ardis;
 
-    for(int i=0;i<THREADS_NUMBER;i++) _ct[i]->updateWeights(b_t,h);
+    for(int i=0;i<THREADS_NUMBER;i++) _ct[i]->updateWeights(b_t,h,_tir);
     
     _feature_number+=1;
 }

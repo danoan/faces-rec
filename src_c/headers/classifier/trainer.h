@@ -10,8 +10,8 @@
 #include "trainingSet.h"
 #include "validationSet.h"
 #include "../feature/libfeature.h"
-#include "../basic.h"
-#include "../config.h"
+#include "../util/basic.h"
+#include "../util/config.h"
 
 #define THREADS_NUMBER 4
 
@@ -36,7 +36,7 @@ private:
     Point _ardis;    
 
     TrainingSet _ts;
-    ValidationSet _vs;
+    ValidationSet _vs;    
 
     pthread_t _threads[THREADS_NUMBER];
 
@@ -45,7 +45,8 @@ private:
 
 public:
     ClassificationTable* _ct[THREADS_NUMBER];
-    std::vector<FeatureMask> _featureMasks;
+    FacesFeatureFactory _facesFactory;
+    TrainingImageRepository _tir;
 
     Trainer(TrainingSet& ts, ValidationSet& vs);
 
@@ -57,6 +58,9 @@ public:
     void keepTraining(Classifier& cl);
 
     bool checkClassifier(Classifier& cc, double* ac, double* fi, double* di);
+
+    double final_fp_rate(){return _final_fp_rate;};
+    double final_det_rate(){return _final_det_rate;};
 };
 
 typedef struct{

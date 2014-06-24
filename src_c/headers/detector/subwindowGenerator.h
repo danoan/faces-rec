@@ -7,8 +7,8 @@
 #include <math.h>
 #include <vector>
 
-#include "../image.h"
-#include "../basic.h"
+#include "../util/image.h"
+#include "../util/basic.h"
 
 class SubwindowGenerator{
 public:

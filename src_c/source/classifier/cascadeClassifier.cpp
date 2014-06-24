@@ -14,8 +14,8 @@ int CascadeClassifier::isFace(IntegralImage &ii, Subwindow &sw, double ac){
 
 int CascadeClassifier::isFace(IntegralImage &ii, double ac){
     Point wr;
-    wr.x=64;
-    wr.y=64;
+    wr.x=Config::ARDIS_WIDTH;
+    wr.y=Config::ARDIS_HEIGHT;
 
     Subwindow sw (0,0,wr,1,1);  
     return isFace(ii,sw,ac);    
@@ -35,8 +35,8 @@ int CascadeClassifier::isFace(IntegralImage& ii, Subwindow& sw){
 
 int CascadeClassifier::isFace(IntegralImage& ii){
     Point wr;
-    wr.x=64;
-    wr.y=64;
+    wr.x=Config::ARDIS_WIDTH;
+    wr.y=Config::ARDIS_HEIGHT;
 
     Subwindow sw (0,0,wr,1,1);        
     return isFace(ii,sw);

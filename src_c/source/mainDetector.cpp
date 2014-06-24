@@ -2,8 +2,7 @@
 #include <vector>
 #include <string>
 
-#include "../headers/basic.h"
-#include "../headers/config.h"
+#include "../headers/util/libutil.h"
 #include "../headers/classifier/integralImage.h"
 #include "../headers/feature/libfeature.h"
 #include "../headers/classifier/cascadeClassifier.h"
@@ -19,6 +18,8 @@ std::string classifier_folder_path;
 bool b_simpleFaces = false;
 std::string img_dir;
 
+int feature_id;
+
 std::vector<FeatureMask> _featureMasks;
 
 ulong addFeatureMasks(FMF factory){
@@ -31,18 +32,22 @@ ulong addFeatureMasks(FMF factory){
 
     return c;
 }
+    static std::string PROJECT_PATH;
 
+    static std::string LOG_PATH;
+
+    static std::string DATASET_PATH;
 void teste(){
-    std::string img1 = "/home/daniel/Projects/faces-rec/dataset/seinfeld.pgm";  //(588,285) - 
-    std::string img2 = "/home/daniel/Projects/faces-rec/dataset/seinfeld2.pgm"; //(360,221) - corte 64 Topo; Corte 100 esquerda; Corte 128 direita
-    std::string classifier_path = "/home/daniel/Projects/faces-rec/src_c/classifiers/state/classifier_5400_2_21";
+    std::string img1 = Config::DATASET_PATH + "/seinfeld.pgm";  //(588,285) - 
+    std::string img2 = Config::DATASET_PATH + "/seinfeld2.pgm"; //(360,221) - corte 64 Topo; Corte 100 esquerda; Corte 128 direita
+    std::string classifier_path = Config::STATES_PATH + "/classifier_5400_2_21";
 
     CascadeClassifier cl;
     cl.load(classifier_path);        
 
     Point wr;
-    wr.x=64;
-    wr.y=64;
+    wr.x=Config::ARDIS_WIDTH;
+    wr.y=Config::ARDIS_HEIGHT;
 
     IntegralImage i1(img1);
     IntegralImage i2(img2);
@@ -77,9 +82,9 @@ void teste(){
 
     for(int m=0;m<_featureMasks.size();m++){
 
-        for(int i=0;i<(221-64);i++){
-            for(int j=0;j<(360-64);j++){
-                Subwindow sw1 (j+100,64+i,wr,1,1);    
+        for(int i=0;i<(221-Config::ARDIS_HEIGHT);i++){
+            for(int j=0;j<(360-Config::ARDIS_WIDTH);j++){
+                Subwindow sw1 (j+100,Config::ARDIS_HEIGHT+i,wr,1,1);    
                 Subwindow sw2 (j,i,wr,1,1);                            
 
                 _featureMasks[m].adjustMask(sw1);
@@ -110,8 +115,8 @@ int detectSimpleFaces(std::string img_dir, std::string classifier_path){
     getAllFiles(img_dir,files);
 
     Point wr;
-    wr.x=64;
-    wr.y=64;
+    wr.x=Config::ARDIS_WIDTH;
+    wr.y=Config::ARDIS_HEIGHT;
 
     Subwindow sw (0,0,wr,1,1);
     int faces_count=0;
@@ -154,16 +159,25 @@ void testClassifiers(std::string classifier_folder_path){
     }
 }
 
-int readInput(int argc, char* argv[]){
-    char* options = "s:w:h:g:a:b:c:d:";
+int readInputDetector(int argc, char* argv[]){
+    char* options = "s:w:h:g:j:k:l:d:if:r:a:b:";
     int c = 0;
     while(1){
         c=getopt(argc,argv,options);
         if(c<0) break;
         switch(c){
+            case 'a':
+                Config::ARDIS_WIDTH = atof(optarg);
+                break;                
+            case 'b':
+                Config::ARDIS_HEIGHT = atoi(optarg);
+                break;            
             case 's':
                 Config::CLASSIFIER_SHIFT_STEP = atoi(optarg);
                 break;
+            case 'r':
+                Config::CLASSIFIER_RESIZE_FACTOR = atof(optarg);
+                break;                
             case 'w':
                 Config::CLASSIFIER_SUBWINDOW_START_WIDTH = atoi(optarg);
                 break;
@@ -173,28 +187,36 @@ int readInput(int argc, char* argv[]){
             case 'g':
                 Config::DETECTOR_GENERATIONS = atoi(optarg);
                 break;
-            case 'a':
+            case 'd':
+                classifier_path = std::string(optarg);
+                break;                     
+            case 'f':
+                feature_id = atoi(optarg);
+                break;                                     
+            case 'j':
                 b_detectFaces = true;
                 b_testClassifiers = false;
                 b_simpleFaces = false;
                 classifier_path = std::string(optarg);
                 break;                
-            case 'b':
+            case 'k':
                 b_detectFaces = false;
                 b_testClassifiers = true;
                 b_simpleFaces = false;
                 classifier_folder_path = std::string(optarg);
                 break;         
-            case 'c':
+            case 'l':
                 b_detectFaces = false;
                 b_testClassifiers = false;
                 b_simpleFaces = true;
 
                 img_dir = std::string(optarg);
                 break;    
-            case 'd':
-                classifier_path = std::string(optarg);
-                break;     
+            case 'i':
+                b_detectFaces = false;
+                b_testClassifiers = false;
+                b_simpleFaces = false;            
+                break;
         }    
     }
 
@@ -202,15 +224,21 @@ int readInput(int argc, char* argv[]){
 }
 
 int main(int argc, char* argv[]){
-    if( readInput(argc,argv)!= 1) return 1;
+    if( readInputDetector(argc,argv)!= 1) return 1;
     Logger::init("detector");
 
     if(b_detectFaces){
         detectFaces(Config::CLASSIFIERS_PATH, classifier_path);    
     }else if(b_testClassifiers){
         testClassifiers(classifier_folder_path);
-    }else{
+    }else if(b_simpleFaces){
         detectSimpleFaces(img_dir,classifier_path);
+    }else{
+        FacesFeatureFactory fff;
+        FeatureMask fm;
+        fm = fff.next();
+
+        drawFeatureImage(fff._facesFeatures[feature_id],1,Config::PROJECT_PATH + "/analysis/feature_images/", Config::ARDIS_WIDTH);
     }
     
     return 0;

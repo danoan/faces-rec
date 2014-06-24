@@ -31,10 +31,10 @@ cascadeClassifier.o:
 	g++ $(magick_left) -o $(object_path)/cascadeClassifier.o -c $(source_path)/cascadeClassifier.cpp $(magick_right) -O3 -w
 
 trainingImage.o:
-	g++ $(magick_left) -o $(object_path)/trainingImage.o -c $(source_path)/trainingImage.cpp $(magick_right) -Llib -lfeature -O3 -w
+	g++ $(magick_left) -o $(object_path)/trainingImage.o -c $(source_path)/trainingImage.cpp $(magick_right) -Llib -lfeature -lutil -O3 -w
 
 trainer.o:
-	g++ $(magick_left) -o $(object_path)/trainer.o -c $(source_path)/trainer.cpp $(magick_right) -Llib -lfeature -O3 -w
+	g++ $(magick_left) -o $(object_path)/trainer.o -c $(source_path)/trainer.cpp $(magick_right) -Llib -lfeature -lutil -O3 -w
 
 trainingImageRepository.o:
 	g++ $(magick_left) -o $(object_path)/trainingImageRepository.o -c $(source_path)/trainingImageRepository.cpp $(magick_right) -Llib -lfeature -O3 -w	

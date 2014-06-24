@@ -89,9 +89,9 @@ std::vector<Point> FMF::changeLocal(){
     return this->changeLocal(currentSize);
 }
 
-FeatureMask FMF::next(){
+FeatureMask FMF::next(int id){
 
-    FeatureMask fm ( this->_resizeList[_rit], this->_localList[_lit++], _counter++);
+    FeatureMask fm ( this->_resizeList[_rit], this->_localList[_lit++], id);
     // printf("(%lu %lu) (%lu %lu)\n",_resizeList[_rit].size().y, _resizeList[_rit].size().x,_localList[_lit-1].y,_localList[_lit-1].x);
 
     if(_lit==this->_localList.size()){      

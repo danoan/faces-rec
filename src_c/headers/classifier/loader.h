@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../basic.h"
+#include "../util/basic.h"
 #include "../pyToC/c_basic.h"
 #include "../pyToC/c_loader.h"
 

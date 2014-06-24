@@ -8,8 +8,11 @@ object_path:=$(object)/$(module)
 feature:=$(source)/feature
 
 
-all: maskBlock.o mask.o featureMask.o featureFactory.o mdf.o m3vf.o m3hf.o m2vf.o m2hf.o 
-	ar rc $(lib)/libfeature.a $(object_path)/maskBlock.o $(object_path)/mask.o $(object_path)/featureMask.o $(object_path)/featureFactory.o $(object_path)/mdf.o $(object_path)/m3vf.o $(object_path)/m3hf.o $(object_path)/m2vf.o $(object_path)/m2hf.o 
+all: maskBlock.o mask.o featureMask.o featureFactory.o mdf.o m3vf.o m3hf.o m2vf.o m2hf.o facesFeatureFactory.o
+	ar rc $(lib)/libfeature.a $(object_path)/maskBlock.o $(object_path)/mask.o $(object_path)/featureMask.o $(object_path)/featureFactory.o $(object_path)/mdf.o $(object_path)/m3vf.o $(object_path)/m3hf.o $(object_path)/m2vf.o $(object_path)/m2hf.o $(object_path)/facesFeatureFactory.o
+
+facesFeatureFactory.o:
+	g++ -o $(object_path)/facesFeatureFactory.o -c $(feature)/facesFeatureFactory.cpp -O3 -w
 
 mdf.o:
 	g++ -o $(object_path)/mdf.o -c $(feature)/maskDiagonalFactory.cpp -O3 -w

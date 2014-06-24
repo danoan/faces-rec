@@ -10,7 +10,7 @@
 #include <vector>
 #include <cmath>
 
-#include "../basic.h"
+#include "../util/basic.h"
 #include "featureMask.h"
 
 /*
@@ -64,7 +64,8 @@ public:
 	*/			
 	std::vector<Point> changeLocal(Point);
 	std::vector<Point> changeLocal();
-	FeatureMask next();
+	FeatureMask next(int id);
+	FeatureMask next(){return next(_counter++);};
 
 	inline int hasNext(){ 
 		return _rit>=this->_resizeList.size()?-1:1;

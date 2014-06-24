@@ -7,7 +7,7 @@ MaskBlock::MaskBlock(Point pa, Point pb, Point pc, Point pd){
     this->_points[3] = pd;
 
     this->_w = pb.x - pa.x + 1;
-    this->_h = pc.y - pc.y + 1;
+    this->_h = pc.y - pa.y + 1;
 };
 
 std::ostream& operator<<(std::ostream& os, const MaskBlock& mb){

@@ -6,8 +6,8 @@
 #include <string>
 #include <vector>
 
-#include "../basic.h"
-#include "../image.h"
+#include "../util/basic.h"
+#include "../util/image.h"
 #include "../classifier/libclassifier.h"
 
 #include "subwindowGenerator.h"

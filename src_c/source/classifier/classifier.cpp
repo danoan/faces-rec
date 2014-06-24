@@ -3,8 +3,8 @@
 
 int Classifier::isFace(IntegralImage &ii){
 	Point wr;
-    wr.x=64;
-    wr.y=64;
+    wr.x=Config::ARDIS_WIDTH;
+    wr.y=Config::ARDIS_HEIGHT;
 
     Subwindow sw (0,0,wr,1,1);        
     return isFace(ii,sw,_ac);
@@ -12,8 +12,8 @@ int Classifier::isFace(IntegralImage &ii){
 
 int Classifier::isFace(IntegralImage &ii, double ac){
 	Point wr;
-    wr.x=64;
-    wr.y=64;
+    wr.x=Config::ARDIS_WIDTH;
+    wr.y=Config::ARDIS_HEIGHT;
 
     Subwindow sw (0,0,wr,1,1);        
     return isFace(ii,sw,ac);	

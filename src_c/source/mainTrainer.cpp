@@ -1,88 +1,16 @@
 #include <cstring>
 #include <cstdlib>
 #include <cstdio>
-#include <unistd.h>
+
+#include "../headers/feature/featureMask.h"
 
 #include "../headers/classifier/cascadeClassifier.h"
 #include "../headers/classifier/validationSet.h"
 #include "../headers/classifier/trainingSet.h"
 #include "../headers/classifier/trainer.h"
 #include "../headers/classifier/directory.h"
-#include "../headers/config.h"
-#include "../headers/basic.h"
-
-
-int readInput(int argc, char* argv[]){
-    char* options = "s:r:w:h:f:d:m:t:n:v:a:b:i:uzx:p:";
-    int c=0;
-    while(1){
-        c = getopt(argc,argv,options);
-        if(c<0) break;
-        switch(c){
-            case 's':   //SHIFT_STEP
-                Config::CLASSIFIER_SHIFT_STEP = atoi(optarg);
-                break;
-            case 'r':   //RESIZE FACTOR
-                Config::CLASSIFIER_RESIZE_FACTOR = atof(optarg);
-                break;
-            case 'w':   //START WIDTH
-                Config::CLASSIFIER_SUBWINDOW_START_WIDTH = atoi(optarg);
-                break;               
-            case 'h':   //START HEIGHT
-                Config::CLASSIFIER_SUBWINDOW_START_HEIGHT = atoi(optarg);
-                break;                
-            case 'f':   //FINAL FALSE POSITIVE RATE
-                Config::CLASSIFIER_FINAL_FALSE_POSITIVE_RATE = atof(optarg);
-                break;                 
-            case 'd':   //FINAL DETECTION RATE
-                Config::CLASSIFIER_FINAL_DETECTION_RATE = atof(optarg);
-                break;
-            case 'm':   //MAX STAGE FALSE POSITIVE RATE
-                Config::CLASSIFIER_STAGE_MAX_FALSE_POSITIVE_RATE = atof(optarg);
-                break;                
-            case 't':   //MIN STAGE DETECTION RATE
-                Config::CLASSIFIER_STAGE_MIN_DETECTION_RATE = atof(optarg);
-                break;              
-            case 'n':   //MAX STAGES
-                Config::CLASSIFIER_MAX_STAGES = atoi(optarg);
-                break;              
-            case 'v':   //MAX VALIDATION SET LENGTH
-                Config::MAX_LENGHT_VALIDATION_SET = atoi(optarg);
-                break;                    
-            case 'a':   //ARDIS_WIDTH
-                Config::ARDIS_WIDTH = atoi(optarg);
-                break;                             
-            case 'b':   //ARDIS_HEIGHT
-                Config::ARDIS_HEIGHT = atoi(optarg);
-                break;                             
-            case 'i':   //II Buffer Size
-                Config::INTEGRAL_IMAGE_BUFFER_SIZE = atoi(optarg);
-                break;     
-            case 'u':
-                Config::HAS_BUFFER = true;
-                break;           
-            case 'z':
-                Config::TEST_EXECUTION = true;
-                break;                           
-            case 'x':
-                Config::MAX_HYPOTHESIS_PER_STAGE = atoi(optarg);
-                break;        
-            case 'p':                
-                Config::TEST_IMG_PATH = Config::DATASET_PATH + "/" + optarg + "/test_images";
-                Config::TRAINING_TEST_IMG_PATH = Config::DATASET_PATH + "/" + optarg + "/training_images";
-                Config::VALIDATION_TEST_IMG_PATH = Config::DATASET_PATH + "/" + optarg + "/validation_images";                                   
-
-                Config::TRAINING_FACES_TEST_PATH =  Config::TRAINING_TEST_IMG_PATH + "/faces";    
-                Config::TRAINING_SCENES_TEST_PATH = Config::TRAINING_TEST_IMG_PATH + "/non_faces";
-
-                Config::VALIDATION_FACES_TEST_PATH = Config::VALIDATION_TEST_IMG_PATH + "/faces";
-                Config::VALIDATION_SCENES_TEST_PATH = Config::VALIDATION_TEST_IMG_PATH + "/non_faces";                  
-                break;
-        }
-    }
-
-    return 1;
-}
+#include "../headers/util/config.h"
+#include "../headers/util/basic.h"
 
 int train(){
     std::string vs_face_path, vs_scene_path;

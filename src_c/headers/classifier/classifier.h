@@ -1,7 +1,7 @@
 #ifndef __CLASSIFIER__
 #define __CLASSIFIER__
 
-#include "../basic.h"
+#include "../util/basic.h"
 #include "../feature/libfeature.h"
 
 #include "integralImage.h"

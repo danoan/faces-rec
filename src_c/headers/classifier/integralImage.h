@@ -6,8 +6,8 @@
 #include <vector>
 #include <string>
 
-#include "../basic.h"
-#include "../image.h"
+#include "../util/basic.h"
+#include "../util/image.h"
 
 #include "../feature/libfeature.h"
 

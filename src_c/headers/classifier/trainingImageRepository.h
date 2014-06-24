@@ -5,16 +5,25 @@
 #include "trainingImage.h"
 
 class TrainingImageRepository{
+private:
+    int _max_buffer;
+    int _features_number;
 public:
-    static std::vector<TrainingImage*> _faces;
-    static std::vector<TrainingImage*> _scenes;
+    TrainingImageRepository(){};
+    void init(int features_number);
 
-    static void addFace(std::string imagePath, TrainingType tit);
-    static void addScene(std::string imagePath, TrainingType tit);
+    std::vector<TrainingImage*> _faces;
+    std::vector<TrainingImage*> _scenes;
 
-    static TrainingImage* get(int index);
-    static int size(){ return _faces.size() + _scenes.size(); };
-    static void clearScenes(){ for(int i=_scenes.size()-1;i>=0;i--) delete _scenes[i]; _scenes.clear(); };
+    void addFace(std::string imagePath, TrainingType tit);
+    void addScene(std::string imagePath, TrainingType tit);
+
+    TrainingImage* get(int index);
+    int size(){ return _faces.size() + _scenes.size(); };
+    
+    void clearScenes(){ for(int i=_scenes.size()-1;i>=0;i--) delete _scenes[i]; _scenes.clear(); };
+    void clearFaces(){ for(int i=_faces.size()-1;i>=0;i--) delete _faces[i]; _faces.clear(); };
+    void clear(){clearScenes();clearFaces();printf("%d %d\n",_faces.size(),_scenes.size());};
 };
 
 #endif

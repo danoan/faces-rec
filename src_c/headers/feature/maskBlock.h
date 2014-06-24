@@ -1,7 +1,7 @@
 #ifndef __MASK_BLOCK__
 #define __MASK_BLOCK__
 
-#include "../basic.h"
+#include "../util/basic.h"
 #include "maskBlock.h"
 
 class MaskBlock{

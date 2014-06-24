@@ -1,7 +1,7 @@
 #ifndef __LIB_FEATURE__
 #define __LIB_FEATURE__
 
-#include "../basic.h"
+#include "../util/basic.h"
 
 #include "featureFactory.h"
 #include "featureMask.h"
@@ -13,5 +13,7 @@
 #include "maskThreeVerticalFactory.h"
 #include "maskTwoHorizontalFactory.h"
 #include "maskTwoVerticalFactory.h"
+
+#include "facesFeatureFactory.h"
 
 #endif

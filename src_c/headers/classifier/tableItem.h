@@ -1,7 +1,7 @@
 #ifndef __TABLE_ITEM__
 #define __TABLE_ITEM__
 
-#include "../basic.h"
+#include "../util/basic.h"
 #include "trainingImage.h"
 
 class TableItem{

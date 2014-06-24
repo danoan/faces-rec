@@ -17,7 +17,7 @@ private:
     double _t_plus,_t_minus;
 
     int _positive,_negative;
-    double _s_plus,_s_minus;
+    double _s_plus,_s_minus;    
 
 public:    
     ClassificationTable();
@@ -28,9 +28,9 @@ public:
     }
     void addTrainingImage(std::string imagePath, TrainingType tit);
 
-    void initTable();
-    TableItem getBestTableItem(FeatureMask& fm);
-    void updateWeights(double b_t, Hypothesy& best);
+    void initTable(TrainingImageRepository& tir);
+    TableItem getBestTableItem(FeatureMask& fm, TrainingImageRepository& tir);
+    void updateWeights(double b_t, Hypothesy& best, TrainingImageRepository& tir);
 
 };
 

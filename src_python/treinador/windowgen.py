@@ -115,15 +115,15 @@ class ImageWindow():
 	used for retrieving of the negative face image instances on the trainning 
 	step of the features.
 '''
-def get_next_random_image_window(folder,n):
+def get_next_random_image_window(folder,n,ardis=64):
 	#folder: folder where the scene image files are located
 	#n: number of random window to be generated
 
 	file_names = os.listdir(folder)
 	folder_to_save = str( time.time() )
-	face_size = (64,64)
+	face_size = (ardis,ardis)
 
-	shift_step = 64
+	shift_step = ardis
 	img_windows = []
 
 	windows_total = 0

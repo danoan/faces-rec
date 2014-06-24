@@ -4,7 +4,7 @@
 #include <vector>
 #include <cmath>
 
-#include "../basic.h"
+#include "../util/basic.h"
 #include "maskBlock.h"
 
 
