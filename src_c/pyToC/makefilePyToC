@@ -1,0 +1,16 @@
+source:=../source
+object:=../object
+lib:=../lib
+
+module:=pyToC
+
+object_path:=$(object)/$(module)
+source_path:=$(source)/$(module)
+lib_path:=$(lib)
+
+
+all: c_loader.o
+	ar rc $(lib_path)/libpytoc.a $(object_path)/c_loader.o
+
+c_loader.o:
+	g++ -o $(object_path)/c_loader.o -c $(source_path)/c_loader.c -O3 -w
