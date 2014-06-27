@@ -90,8 +90,8 @@ TableItem ClassificationTable::getBestTableItem(FeatureMask& fm, TrainingImageRe
 }
 
 void ClassificationTable::updateWeights(double b_t, Hypothesy& h, TrainingImageRepository& tir){
-    _t_plus=0;
-    _t_minus=0;
+    _t_plus=0.0;
+    _t_minus=0.0;
     std::vector<TrainingImage*>::iterator it;
     // printf("UPDATE WEIGHTS %d %lu\n",h._direction,h._threshold);
     for(int i=0;i<tir.size();i++){

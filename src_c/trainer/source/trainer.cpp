@@ -115,9 +115,11 @@ CascadeClassifier Trainer::startTrainingCascade(){
         cascade.save(std::string(path));
 
         if(_ts.resetScenesSet(cascade,_vs,_stage_number,_training_set_size)==-1) break;                
-        if(_vs.resetScenesSet(_stage_number)==-1) break;  
+        if(_vs.resetScenesSet(_stage_number)==-1) break;  	
 
         endTrainer();       
+
+	if(_ts._scenes.size()<=20) break;
     }
     
 

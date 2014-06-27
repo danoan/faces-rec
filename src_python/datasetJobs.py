@@ -37,7 +37,8 @@ def selectImages(d,n):
 
 #Corta n subjanelas utilizando como base todas as imagens presentes em folder_scenes
 def crop(folder_scenes,n,ardis=64):
-    for scene_window in wg.get_next_random_image_window(folder_scenes, int(n),ardis):
+    print "CROP"
+    for scene_window in wg.get_next_random_image_window(folder_scenes, int(n), int(ardis)):
         print scene_window
 
 
@@ -215,14 +216,14 @@ def createTestSetFull(scene_source,face_source,face_train_number,scene_train_num
 
 
 if __name__=='__main__':
-    if( len(sys.argv)==4 ):
+    if( len(sys.argv)<=5 ):
         if( sys.argv[1]=="select"):
             selectImages(sys.argv[2],sys.argv[3])
         elif ( sys.argv[1]=="crop"):
-            crop(sys.argv[2],sys.argv[3])
+            crop(sys.argv[2],sys.argv[3],sys.argv[4])
         elif ( sys.argv[1]=="match"):
             imageMatching(sys.argv[2],sys.argv[3]) 
-    elif( len(sys.argv) ):
+    elif( len(sys.argv) >= 6 ):
         if( sys.argv[1]=="createTestSet"):
             createTestSet( *(sys.argv[2:]) )           
 

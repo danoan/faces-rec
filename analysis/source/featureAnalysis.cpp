@@ -1,14 +1,14 @@
 #include <cstdio>
 #include <string>
-#include "/home/daniel/Projects/faces-rec/src_c/viola/headers/libviola.h"
+#include "../../src_c/viola/headers/libviola.h"
 
-#define MAX_SHIFT_STEP 1
+#define MAX_SHIFT_STEP 3
 #define MAX_RESIZE_FACTOR 1
 #define MAX_DATASET 4
 
-int shiftStep[MAX_SHIFT_STEP] = {1};
+int shiftStep[MAX_SHIFT_STEP] = {1,2,3};
 double resizeFactor[MAX_RESIZE_FACTOR] = {0};
-std::string dataset[MAX_DATASET] = {"24x24/Instancia_SUN_600_800","24x24/Instancia_SUN_1200_1600","24x24/Instancia_SUN_2400_3600"};
+std::string dataset[MAX_DATASET] = {"24x24/Instancia_Sun_300_400", "24x24/Instancia_Sun_600_800","24x24/Instancia_Sun_1200_1600","24x24/Instancia_Sun_2400_3600"};
 // std::string dataset[MAX_DATASET] = {"24x24/Instancia SUN_8000_6000"};
 
 int detectFaces(CascadeClassifier cc, std::string image_path){

@@ -5,9 +5,9 @@ STATES_PATH= /states
 DATASET_PATH=  /dataset
 ATT_FACES_PATH= /att_faces
 
-TRAINING_IMG_PATH= /24x24/Instancia_Sun_2400_3200/training_images
-VALIDATION_IMG_PATH= /24x24/Instancia_Sun_2400_3200/validation_images
-TEST_IMG_PATH= /24x24/Instancia_Sun_2400_3200/test_images
+TRAINING_IMG_PATH= /24x24/Instancia_sun_600_800/training_images
+VALIDATION_IMG_PATH= /24x24/Instancia_sun_600_800/validation_images
+TEST_IMG_PATH= /24x24/Instancia_sun_600_800/test_images
 
 TEST_FACES_PATH= /faces
 TRAINING_FACES_PATH= /faces
