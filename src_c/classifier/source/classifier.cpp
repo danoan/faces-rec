@@ -33,6 +33,7 @@ int Classifier::isFace(IntegralImage &ii, Subwindow &sw, double ac){
 	double sa=0;
 
 	Hypothesy h;
+    // printf("HYPOTHESIS %d\n",_hypothesis.size());
 	for(register int i=0;i<_hypothesis.size();++i){
 		h = _hypothesis[i];
 
@@ -44,11 +45,12 @@ int Classifier::isFace(IntegralImage &ii, Subwindow &sw, double ac){
 		fm.adjustMask(sw);
 		sx+= a*h_function(ii.filter(fm),d,t);		
 
+        // printf(" FILTER %lu\n",ii.filter(fm));
 		// printf("%d %lf %lu %ld %lu\n",h_function(ii.filter(fm),d,t), a,ii.filter(fm),d,t);
 		sa+= a;
 	}
 
-	// printf("%.11f %lu %lu (%lu %lu)\n", sx, sw._y,sw._x,sw._size.y,sw._size.x);
+	// printf("%.5f %.5f %.5f \n", sx, ac, ac*sa );
 	if(sx>=(ac*sa)){
 		return 1;
 	}else{

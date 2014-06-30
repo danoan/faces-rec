@@ -8,7 +8,7 @@ public:
     ValidationSet():ImageSet(){};
     ValidationSet(std::string facesValidationDir, std::string scenesValidationDir);
 
-    int resetScenesSet(int stage);
+    int resetScenesSet();
 };
 
 #endif

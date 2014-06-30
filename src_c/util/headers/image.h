@@ -23,6 +23,7 @@ typedef unsigned long ulong;
 #define WIDTH 1
 
 void loadImage(ulong*** data,const char* filepath,Point* size);
+void getSize(const char* filepath,Point* size);
 void drawRectangles(const char* filepath,int num_boxes,int** boxes, const char* color);
 void drawRectangles(MagickWand* image_wand,int num_boxes,int** boxes, const char* color);
 #endif

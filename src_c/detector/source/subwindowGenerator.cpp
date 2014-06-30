@@ -16,6 +16,11 @@ SubwindowGenerator::SubwindowGenerator(std::string img_path,Point wr,ulong shift
 	if(_ce0<0.5){
 		_ce0 = 0.5;
 	}
+
+	if(Config::DETECTOR_SCAN_WINDOW_FACTOR!=0.0){
+		_ce0=Config::DETECTOR_SCAN_WINDOW_FACTOR;	
+	}
+	
 	 
 	_ce_max = fmin( ( img_size.x/_wr.x ), ( img_size.y/_wr.y ) );
 }

@@ -6,10 +6,8 @@ ValidationSet::ValidationSet(std::string facesValidationDir, std::string scenesV
 }
 
 
-int ValidationSet::resetScenesSet(int stage){
+int ValidationSet::resetScenesSet(){
     int validation_set_size = _scenes.size();
     _scenes.clear();
-    getGroupScenePath(_svd, stage, validation_set_size, _scenes);   
-
-    return 1;
+    return getGroupScenePath(_svd, _group, validation_set_size, _scenes);   
 }

@@ -63,8 +63,8 @@ public:
 
 inline Point computeSubwindowSize(Point wr,double ce){
     Point p;
-    p.y = (int) ( round(wr.y*ce) );
-    p.x = (int) ( round(wr.x*ce) );
+    p.y = (int) ( floor(wr.y*ce) );
+    p.x = (int) ( floor(wr.x*ce) );
 
     return p;
 };

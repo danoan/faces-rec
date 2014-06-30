@@ -123,7 +123,7 @@ def get_next_random_image_window(folder,n,ardis=64):
 	folder_to_save = str( time.time() )
 	face_size = (ardis,ardis)
 
-	shift_step = ardis
+	shift_step = 1
 	img_windows = []
 
 	windows_total = 0

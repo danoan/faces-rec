@@ -32,8 +32,6 @@ Trainer::Trainer(TrainingSet& ts, ValidationSet& vs){
     _ts = ts;
     _vs = vs;
 
-    _training_set_size = _ts._scenes.size();
-
     _tir.init(_facesFactory._facesFeatures.size());
 
     for(register int j=0;j<_ts._faces.size();j++){
@@ -75,7 +73,6 @@ CascadeClassifier Trainer::startTrainingCascade(){
     double fi;
     double di;
 
-    int features_to_check = 1;  //Number of features to create before check classifier
     int total_features = 0;
     while( _fp_rate>_final_fp_rate && _stage_number < Config::CLASSIFIER_MAX_STAGES ){          
         prepareTrainer(); 
@@ -83,7 +80,7 @@ CascadeClassifier Trainer::startTrainingCascade(){
         
         for(int i=0;i<THREADS_NUMBER;i++) _ct[i]->initTable(_tir);
 
-        Logger::debug->log("Start Training Stage %d\n\n", _stage_number++);
+        Logger::debug->log("Start Training Stage %d\n\n", _stage_number);
         _feature_number=0;
 
         Classifier fc;    
@@ -91,14 +88,20 @@ CascadeClassifier Trainer::startTrainingCascade(){
         keepTraining(fc);
         stopClock("KEEP TRAINING");
 
-        while(!checkClassifier(fc,&ac,&fi,&di) && _feature_number < Config::CLASSIFIER_MAX_HYPOTHESIS_PER_STAGE){
-            for(int i=0;i<features_to_check;i++){
+        if(_stage_number<5){
+            while(!firstStagesCheckClassifier(fc,&ac,&fi,&di,_stage_number,_feature_number)){
                 startClock();       
                 keepTraining(fc);
                 stopClock("KEEP TRAINING");
-            }                        
+            }
+        }else{
+            while(!checkClassifier(fc,&ac,&fi,&di) && _feature_number < Config::CLASSIFIER_MAX_HYPOTHESIS_PER_STAGE){
+                startClock();       
+                keepTraining(fc);
+                stopClock("KEEP TRAINING");
+            }            
         }
-        features_to_check *= 1.5;    //*_stage_number*4
+
 
         _fp_rate*=fi;
         _det_rate*=di;
@@ -114,12 +117,12 @@ CascadeClassifier Trainer::startTrainingCascade(){
         printf("%s\n",path);
         cascade.save(std::string(path));
 
-        if(_ts.resetScenesSet(cascade,_vs,_stage_number,_training_set_size)==-1) break;                
-        if(_vs.resetScenesSet(_stage_number)==-1) break;  	
+        if(_ts.resetScenesSet(cascade,_vs)==-1) break;                
+        if(_vs.resetScenesSet()==-1) break;
+
+        _stage_number++; 	
 
         endTrainer();       
-
-	if(_ts._scenes.size()<=20) break;
     }
     
 
@@ -206,8 +209,54 @@ void Trainer::keepTraining(Classifier& cl){
     _feature_number+=1;
 }
 
+bool Trainer::firstStagesCheckClassifier(Classifier& cc, double* ac, double* fi, double* di, int stage, int featureNumber){
+    std::vector<TID>::iterator it;
+
+    double rate_fp;
+    double rate_det;
+
+    *ac = 0.8;
+    while( *ac>=0.20){
+        *ac-=0.1;
+        rate_fp=0;
+
+        for(it=_vs._scenes.begin();it!=_vs._scenes.end();it++){
+            IntegralImage ii(it->_img_path);
+            rate_fp += cc.isFace(ii,*ac);
+        }
+
+        rate_fp = rate_fp/_vs._scenes.size();
+        Logger::debug->log("RATE FP: %.4f\n",rate_fp);
+
+        if(rate_fp>0.75) break;    //I have to put more features in the classifier        
+
+        rate_det=0;
+        for(it=_vs._faces.begin();it!=_vs._faces.end();it++){
+            IntegralImage ii(it->_img_path);
+            rate_det += cc.isFace(ii,*ac);
+        }    
+
+        rate_det = rate_det/_vs._faces.size();
+        Logger::debug->log("RATE DET: %.4f (MIN:%.4f)\n",rate_det,_min_det_rate);
+
+        *fi = rate_fp;
+        *di = rate_det;        
+
+        if(rate_det<_min_det_rate) continue;
+
+        return true;
+    }
+
+    if( featureNumber < _firstStagesMaxFeature[stage]){
+        return false;
+    }else{
+        return true;        
+    }
+
+}
+
 bool Trainer::checkClassifier(Classifier& cc, double* ac, double* fi, double* di){
-    std::vector<std::string>::iterator it;
+    std::vector<TID>::iterator it;
 
     double rate_fp;
     double rate_det;
@@ -218,7 +267,7 @@ bool Trainer::checkClassifier(Classifier& cc, double* ac, double* fi, double* di
         rate_fp=0;
 
         for(it=_vs._scenes.begin();it!=_vs._scenes.end();it++){
-            IntegralImage ii(*it);
+            IntegralImage ii(it->_img_path);
             rate_fp += cc.isFace(ii,*ac);
         }
 
@@ -229,7 +278,7 @@ bool Trainer::checkClassifier(Classifier& cc, double* ac, double* fi, double* di
 
         rate_det=0;
         for(it=_vs._faces.begin();it!=_vs._faces.end();it++){
-            IntegralImage ii(*it);
+            IntegralImage ii(it->_img_path);
             rate_det += cc.isFace(ii,*ac);
         }    
 

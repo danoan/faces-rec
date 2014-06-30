@@ -11,16 +11,21 @@ void TrainingImageRepository::init(int features_number){
     _features_number = features_number;
 }
 
-void TrainingImageRepository::addFace(std::string imagePath, TrainingType tit){
+void TrainingImageRepository::addFace(TID tid, TrainingType tit){
     if(_faces.size()<_max_buffer){
-        _faces.push_back(new TrainingImage(imagePath,tit,Config::CLASSIFIER_HAS_BUFFER,_features_number)); 
+        _faces.push_back(new TrainingImage(tid._img_path,tit,Config::CLASSIFIER_HAS_BUFFER,_features_number)); 
     }else{
-        _faces.push_back(new TrainingImage(imagePath,tit,false,_features_number)); 
+        _faces.push_back(new TrainingImage(tid._img_path,tit,false,_features_number)); 
     }
 }
 
-void TrainingImageRepository::addScene(std::string imagePath, TrainingType tit){
-    _scenes.push_back(new TrainingImage(imagePath,tit,false,_features_number)); 
+void TrainingImageRepository::addScene(TID tid, TrainingType tit){
+    if(tid._crop_selector){
+
+    }else{
+        _scenes.push_back(new TrainingImage(tid._img_path,tit,false,_features_number));     
+    }
+    
 }
 
 TrainingImage* TrainingImageRepository::get(int index){

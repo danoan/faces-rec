@@ -1,5 +1,18 @@
 #include "../headers/image.h"
 
+void getSize(const char* filepath,Point* size){
+	MagickWand * image_wand;
+	MagickBooleanType status;
+
+	image_wand = NewMagickWand();
+	status=MagickReadImage(image_wand,filepath);	
+
+	size->y = MagickGetImageHeight(image_wand);
+	size->x = MagickGetImageWidth(image_wand);
+
+	DestroyMagickWand(image_wand);
+}
+
 void loadImage(ulong*** data, const char* filepath,Point* size){
 	MagickWand * image_wand;
 	PixelIterator* iterator;

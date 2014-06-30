@@ -1,6 +1,6 @@
 #include "../headers/config.h"
 
-//LIVRE:    y,z
+//LIVRE:  g,j,k,l,p,o,q,v,y,z
 
 std::string Config::CONFIG_FILE;
 
@@ -22,24 +22,28 @@ int Config::CLASSIFIER_MAX_STAGES = 38; //"n"
 double Config::CLASSIFIER_BETA_MIN_VALUE = 1e-8;    //"NONE"
 
 int Config::CLASSIFIER_MAX_HYPOTHESIS_PER_STAGE = 300;      //"x"
+int Config::CLASSIFIER_SCENE_MIN_TRAINING_SET_ELEMENTS = 20; //"l"
 
 int Config::CLASSIFIER_INTEGRAL_IMAGE_BUFFER_SIZE = 2000;   //"i"
 bool Config::CLASSIFIER_HAS_BUFFER = false;                 //"u"
 
 
-int Config::DETECTOR_GENERATIONS = 3;   //"g"
-int Config::DETECTOR_SHIFT_STEP = 3;    //"j"
+int Config::DETECTOR_GENERATIONS = 3;   //"G"
+int Config::DETECTOR_SHIFT_STEP = 3;    //"S"
 
-int Config::DETECTOR_SUBWINDOW_START_WIDTH = 6;     //"k"
-int Config::DETECTOR_SUBWINDOW_START_HEIGHT = 6;    //"l"
+int Config::DETECTOR_SUBWINDOW_START_WIDTH = 6;     //"W"
+int Config::DETECTOR_SUBWINDOW_START_HEIGHT = 6;    //"H"
+
+std::string Config::DETECTOR_CLASSIFIER_PATH;   //P
+std::string Config::DETECTOR_IMG_DIR;   
+std::string Config::DETECTOR_IMG_PATH;  //Z
+bool Config::DETECTOR_DETECT_FACES;     //D
+bool Config::DETECTOR_SIMPLE_FACES;     //F
+int Config::DETECTOR_DRAW = 0;             //R
+double Config::DETECTOR_SCAN_WINDOW_FACTOR = 0.0;             //C
 
 int Config::VIEWER_FEATURE_ID;  //e
 
-std::string Config::DETECTOR_CLASSIFIER_PATH;   //p
-std::string Config::DETECTOR_IMG_DIR;   
-bool Config::DETECTOR_DETECT_FACES;     //q
-bool Config::DETECTOR_SIMPLE_FACES;     //o
-int Config::DETECTOR_DRAW = 0;             //v
 
 // std::string Config::PROJECT_PATH = "/home/users/danielantunes/Documentos/faces-rec";
 std::string Config::PROJECT_PATH = "/home/daniel/Projects/faces-rec";
@@ -62,7 +66,7 @@ std::string Config::VALIDATION_SCENES_PATH = VALIDATION_IMG_PATH + "/non_faces";
 
 
 int Config::readInput(int argc, char* argv[]){
-    char* options = "a:b:s:r:w:h:f:d:m:t:n:x:i:ug:j:k:l:c:e:p:o:q:v?";
+    char* options = "c:a:b:s:r:w:h:f:d:m:t:n:x:i:ue:l:G:S:W:H:P:O:Q:RC:Z:?";
     int c=0;
     while(1){
         c = getopt(argc,argv,options);
@@ -114,38 +118,47 @@ int Config::readInput(int argc, char* argv[]){
             case 'x':   //MAXIMOS DE ESTAGIOS POR HIPOTESE
                 Config::CLASSIFIER_MAX_HYPOTHESIS_PER_STAGE = atoi(optarg);
                 break;        
-            case 'g':
-                Config::DETECTOR_GENERATIONS = atoi(optarg);
-                break;
-            case 'j':
-                Config::DETECTOR_SHIFT_STEP = atoi(optarg);
-                break;
-            case 'k':
-                Config::DETECTOR_SUBWINDOW_START_WIDTH = atoi(optarg);
-                break;
             case 'l':
-                Config::DETECTOR_SUBWINDOW_START_HEIGHT = atoi(optarg);
+                Config::CLASSIFIER_SCENE_MIN_TRAINING_SET_ELEMENTS = atoi(optarg);
                 break;
             case 'e':
                 Config::VIEWER_FEATURE_ID = atoi(optarg);
+                break;                
+            case 'G':
+                Config::DETECTOR_GENERATIONS = atoi(optarg);
                 break;
-            case 'p':
+            case 'S':
+                Config::DETECTOR_SHIFT_STEP = atoi(optarg);
+                break;
+            case 'W':
+                Config::DETECTOR_SUBWINDOW_START_WIDTH = atoi(optarg);
+                break;
+            case 'H':
+                Config::DETECTOR_SUBWINDOW_START_HEIGHT = atoi(optarg);
+                break;
+            case 'P':
                 Config::DETECTOR_CLASSIFIER_PATH = std::string(optarg);
                 break;                     
-            case 'o':
+            case 'O':
                 Config::DETECTOR_DETECT_FACES = true;
                 Config::DETECTOR_SIMPLE_FACES = false;
                 Config::DETECTOR_CLASSIFIER_PATH = std::string(optarg);
                 break;                       
-            case 'q':
+            case 'Q':
                 Config::DETECTOR_DETECT_FACES = false;
                 Config::DETECTOR_SIMPLE_FACES = true;
 
                 Config::DETECTOR_IMG_DIR = std::string(optarg);
                 break;                      
-            case 'v':
+            case 'R':
                 Config::DETECTOR_DRAW = 1;
-                break;                   
+                break;                                   
+            case 'C':
+                Config::DETECTOR_SCAN_WINDOW_FACTOR = atof(optarg);
+                break;                                   
+            case 'Z':
+                Config::DETECTOR_IMG_PATH = std::string(optarg);
+                break;
             case '?':
                 printf("-c Config File\n");
                 printf("-s Shift Step\n");
@@ -159,23 +172,26 @@ int Config::readInput(int argc, char* argv[]){
                 printf("-t Min Stage Detection Rate\n");
                 printf("-n Max Stages\n");
                 printf("-x Max Hypothesis per Stage \n");
+                printf("-l Scene Min Training Set Elements \n");
 
                 printf("-a Ardis Width \n");
                 printf("-b Ardis Height \n");
                 printf("-i Buffer Size \n");
                 printf("-u Usa Buffer \n");
 
-                printf("-g Detector Generations \n");
-                printf("-j Detector Shift Step \n");
-                printf("-k Detector Subwindow Start Width \n");
-                printf("-l Detector Subwindow Start Height \n");
+                printf("-G Detector Generations \n");
+                printf("-S Detector Shift Step \n");
+                printf("-W Detector Subwindow Start Width \n");
+                printf("-H Detector Subwindow Start Height \n");
 
                 printf("-e Viewer Feature Id \n");
 
-                printf("-p Detector Classifier Path \n");
-                printf("-o Detector Detect Faces \n");
-                printf("-q Detector Simple Faces \n");
-                printf("-v Detector Draw Rectangles \n");
+                printf("-P Detector Classifier Path \n");
+                printf("-O Detector Detect Faces \n");
+                printf("-Q Detector Simple Faces \n");
+                printf("-R Detector Draw Rectangles \n");
+                printf("-C Detector Subwindow Scan Factor \n");
+                printf("-Z Detector Image Path for Detect Faces \n");
                 return -1;
                 
                 break;

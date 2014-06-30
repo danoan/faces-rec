@@ -6,11 +6,12 @@
 
 class TrainingSet:public ImageSet{
 public:    
+    int _theEnd;
     TrainingSet():ImageSet(){};
     TrainingSet(std::string facesValidationDir, std::string scenesValidationDir);
 
-    int resetScenesSet(ClassifierInterface& cc, ValidationSet& vs, int stage, int training_set_size);
-    void storeFalsePositives(ClassifierInterface& cc,std::vector<std::string>& all_examples, std::vector<std::string>& fp_examples);
+    int resetScenesSet(ClassifierInterface& cc, ValidationSet& vs);
+    void storeFalsePositives(ClassifierInterface& cc,std::vector<TID>& all_examples, std::vector<TID>& fp_examples);
 };
 
 #endif

@@ -45,8 +45,8 @@ inline void Mask::addBlack(MaskBlock &mb){
 
 Mask Mask::rescale(double ce, Point original_size){
 
-    this->_size.x = (int) round( original_size.x*ce );
-    this->_size.y = (int) round( original_size.y*ce );
+    this->_size.x = (int) floor( original_size.x*ce );
+    this->_size.y = (int) floor( original_size.y*ce );
 
     return (*this->_createMask)(this->_size);
 }

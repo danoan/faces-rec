@@ -27,6 +27,7 @@ public:
     static double CLASSIFIER_BETA_MIN_VALUE;
 
     static int CLASSIFIER_MAX_HYPOTHESIS_PER_STAGE;
+    static int CLASSIFIER_SCENE_MIN_TRAINING_SET_ELEMENTS;
 
     static int CLASSIFIER_INTEGRAL_IMAGE_BUFFER_SIZE;
     static bool CLASSIFIER_HAS_BUFFER;
@@ -42,6 +43,8 @@ public:
     static bool DETECTOR_DETECT_FACES;
     static bool DETECTOR_SIMPLE_FACES;
     static int DETECTOR_DRAW;
+    static double DETECTOR_SCAN_WINDOW_FACTOR;
+    static std::string DETECTOR_IMG_PATH;
 
     static int VIEWER_FEATURE_ID;
 

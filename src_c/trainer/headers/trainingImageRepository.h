@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "trainingImage.h"
+#include "trainingImageDescriptor.h"
 
 class TrainingImageRepository{
 private:
@@ -15,8 +16,8 @@ public:
     std::vector<TrainingImage*> _faces;
     std::vector<TrainingImage*> _scenes;
 
-    void addFace(std::string imagePath, TrainingType tit);
-    void addScene(std::string imagePath, TrainingType tit);
+    void addFace(TID tid, TrainingType tit);
+    void addScene(TID tid, TrainingType tit);
 
     TrainingImage* get(int index);
     int size(){ return _faces.size() + _scenes.size(); };

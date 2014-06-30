@@ -22,7 +22,7 @@ int CascadeClassifier::isFace(IntegralImage &ii, double ac){
 }
 
 int CascadeClassifier::isFace(IntegralImage& ii, Subwindow& sw){
-
+    // printf("IS FACE CASCADE\n");
     std::vector<Classifier>::iterator it;
     for(it=_classifiers.begin();it!=_classifiers.end();it++){
         if( (*it).isFace(ii,sw)!=1 ){

@@ -21,6 +21,7 @@ int Detector::detectFaces(ClassifierInterface* ci, const std::string img_path, d
 	std::vector<int*> faces_boxes;
 	std::vector<int*> scenes_boxes;
 	for(register int i=0;i<lista.size();++i){		
+		// printf("NEW SUBWINDOW\n");
 		if(ac<0){
 			res = ci->isFace(ii,(lista[i]));
 		}else{
@@ -29,7 +30,7 @@ int Detector::detectFaces(ClassifierInterface* ci, const std::string img_path, d
 
 		if(res==1){						
 			faces_boxes.push_back(new int[4]);
-			lista[i].cropBox( faces_boxes[faces_boxes.size()-1] );			
+			lista[i].cropBox( faces_boxes[faces_boxes.size()-1] );		
 			total_faces+=1;
 		}else{
 			scenes_boxes.push_back(new int[4]);

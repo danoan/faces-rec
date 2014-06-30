@@ -7,6 +7,7 @@
 #include "trainer.h"
 #include "trainingImage.h"
 #include "trainingSet.h"
+#include "trainingImageDescriptor.h"
 #include "trainingImageRepository.h"
 #include "validationSet.h"
 
