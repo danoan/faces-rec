@@ -2,13 +2,11 @@
 #define __LIB_TRAINER__
 
 #include "classificationTable.h"
-#include "imageSet.h"
 #include "tableItem.h"
 #include "trainer.h"
+#include "trainerSetStatic.h"
 #include "trainingImage.h"
-#include "trainingSet.h"
 #include "trainingImageDescriptor.h"
-#include "trainingImageRepository.h"
-#include "validationSet.h"
+#include "trainingSet.h"
 
 #endif

@@ -13,7 +13,7 @@ void Trainer::inputInfo(){
     Logger::logger->log("Total Features: %d\n",_facesFactory._facesFeatures.size());    
 }
 
-Trainer::Trainer(TrainingSet& ts, ValidationSet& vs){
+Trainer::Trainer(TrainerSetManager* tsm){
     _ardis.x = Config::ARDIS_WIDTH; _ardis.y = Config::ARDIS_HEIGHT;
 
     _shift_w = Config::CLASSIFIER_SHIFT_STEP;
@@ -29,32 +29,19 @@ Trainer::Trainer(TrainingSet& ts, ValidationSet& vs){
     _max_fp_rate = Config::CLASSIFIER_STAGE_MAX_FALSE_POSITIVE_RATE;
     _min_det_rate = Config::CLASSIFIER_STAGE_MIN_DETECTION_RATE;    
 
-    _ts = ts;
-    _vs = vs;
-
-    _tir.init(_facesFactory._facesFeatures.size());
-
-    for(register int j=0;j<_ts._faces.size();j++){
-        _tir.addFace( _ts._faces[j], FACE );
-    }    
+    _tsm = tsm;
+    _tsm->init(_facesFactory._facesFeatures.size(),Config::CLASSIFIER_INTEGRAL_IMAGE_BUFFER_SIZE);
 
     inputInfo();
 }
 
 void Trainer::prepareTrainer(){
-    printf("PREPARE TRAINER\n");
-
-    _tir.clearScenes();
-    for(register int j=0;j<_ts._scenes.size();j++){
-        _tir.addScene( _ts._scenes[j], SCENE );
-    }    
-    printf("END TRAINER\n");
-
     for(int i=0;i<THREADS_NUMBER;i++) _ct[i] = new ClassificationTable();        
+    for(int i=0;i<THREADS_NUMBER;i++) _ct[i]->initTable(_tsm->trs());
 }
 
 Classifier Trainer::startTraining(){
-    for(int i=0;i<THREADS_NUMBER;i++) _ct[i]->initTable(_tir);
+    prepareTrainer();
     Logger::debug->log("Start Training Stage %d\n\n", _stage_number++);
     _feature_number=0;
 
@@ -76,9 +63,6 @@ CascadeClassifier Trainer::startTrainingCascade(){
     int total_features = 0;
     while( _fp_rate>_final_fp_rate && _stage_number < Config::CLASSIFIER_MAX_STAGES ){          
         prepareTrainer(); 
-        Logger::debug->log("End Preparation \n\n");
-        
-        for(int i=0;i<THREADS_NUMBER;i++) _ct[i]->initTable(_tir);
 
         Logger::debug->log("Start Training Stage %d\n\n", _stage_number);
         _feature_number=0;
@@ -113,15 +97,13 @@ CascadeClassifier Trainer::startTrainingCascade(){
 
         char path[128];
         total_features += _feature_number;
-        sprintf(path,"%s/classifier_%d_%d_%d",Config::STATES_PATH.c_str(), _ts._faces.size()+_ts._scenes.size(), _stage_number, total_features);
+        sprintf(path,"%s/classifier_%d_%d_%d",Config::STATES_PATH.c_str(), _tsm->trs()._faces.size()+_tsm->vas()._scenes.size(), _stage_number, total_features);
         printf("%s\n",path);
         cascade.save(std::string(path));
 
-        if(_ts.resetScenesSet(cascade,_vs)==-1) break;                
-        if(_vs.resetScenesSet()==-1) break;
-
-        _stage_number++; 	
-
+        _stage_number++;    
+        _tsm->resetSets(_stage_number,cascade);
+        
         endTrainer();       
     }
     
@@ -145,7 +127,7 @@ void* getBestFromFeature(void* params){
     TableItem partialBest;
     for(int i=from;i<to;i++){
         // printf("GO %d\n", i);
-        partialBest = ep->t->_ct[ep->thread_number]->getBestTableItem( (ep->t->_facesFactory._facesFeatures)[i], ep->t->_tir );
+        partialBest = ep->t->_ct[ep->thread_number]->getBestTableItem( (ep->t->_facesFactory._facesFeatures)[i], ep->t->_tsm->trs() );
         // printf("STOP\n");
 
         if(partialBest._error<ep->best._error){
@@ -204,93 +186,20 @@ void Trainer::keepTraining(Classifier& cl){
     cl.addHypothesy(h);
     cl._ardis = _ardis;
 
-    for(int i=0;i<THREADS_NUMBER;i++) _ct[i]->updateWeights(b_t,h,_tir);
+    for(int i=0;i<THREADS_NUMBER;i++) _ct[i]->updateWeights(b_t,h,_tsm->trs());
     
     _feature_number+=1;
 }
 
 bool Trainer::firstStagesCheckClassifier(Classifier& cc, double* ac, double* fi, double* di, int stage, int featureNumber){
-    std::vector<TID>::iterator it;
-
-    double rate_fp;
-    double rate_det;
-
-    *ac = 0.8;
-    while( *ac>=0.20){
-        *ac-=0.1;
-        rate_fp=0;
-
-        for(it=_vs._scenes.begin();it!=_vs._scenes.end();it++){
-            IntegralImage ii(it->_img_path);
-            rate_fp += cc.isFace(ii,*ac);
-        }
-
-        rate_fp = rate_fp/_vs._scenes.size();
-        Logger::debug->log("RATE FP: %.4f\n",rate_fp);
-
-        if(rate_fp>0.75) break;    //I have to put more features in the classifier        
-
-        rate_det=0;
-        for(it=_vs._faces.begin();it!=_vs._faces.end();it++){
-            IntegralImage ii(it->_img_path);
-            rate_det += cc.isFace(ii,*ac);
-        }    
-
-        rate_det = rate_det/_vs._faces.size();
-        Logger::debug->log("RATE DET: %.4f (MIN:%.4f)\n",rate_det,_min_det_rate);
-
-        *fi = rate_fp;
-        *di = rate_det;        
-
-        if(rate_det<_min_det_rate) continue;
-
-        return true;
+    bool check = _tsm->checkClassifier(cc,ac,fi,di,_max_fp_rate,_min_det_rate,0.8,0.1,0.2);
+    if(check==false){
+         if( featureNumber >= _firstStagesMaxFeature[stage] ) return true;
     }
 
-    if( featureNumber < _firstStagesMaxFeature[stage]){
-        return false;
-    }else{
-        return true;        
-    }
-
+    return check;
 }
 
 bool Trainer::checkClassifier(Classifier& cc, double* ac, double* fi, double* di){
-    std::vector<TID>::iterator it;
-
-    double rate_fp;
-    double rate_det;
-
-    *ac = 0.525;
-    while( *ac>=0.25){
-        *ac-=0.025;
-        rate_fp=0;
-
-        for(it=_vs._scenes.begin();it!=_vs._scenes.end();it++){
-            IntegralImage ii(it->_img_path);
-            rate_fp += cc.isFace(ii,*ac);
-        }
-
-        rate_fp = rate_fp/_vs._scenes.size();
-        Logger::debug->log("RATE FP: %.4f\n",rate_fp);
-
-        if(rate_fp>_max_fp_rate) return false;    //I have to put more features in the classifier
-
-        rate_det=0;
-        for(it=_vs._faces.begin();it!=_vs._faces.end();it++){
-            IntegralImage ii(it->_img_path);
-            rate_det += cc.isFace(ii,*ac);
-        }    
-
-        rate_det = rate_det/_vs._faces.size();
-        Logger::debug->log("RATE DET: %.4f (MIN:%.4f)\n",rate_det,_min_det_rate);
-
-        if(rate_det<_min_det_rate) continue;
-
-        *fi = rate_fp;
-        *di = rate_det;
-        return true;
-    }
-    
-    return false;
+    return _tsm->checkClassifier(cc,ac,fi,di,_max_fp_rate,_min_det_rate,0.525,0.025,0.25);
 }

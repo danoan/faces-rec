@@ -1,47 +1,50 @@
 #include "../headers/trainingSet.h"
 
-TrainingSet::TrainingSet(std::string facesTrainingDir, std::string scenesTrainingDir): ImageSet(facesTrainingDir, scenesTrainingDir){
-    _theEnd = 0;
-    getAllPathFaces(facesTrainingDir, _faces);    
-    getGroupScenePath(scenesTrainingDir, 0, -1, _scenes);
+void TrainingSet::init(int featuresNumber, int bufferSize){
+    /*Com 97039 features, posso armazenar 2500 imagens.Aqui faço uma aproximação.
+    Eu digo que 100000 features ocupam 1MB. Logo, para saber quantas imagens podem
+    ficar no buffer, basta multiplicar o espaço disponível pela razao 100.000 sobre
+    o número de features atual
+    */
+
+    _max_buffer = bufferSize*(100000*1.0/featuresNumber);
+    _features_number = featuresNumber;
 }
 
-void TrainingSet::storeFalsePositives(ClassifierInterface& cc, std::vector<TID>& all_examples, std::vector<TID>& fp_examples){
-    for(register int i=all_examples.size()-1;i>=0;i--){
-        IntegralImage ii( all_examples[i]._img_path );
-        if( cc.isFace(ii)==1 ){
-            fp_examples.push_back( all_examples[i] );
-        }
-    }            
-}
-
-int TrainingSet::resetScenesSet(ClassifierInterface& cc, ValidationSet& vs){
-    if(_theEnd==1) return -1;
-    std::vector<TID> all_fp;
-
-    storeFalsePositives(cc,vs._scenes,all_fp); //Pega FP do conjunto de validacao
-    storeFalsePositives(cc,_scenes,all_fp);    //Pega FP do conjunto de treinamento
-
-    Logger::debug->log("USING UNTIL GROUP: %d\n (FP: %d/%d)\n",_group,all_fp.size(),vs._scenes.size() + _scenes.size());
-    _scenes.clear();
-    int r;
-
-    while(all_fp.size()<Config::CLASSIFIER_SCENE_MIN_TRAINING_SET_ELEMENTS){
-        std::vector<TID> new_group;
-        r = getGroupScenePath(_svd, _group++, -1, new_group);   
-
-        if(r==-1){
-            _theEnd=1;
-            printf("REACH END OF THE GROUP\n");
-            break;            
-        }
-
-        //Irei adicionar apenas os falsos positivos do new_group no grupo de treinamento
-        storeFalsePositives(cc,new_group,all_fp);
+void TrainingSet::addFace(TID tid){
+    if(_faces.size()<_max_buffer){
+        _faces.push_back(new TrainingImage(tid._img_path,FACE,Config::CLASSIFIER_HAS_BUFFER,_features_number)); 
+    }else{
+        _faces.push_back(new TrainingImage(tid._img_path,FACE,false,_features_number)); 
     }
+}
 
-    _scenes = all_fp;
-    printf("Tamanho Conj. Treinamento(Last group being Used %d): %d\n",_group,_scenes.size());
+void TrainingSet::addScene(TID tid,ClassifierInterface& cc){
+    if(tid._crop_selector){
 
-    return 1;
+    }else{    
+        TrainingImage* ti = new TrainingImage(tid._img_path,SCENE,false,_features_number);
+        if( cc.isFace( *(ti->_ii) )==1 ){
+            _scenes.push_back(ti);
+        }else{
+            delete ti;
+        }
+    }
+}
+
+void TrainingSet::addScene(TID tid){
+    if(tid._crop_selector){
+
+    }else{
+        _scenes.push_back(new TrainingImage(tid._img_path,SCENE,false,_features_number));                
+    }
+    
+}
+
+TrainingImage* TrainingSet::get(int index){
+    if(index<_faces.size()){
+        return _faces[index];
+    }else{
+        return _scenes[ index- _faces.size() ];
+    }
 }

@@ -15,6 +15,9 @@ public:
     TrainingType _tt;
     IntegralImage* _ii;
 
+    std::string _img_path;
+    int _features_number;
+
     bool _has_buffer;
     std::vector<ulong> _ii_buffer;  //if has_buffer is true, it puts the integral values here
 

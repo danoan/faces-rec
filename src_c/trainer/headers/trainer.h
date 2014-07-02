@@ -6,13 +6,12 @@
 #include "trainingImageDescriptor.h"
 #include "trainingImage.h"
 #include "classificationTable.h"
-#include "../../classifier/headers/cascadeClassifier.h"
-#include "../../classifier/headers/classifier.h"
 #include "trainingSet.h"
-#include "validationSet.h"
+#include "trainerSetStatic.h"
+
+#include "../../classifier/headers/libclassifier.h"
 #include "../../feature/headers/libfeature.h"
-#include "../../util/headers/basic.h"
-#include "../../util/headers/config.h"
+#include "../../util/headers/libutil.h"
 
 #define THREADS_NUMBER 4
 
@@ -38,9 +37,6 @@ private:
 
     Point _ardis;    
 
-    TrainingSet _ts;
-    ValidationSet _vs;    
-
     pthread_t _threads[THREADS_NUMBER];
 
     void inputInfo();
@@ -49,9 +45,9 @@ private:
 public:
     ClassificationTable* _ct[THREADS_NUMBER];
     FacesFeatureFactory _facesFactory;
-    TrainingImageRepository _tir;
+    TrainerSetManager* _tsm;
 
-    Trainer(TrainingSet& ts, ValidationSet& vs);
+    Trainer(TrainerSetManager* tsm);
 
     void prepareTrainer();
     void endTrainer(){ for(int i=0;i<THREADS_NUMBER;i++) delete _ct[i];};

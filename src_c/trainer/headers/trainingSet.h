@@ -1,17 +1,32 @@
 #ifndef __TRAINING_SET__
 #define __TRAINING_SET__
 
-#include "imageSet.h"
-#include "validationSet.h"
+#include <vector>
+#include "trainingImage.h"
+#include "trainingImageDescriptor.h"
+#include "../../classifier/headers/classifier.h"
 
-class TrainingSet:public ImageSet{
+class TrainingSet{
+private:
+    int _features_number;
+    int _max_buffer;
 public:    
-    int _theEnd;
-    TrainingSet():ImageSet(){};
-    TrainingSet(std::string facesValidationDir, std::string scenesValidationDir);
+    TrainingSet(){};    
+    void init(int featuresNumber, int bufferSize);
 
-    int resetScenesSet(ClassifierInterface& cc, ValidationSet& vs);
-    void storeFalsePositives(ClassifierInterface& cc,std::vector<TID>& all_examples, std::vector<TID>& fp_examples);
+    std::vector<TrainingImage*> _faces;
+    std::vector<TrainingImage*> _scenes;
+
+    void addFace(TID tid);
+    void addScene(TID tid);
+    void addScene(TID tid,ClassifierInterface& cc);
+
+    TrainingImage* get(int index);
+    int size(){ return _faces.size() + _scenes.size(); };
+    
+    void clearScenes(){ for(int i=_scenes.size()-1;i>=0;i--) delete _scenes[i]; _scenes.clear(); };
+    void clearFaces(){ for(int i=_faces.size()-1;i>=0;i--) delete _faces[i]; _faces.clear(); };
+    void clear(){clearScenes();clearFaces();printf("%d %d\n",_faces.size(),_scenes.size());};
 };
 
 #endif

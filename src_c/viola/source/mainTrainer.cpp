@@ -9,21 +9,9 @@
 
 
 int train(){
-    std::string vs_face_path, vs_scene_path;
-    std::string ts_face_path, ts_scene_path;
+    TrainerSetManager* tsm = new TrainerSetStatic(Config::TRAINING_FACES_PATH,Config::VALIDATION_FACES_PATH,Config::TRAINING_SCENES_PATH,Config::VALIDATION_SCENES_PATH);
 
-    vs_face_path = Config::VALIDATION_FACES_PATH;
-    vs_scene_path = Config::VALIDATION_SCENES_PATH;
-
-    ts_face_path = Config::TRAINING_FACES_PATH;
-    ts_scene_path = Config::TRAINING_SCENES_PATH;
-
-    ValidationSet vs(vs_face_path,vs_scene_path);
-    TrainingSet ts(ts_face_path,ts_scene_path);
-
-    Logger::debug->log("Image Sets TS_FACES %d\nTS_SCENES %d\n",ts._faces.size(),ts._scenes.size());
-
-    Trainer* t = new Trainer(ts,vs);
+    Trainer* t = new Trainer(tsm);
     CascadeClassifier cl = t->startTrainingCascade();    
 
     // cl.save(Config::CLASSIFIERS_PATH + "/classifier_final");

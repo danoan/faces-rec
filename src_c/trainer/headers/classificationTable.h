@@ -7,7 +7,7 @@
 
 #include "../../classifier/headers/classifier.h"
 #include "trainingImage.h"
-#include "trainingImageRepository.h"
+#include "trainingSet.h"
 #include "tableItem.h"
 
 class ClassificationTable{
@@ -28,9 +28,9 @@ public:
     }
     void addTrainingImage(std::string imagePath, TrainingType tit);
 
-    void initTable(TrainingImageRepository& tir);
-    TableItem getBestTableItem(FeatureMask& fm, TrainingImageRepository& tir);
-    void updateWeights(double b_t, Hypothesy& best, TrainingImageRepository& tir);
+    void initTable(TrainingSet& ts);
+    TableItem getBestTableItem(FeatureMask& fm, TrainingSet& ts);
+    void updateWeights(double b_t, Hypothesy& best, TrainingSet& ts);
 
 };
 

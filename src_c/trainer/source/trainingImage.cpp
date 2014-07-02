@@ -1,13 +1,11 @@
 #include "../headers/trainingImage.h"
 
-TrainingImage::TrainingImage(std::string imagePath, TrainingType tt, bool has_buffer,int features_number){
-    _tt = tt;
+TrainingImage::TrainingImage(std::string imagePath, TrainingType tt, bool has_buffer,int features_number):_img_path(imagePath),_tt(tt),_has_buffer(has_buffer){
     _ii = new IntegralImage(imagePath);
-    _has_buffer = has_buffer;
     // printf("%s\n",imagePath.c_str());
 
     if(_has_buffer){   
-        for(int i=0;i<features_number;i++){
+        for(int i=0;i<features_number;i++){ 
           _ii_buffer.push_back( MAX_FEATURE_VALUE );  
         } 
     }

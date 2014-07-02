@@ -3,9 +3,9 @@
 ClassificationTable::ClassificationTable(){
 };
 
-void ClassificationTable::initTable(TrainingImageRepository& tir){
-    _positive = tir._faces.size();
-    _negative = tir._scenes.size();
+void ClassificationTable::initTable(TrainingSet& ts){
+    _positive = ts._faces.size();
+    _negative = ts._scenes.size();
 
     double ipw = 1.0/(2*_positive);;
     double inw = 1.0/(2*_negative);
@@ -16,8 +16,8 @@ void ClassificationTable::initTable(TrainingImageRepository& tir){
     _t_minus=0;
 
     int element_order=0;
-    for(int i=0;i<tir.size();i++){
-        TrainingImage* ti = tir.get(i);
+    for(int i=0;i<ts.size();i++){
+        TrainingImage* ti = ts.get(i);
 
         if( ti->_tt==FACE){            
             _elements.push_back( new TableItem(ipw,0.0,FACE,1.0,1,element_order++) );
@@ -33,13 +33,13 @@ void ClassificationTable::initTable(TrainingImageRepository& tir){
     Logger::debug->log("TOTAL ELEMENTS TRAINING: %d\n",_elements.size());
 }
 
-TableItem ClassificationTable::getBestTableItem(FeatureMask& fm, TrainingImageRepository& tir){
+TableItem ClassificationTable::getBestTableItem(FeatureMask& fm, TrainingSet& ts){
     _s_plus=0;
     _s_minus=0;
     // TrainingImage* t;
     int i=0;
-    for(int i=0;i<tir.size();i++){
-        TrainingImage* ti = tir.get(i);
+    for(int i=0;i<ts.size();i++){
+        TrainingImage* ti = ts.get(i);
 
         *(_elements[i]) = TableItem(_weights[i],  ti->filter(fm),  ti->_tt, 0, 1,i); 
     }
@@ -89,13 +89,13 @@ TableItem ClassificationTable::getBestTableItem(FeatureMask& fm, TrainingImageRe
     return bestItem;
 }
 
-void ClassificationTable::updateWeights(double b_t, Hypothesy& h, TrainingImageRepository& tir){
+void ClassificationTable::updateWeights(double b_t, Hypothesy& h, TrainingSet& ts){
     _t_plus=0.0;
     _t_minus=0.0;
     std::vector<TrainingImage*>::iterator it;
     // printf("UPDATE WEIGHTS %d %lu\n",h._direction,h._threshold);
-    for(int i=0;i<tir.size();i++){
-        TrainingImage* ti = tir.get(i);
+    for(int i=0;i<ts.size();i++){
+        TrainingImage* ti = ts.get(i);
 
         if( h_function( ti->filter(h._fm), h._direction, h._threshold )==1 ){
             // printf("IMG %d IS FACE (%lu) \n", i,(*it)->filter(h._fm));
@@ -128,7 +128,7 @@ void ClassificationTable::updateWeights(double b_t, Hypothesy& h, TrainingImageR
 
     //Now normalize the weights
     double normal_factor = 1.0/(_t_plus+_t_minus);
-    for(int i=0;i<tir.size();i++){
+    for(int i=0;i<ts.size();i++){
         _weights[ i ] *=  normal_factor;
     }
 
