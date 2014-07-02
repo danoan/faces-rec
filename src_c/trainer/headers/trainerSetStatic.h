@@ -10,9 +10,9 @@
 
 class TrainerSetStatic:public TrainerSetManager{
 private:
-    int loadAndStorageFaces(std::string dir_path, TrainingSet& ts);
-    int loadAndStorageScenes(std::string dir_path, TrainingSet& ts);
-    int loadAndStorageScenes(std::string dir_path, TrainingSet& ts, ClassifierInterface& cc);
+    int loadAndStoreFaces(std::string dir_path, TrainingSet& ts);
+    int loadAndStoreScenes(std::string dir_path, TrainingSet& ts);
+    int loadAndStoreScenes(std::string dir_path, TrainingSet& ts, ClassifierInterface& cc);
 
     void storeFalsePositives(ClassifierInterface& cc, std::vector<TrainingImage*>& all_examples, std::vector<TrainingImage*>& fp_examples);
 

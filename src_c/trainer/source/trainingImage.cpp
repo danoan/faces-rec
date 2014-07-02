@@ -11,6 +11,10 @@ TrainingImage::TrainingImage(std::string imagePath, TrainingType tt, bool has_bu
     }
 }
 
+TrainingImage::TrainingImage(ulong**& data, Point size, TrainingType tt):_tt(tt),_has_buffer(false){
+    _ii = new IntegralImage(data,size);
+}
+
 unsigned long int TrainingImage::filter(FeatureMask& fm){
     //Check if CLASSIFIER_HAS_BUFFER and pick the value for this feature mask or compute the integral image
     if(_has_buffer){

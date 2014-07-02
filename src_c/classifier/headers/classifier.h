@@ -58,6 +58,11 @@ public:
 
 };
 
+namespace ClassifierCheckFunctions{
+	int checkData(ulong** data, Point size, void* vp);	
+};
+
+
 std::ostream& operator<<(std::ostream& os, const Hypothesy& h);
 std::istream& operator>>(std::istream& is, Hypothesy& h);
 

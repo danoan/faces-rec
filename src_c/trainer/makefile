@@ -11,8 +11,8 @@ object_path:=$(object)
 source_path:=$(source)
 lib_path:=$(lib)
 
-all: classificationTable.o  tableItem.o trainer.o trainerSetStatic.o trainingImage.o trainingSet.o  trainingImageDescriptor.o
-	ar rc $(lib_path)/libtrainer.a $(object_path)/classificationTable.o $(object_path)/tableItem.o $(object_path)/trainer.o $(object_path)/trainerSetStatic.o $(object_path)/trainingImage.o $(object_path)/trainingSet.o $(object_path)/trainingImageDescriptor.o
+all: classificationTable.o  tableItem.o trainer.o trainerSetCrop.o trainerSetStatic.o trainingImage.o trainingSet.o  trainingImageDescriptor.o
+	ar rc $(lib_path)/libtrainer.a $(object_path)/classificationTable.o $(object_path)/tableItem.o $(object_path)/trainer.o $(object_path)/trainerSetCrop.o $(object_path)/trainerSetStatic.o $(object_path)/trainingImage.o $(object_path)/trainingSet.o $(object_path)/trainingImageDescriptor.o
 
 classificationTable.o:
 	g++ $(magick_left) -o $(object_path)/classificationTable.o -c $(source_path)/classificationTable.cpp $(magick_right) -O3 -w	
@@ -22,6 +22,9 @@ tableItem.o:
 
 trainer.o:
 	g++ $(magick_left) -o $(object_path)/trainer.o -c $(source_path)/trainer.cpp $(magick_right) -Llib -lfeature -lutil -O3 -w
+
+trainerSetCrop.o:
+	g++ $(magick_left) -o $(object_path)/trainerSetCrop.o -c $(source_path)/trainerSetCrop.cpp $(magick_right) -O3 -w
 
 trainerSetStatic.o:
 	g++ $(magick_left) -o $(object_path)/trainerSetStatic.o -c $(source_path)/trainerSetStatic.cpp $(magick_right) -O3 -w

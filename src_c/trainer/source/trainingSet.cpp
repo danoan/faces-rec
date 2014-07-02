@@ -21,7 +21,10 @@ void TrainingSet::addFace(TID tid){
 
 void TrainingSet::addScene(TID tid,ClassifierInterface& cc){
     if(tid._crop_selector){
-
+        std::list<ulong**>::iterator it;
+        for(it=tid._crops.begin();it!=tid._crops.end();it++){
+            _scenes.push_back(new TrainingImage(*it,tid._crop_size,SCENE));     
+        }
     }else{    
         TrainingImage* ti = new TrainingImage(tid._img_path,SCENE,false,_features_number);
         if( cc.isFace( *(ti->_ii) )==1 ){
@@ -34,11 +37,13 @@ void TrainingSet::addScene(TID tid,ClassifierInterface& cc){
 
 void TrainingSet::addScene(TID tid){
     if(tid._crop_selector){
-
+        std::list<ulong**>::iterator it;
+        for(it=tid._crops.begin();it!=tid._crops.end();it++){   
+            _scenes.push_back(new TrainingImage(*it,tid._crop_size,SCENE));
+        }
     }else{
         _scenes.push_back(new TrainingImage(tid._img_path,SCENE,false,_features_number));                
-    }
-    
+    }    
 }
 
 TrainingImage* TrainingSet::get(int index){

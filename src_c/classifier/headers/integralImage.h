@@ -26,6 +26,7 @@ public:
         free(_data);        
     }
 	IntegralImage(std::string img_path);
+    IntegralImage(ulong**& data,Point size):_data(data),_size(size){};
 
 	inline int outsideLimits(Point& p);
 	inline ulong** data(){return _data;};

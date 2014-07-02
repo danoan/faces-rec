@@ -11,14 +11,14 @@ void TrainerSetStatic::init(int featuresNumber, int bufferSize){
     _trs.init(featuresNumber,bufferSize*0.8);
     _vas.init(featuresNumber,bufferSize*0.2);
 
-    loadAndStorageFaces(_faces_training_path,_trs);
-    loadAndStorageFaces(_faces_validation_path,_vas);
+    loadAndStoreFaces(_faces_training_path,_trs);
+    loadAndStoreFaces(_faces_validation_path,_vas);
 
     scanGroups(_scenes_training_path,_training_group_paths);
     scanGroups(_scenes_validation_path,_validation_group_paths);
 
-    loadAndStorageScenes(currentTrainingGroupPath(),_trs);
-    loadAndStorageScenes(currentValidationGroupPath(),_vas);
+    loadAndStoreScenes(currentTrainingGroupPath(),_trs);
+    loadAndStoreScenes(currentValidationGroupPath(),_vas);
 
     Logger::debug->log("Image Sets TS_FACES %d\nTS_SCENES %d\n",_trs._faces.size(),_trs._scenes.size());
 
@@ -56,7 +56,7 @@ std::string TrainerSetStatic::currentValidationGroupPath(){
     return _validation_group_paths[_validation_group_number];
 }
 
-int TrainerSetStatic::loadAndStorageFaces(std::string dir_path,TrainingSet& ts){
+int TrainerSetStatic::loadAndStoreFaces(std::string dir_path,TrainingSet& ts){
     std::vector<std::string> file_paths;
     int r = getAllFiles(dir_path,file_paths);
     for(int i=0;i<file_paths.size();i++){
@@ -66,7 +66,7 @@ int TrainerSetStatic::loadAndStorageFaces(std::string dir_path,TrainingSet& ts){
     return r;
 }
 
-int TrainerSetStatic::loadAndStorageScenes(std::string dir_path,TrainingSet& ts, ClassifierInterface& cc){
+int TrainerSetStatic::loadAndStoreScenes(std::string dir_path,TrainingSet& ts, ClassifierInterface& cc){
     std::vector<std::string> file_paths;
     int r = getAllFiles(dir_path,file_paths);
     for(int i=0;i<file_paths.size();i++){        
@@ -76,7 +76,7 @@ int TrainerSetStatic::loadAndStorageScenes(std::string dir_path,TrainingSet& ts,
     return r;
 }
 
-int TrainerSetStatic::loadAndStorageScenes(std::string dir_path,TrainingSet& ts){
+int TrainerSetStatic::loadAndStoreScenes(std::string dir_path,TrainingSet& ts){
     std::vector<std::string> file_paths;
     int r = getAllFiles(dir_path,file_paths);
     for(int i=0;i<file_paths.size();i++){
@@ -113,7 +113,7 @@ int TrainerSetStatic::resetSets(int stage, ClassifierInterface& cc){
         if(_training_group_number>=_training_group_paths.size()){
             r=-1;
         }else{
-            r = loadAndStorageScenes(currentTrainingGroupPath(),_trs,cc);
+            r = loadAndStoreScenes(currentTrainingGroupPath(),_trs,cc);
         }        
 
         if(r==-1){
@@ -123,7 +123,7 @@ int TrainerSetStatic::resetSets(int stage, ClassifierInterface& cc){
         }
     }
 
-    loadAndStorageScenes(currentValidationGroupPath(),_vas);
+    loadAndStoreScenes(currentValidationGroupPath(),_vas);
 
 }
 

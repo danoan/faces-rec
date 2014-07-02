@@ -58,6 +58,14 @@ int Classifier::isFace(IntegralImage &ii, Subwindow &sw, double ac){
 	}
 }
 
+namespace ClassifierCheckFunctions{
+    int checkIsFace(ulong** data, Point size, void* vp){
+        ClassifierInterface* cc = (ClassifierInterface*) vp;
+        IntegralImage ii(data,size);
+        return cc->isFace(ii);
+    }
+}
+
 std::ostream& operator<<(std::ostream& os, const Hypothesy& h){
     os << h._threshold << '\n';
     os << h._direction << '\n';

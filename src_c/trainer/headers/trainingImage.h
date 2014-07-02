@@ -22,6 +22,7 @@ public:
     std::vector<ulong> _ii_buffer;  //if has_buffer is true, it puts the integral values here
 
     TrainingImage(std::string imagePath, TrainingType tt, bool has_buffer, int features_number);
+    TrainingImage(ulong**& data, Point size, TrainingType tt);
     ~TrainingImage(){
         // printf("DESTROY TRAINNING\n");
         delete _ii;

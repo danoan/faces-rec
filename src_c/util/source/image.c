@@ -63,6 +63,78 @@ void loadImage(ulong*** data, const char* filepath,Point* size){
     DestroyMagickWand(image_wand);	    
 }
 
+int getImageCrops(ulong*** data, const char* filepath, int crop_start_index, int ncrops, int maxCrops, int crop_width, int crop_height, int shift_step, int(* checkData)(ulong**,Point,void*), void* vp){
+	ulong** img_data;
+	Point img_size;
+
+	loadImage(&img_data,filepath,&img_size);
+
+	int x,y;
+
+	int real_width = img_size.x - crop_width;
+	int real_height = img_size.y - crop_height;
+
+	data = (ulong***) malloc(sizeof(data)*ncrops);
+
+	int t,h;
+	for(t=0;t<ncrops;t++){
+		data[t] = (ulong**) malloc(sizeof(*data)*crop_height);		
+		for(h=0;h<crop_height;h++){
+			data[t][h] = (ulong*) malloc(sizeof(**data)*crop_width);
+		}
+	}
+
+	// int** boxes = (int**) malloc(sizeof(int*)*ncrops);
+	// int k;
+	// for(int k=0;k<ncrops;k++){
+	// 	boxes[k] = (int*) malloc(sizeof(int)*4);
+	// }
+
+	int total_crops=0;
+	int i = crop_start_index;
+	while(total_crops<ncrops && i<maxCrops){
+		Point loc;
+		loc.x = (i*shift_step)%real_width;
+		loc.y = (i*shift_step)/real_width*shift_step;
+
+		// boxes[total_crops][0] = loc.x;
+		// boxes[total_crops][1] = loc.y;
+		// boxes[total_crops][2] = loc.x + crop_width;
+		// boxes[total_crops][3] = loc.y + crop_height;
+
+		for(y=0;y<crop_height;y++){			
+			for(x=0;x<crop_width;x++){
+				data[total_crops][y][x] = img_data[loc.y+y][loc.x+x];
+			}
+		}
+
+		Point crop_size;
+		crop_size.x = crop_width;
+		crop_size.y = crop_height;
+
+		if(vp==NULL){
+			total_crops+=1;
+		}else{
+			if(checkData(data[total_crops],crop_size,vp)==1){
+				total_crops+=1;
+			}
+		}
+
+		i++;
+	}
+
+	// drawRectangles(filepath,total_crops,boxes,"Green");
+
+	for(t=total_crops;t<ncrops;t++){
+		for(h=0;h<crop_height;h++){
+			free(data[t][h]);
+		}
+		free(data[t]);
+	}
+
+	return total_crops;
+}
+
 void drawRectangles(const char* filepath,int num_boxes,int** boxes, const char* color){
 	MagickWand* image_wand;
 	DrawingWand* d_wand;

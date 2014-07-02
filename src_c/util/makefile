@@ -32,3 +32,6 @@ directory.o:
 
 drawFeature.o:
 	g++ $(magick_left) -o $(object_path)/drawFeature.o -c $(source_path)/drawFeature.cpp $(magick_right) -O3 -w 
+
+teste.out:
+	g++ $(magick_left) $(source_path)/teste.cpp $(source_path)/config.cpp $(source_path)/image.c $(magick_right) -O3 -w -o teste.out
