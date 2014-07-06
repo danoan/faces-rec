@@ -9,7 +9,8 @@
 
 
 int train(){
-    TrainerSetManager* tsm = new TrainerSetStatic(Config::TRAINING_FACES_PATH,Config::VALIDATION_FACES_PATH,Config::TRAINING_SCENES_PATH,Config::VALIDATION_SCENES_PATH);
+    // TrainerSetManager* tsm = new TrainerSetStatic(Config::TRAINING_FACES_PATH,Config::VALIDATION_FACES_PATH,Config::TRAINING_SCENES_PATH,Config::VALIDATION_SCENES_PATH);
+    TrainerSetManager* tsm = new TrainerSetCrop(Config::TRAINING_FACES_PATH, Config::VALIDATION_FACES_PATH, Config::TRAINING_SCENES_PATH, Config::VALIDATION_SCENES_PATH, Config::CLASSIFIER_FACES_TRAINING_SET_SIZE, Config::CLASSIFIER_FACES_TRAINING_SET_SIZE*1.0,Config::CLASSIFIER_SCENES_TRAINING_SET_SIZE, Config::CLASSIFIER_SCENES_TRAINING_SET_SIZE*0.2);
 
     Trainer* t = new Trainer(tsm);
     CascadeClassifier cl = t->startTrainingCascade();    

@@ -34,13 +34,16 @@ class ImageWindowGenerator():
 		self.img_w=0
 		self.img_h=0
 
+		print shift_step
+
 		img = Image.open(self.img_filename)
 		print self.img_filename
 		self.img_w = img.size[0] - self.shift_step
 		self.img_h = img.size[1] - self.shift_step
 		print self.img_w,self.img_h
 
-		self.total_windows = (self.img_w*self.img_h)/(self.shift_step*self.shift_step)
+		ie = int( math.floor( (self.img_w*self.img_h)/(self.shift_step*self.shift_step) ) + 1 );
+		self.total_windows = int( ie + math.floor( (self.img_w - (ie*self.shift_step)%self.img_w)/self.shift_step ) );
 		self.iter = self.get_next_random_window()
 		print self.total_windows
 
@@ -123,9 +126,9 @@ def get_next_random_image_window(folder,n,ardis=64):
 	folder_to_save = str( time.time() )
 	face_size = (ardis,ardis)
 
-	shift_step = 1
+	shift_step = ardis
 	img_windows = []
-
+	print shift_step
 	windows_total = 0
 	a=0
 	for fn in file_names:		
@@ -148,8 +151,8 @@ def get_next_random_image_window(folder,n,ardis=64):
 	for a in xrange(0,n):
 		window = None
 		while(window==None):
-			if len(img_windows)>1:
-				r = random.randint(0,len(img_windows)-1)		
+			r = random.randint(0,len(img_windows)-1)		
+			if len(img_windows)>1:				
 				iw = img_windows[r]
 			else:
 				iw = img_windows[0]

@@ -1,10 +1,24 @@
 #include "../headers/integralImage.h"
 
-IntegralImage::IntegralImage(std::string img_path){
+IntegralImage::IntegralImage(std::string img_path):_copy(true){
 	int y,x;
 	ulong line_sum;
 	loadImage(&(_data),img_path.c_str(),&(_size));
 	// printf("INT IM %d %d\n",_size.y,_size.x);
+}
+
+IntegralImage::IntegralImage(ulong**& data,Point size, bool copy):_size(size),_copy(copy){
+	if(copy){
+		_data = (ulong**) malloc(sizeof(ulong*)*size.y);
+		for(int i=0;i<size.y;i++){
+			_data[i] = (ulong*) malloc(sizeof(ulong)*size.x);
+			for(int j=0;j<size.x;j++){
+				_data[i][j] = data[i][j];
+			}
+		}		
+	}else{
+		_data=data;
+	}
 }
 
 inline int IntegralImage::outsideLimits(Point& p){

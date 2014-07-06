@@ -61,6 +61,7 @@ CascadeClassifier Trainer::startTrainingCascade(){
     double di;
 
     int total_features = 0;
+    int r;
     while( _fp_rate>_final_fp_rate && _stage_number < Config::CLASSIFIER_MAX_STAGES ){          
         prepareTrainer(); 
 
@@ -102,9 +103,11 @@ CascadeClassifier Trainer::startTrainingCascade(){
         cascade.save(std::string(path));
 
         _stage_number++;    
-        _tsm->resetSets(_stage_number,cascade);
+        r = _tsm->resetSets(_stage_number,cascade);
+        printf("END RESET\n");
         
-        endTrainer();       
+        endTrainer();    
+        if(r==-1) break;   
     }
     
 
@@ -192,7 +195,7 @@ void Trainer::keepTraining(Classifier& cl){
 }
 
 bool Trainer::firstStagesCheckClassifier(Classifier& cc, double* ac, double* fi, double* di, int stage, int featureNumber){
-    bool check = _tsm->checkClassifier(cc,ac,fi,di,_max_fp_rate,_min_det_rate,0.8,0.1,0.2);
+    bool check = _tsm->checkClassifier(cc,ac,fi,di,_max_fp_rate,_min_det_rate,0.6,0.1,0.2);
     if(check==false){
          if( featureNumber >= _firstStagesMaxFeature[stage] ) return true;
     }

@@ -8,8 +8,8 @@ TrainerSetStatic::TrainerSetStatic(std::string faces_training_path, std::string 
 }
 
 void TrainerSetStatic::init(int featuresNumber, int bufferSize){
-    _trs.init(featuresNumber,bufferSize*0.8);
-    _vas.init(featuresNumber,bufferSize*0.2);
+    _trs.init(featuresNumber,bufferSize);
+    _vas.init(featuresNumber,0);
 
     loadAndStoreFaces(_faces_training_path,_trs);
     loadAndStoreFaces(_faces_validation_path,_vas);
@@ -108,7 +108,7 @@ int TrainerSetStatic::resetSets(int stage, ClassifierInterface& cc){
 
     _trs._scenes = all_fp;
     int r;
-    while(_trs._scenes.size()<Config::CLASSIFIER_SCENE_MIN_TRAINING_SET_ELEMENTS){
+    while(_trs._scenes.size()<Config::CLASSIFIER_SCENES_TRAINING_SET_SIZE){
         _training_group_number++;
         if(_training_group_number>=_training_group_paths.size()){
             r=-1;
@@ -124,7 +124,7 @@ int TrainerSetStatic::resetSets(int stage, ClassifierInterface& cc){
     }
 
     loadAndStoreScenes(currentValidationGroupPath(),_vas);
-
+    return 1;
 }
 
 bool TrainerSetStatic::checkClassifier(ClassifierInterface& cc, double* ac, double* fi, double* di, double max_fp_rate, double min_det_rate, double ac_start,double ac_step, double ac_min){

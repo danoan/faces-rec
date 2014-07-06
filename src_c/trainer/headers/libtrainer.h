@@ -4,6 +4,7 @@
 #include "classificationTable.h"
 #include "tableItem.h"
 #include "trainer.h"
+#include "trainerSetCrop.h"
 #include "trainerSetStatic.h"
 #include "trainingImage.h"
 #include "trainingImageDescriptor.h"

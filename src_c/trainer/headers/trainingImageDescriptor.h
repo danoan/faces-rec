@@ -9,6 +9,9 @@ class TID{
 public:
     TID(std::string img_path, bool crop_selector);
 
+    ulong** _img_data;
+    Point _img_size;
+
     std::string _img_path;
     Point _size;
 
@@ -21,8 +24,7 @@ public:
 
     std::list<ulong**> _crops;
 
-    int loadNextCrops(int n, int& theEnd, int(* checkData)(ulong**,Point,void*), void* vp);
-    int refreshCrops(int(* checkData)(ulong**,Point,void*), void* vp);
+    int loadNextCrops(int n, int& totalRead, int& theEnd, int(* checkData)(ulong**,Point,void*), void* vp);
 
 };
 

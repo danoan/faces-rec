@@ -1,6 +1,6 @@
 #include "../headers/config.h"
 
-//LIVRE:  g,j,k,l,p,o,q,v,y,z
+//LIVRE:  l,g,p,o,q,v,y,z
 
 std::string Config::CONFIG_FILE;
 
@@ -21,11 +21,16 @@ double Config::CLASSIFIER_STAGE_MIN_DETECTION_RATE = 0.946;     //"t"
 int Config::CLASSIFIER_MAX_STAGES = 38; //"n"
 double Config::CLASSIFIER_BETA_MIN_VALUE = 1e-8;    //"NONE"
 
+int Config::CLASSIFIER_FACES_TRAINING_SET_SIZE = 300; //"j"
+int Config::CLASSIFIER_SCENES_TRAINING_SET_SIZE = 400; //"k"
+
 int Config::CLASSIFIER_MAX_HYPOTHESIS_PER_STAGE = 300;      //"x"
-int Config::CLASSIFIER_SCENE_MIN_TRAINING_SET_ELEMENTS = 20; //"l"
 
 int Config::CLASSIFIER_INTEGRAL_IMAGE_BUFFER_SIZE = 2000;   //"i"
 bool Config::CLASSIFIER_HAS_BUFFER = false;                 //"u"
+
+int Config::CLASSIFIER_SET_CROP_BUFFER_SIZE = 10;
+int Config::CLASSIFIER_SET_CROP_ELEMENTS_PER_WINDOW = 50;
 
 
 int Config::DETECTOR_GENERATIONS = 3;   //"G"
@@ -66,7 +71,7 @@ std::string Config::VALIDATION_SCENES_PATH = VALIDATION_IMG_PATH + "/non_faces";
 
 
 int Config::readInput(int argc, char* argv[]){
-    char* options = "c:a:b:s:r:w:h:f:d:m:t:n:x:i:ue:l:G:S:W:H:P:O:Q:RC:Z:?";
+    char* options = "c:a:b:s:r:w:h:f:d:m:t:n:x:i:ue:j:k:G:S:W:H:P:O:Q:RC:Z:?";
     int c=0;
     while(1){
         c = getopt(argc,argv,options);
@@ -117,10 +122,13 @@ int Config::readInput(int argc, char* argv[]){
                 break;           
             case 'x':   //MAXIMOS DE ESTAGIOS POR HIPOTESE
                 Config::CLASSIFIER_MAX_HYPOTHESIS_PER_STAGE = atoi(optarg);
-                break;        
-            case 'l':
-                Config::CLASSIFIER_SCENE_MIN_TRAINING_SET_ELEMENTS = atoi(optarg);
-                break;
+                break;                          
+            case 'j':
+                Config::CLASSIFIER_FACES_TRAINING_SET_SIZE = atoi(optarg);
+                break;                                                            
+            case 'k':
+                Config::CLASSIFIER_SCENES_TRAINING_SET_SIZE = atoi(optarg);
+                break;                                                    
             case 'e':
                 Config::VIEWER_FEATURE_ID = atoi(optarg);
                 break;                
@@ -172,7 +180,8 @@ int Config::readInput(int argc, char* argv[]){
                 printf("-t Min Stage Detection Rate\n");
                 printf("-n Max Stages\n");
                 printf("-x Max Hypothesis per Stage \n");
-                printf("-l Scene Min Training Set Elements \n");
+                printf("-j Faces Training Set Size \n");
+                printf("-k Scenes Training Set Size \n");
 
                 printf("-a Ardis Width \n");
                 printf("-b Ardis Height \n");

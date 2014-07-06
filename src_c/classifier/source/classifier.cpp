@@ -59,9 +59,11 @@ int Classifier::isFace(IntegralImage &ii, Subwindow &sw, double ac){
 }
 
 namespace ClassifierCheckFunctions{
-    int checkIsFace(ulong** data, Point size, void* vp){
+    int checkData(ulong** data, Point size, void* vp){
+        if(vp==NULL){return 1;}
+
         ClassifierInterface* cc = (ClassifierInterface*) vp;
-        IntegralImage ii(data,size);
+        IntegralImage ii(data,size,false);
         return cc->isFace(ii);
     }
 }

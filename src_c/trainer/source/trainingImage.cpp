@@ -11,7 +11,7 @@ TrainingImage::TrainingImage(std::string imagePath, TrainingType tt, bool has_bu
     }
 }
 
-TrainingImage::TrainingImage(ulong**& data, Point size, TrainingType tt):_tt(tt),_has_buffer(false){
+TrainingImage::TrainingImage(ulong** data, Point size, TrainingType tt):_tt(tt),_has_buffer(false){
     _ii = new IntegralImage(data,size);
 }
 
