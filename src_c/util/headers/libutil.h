@@ -7,5 +7,6 @@
 #include "drawFeature.h"
 #include "image.h"
 #include "log.h"
+#include "plainWriter.h"
 
 #endif

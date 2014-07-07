@@ -6,7 +6,7 @@ int check_data(ulong** data, Point size, void* vp){
     return 1;
 }
 
-int main(int argc, char* argv[]){
+int teste_crop_dinamico(){
     ulong*** crops;
     int d = 4;
 
@@ -28,7 +28,45 @@ int main(int argc, char* argv[]){
 
     printf("%d\n",_max_crops);
 
-    int total_crops = getImageCrops(crops,( Config::DATASET_PATH+"/sun/com_faces/0.pgm" ).c_str(),35000,7428,37428,_crop_size.x,_crop_size.y,_shift_step,check_data,&d);
+    int crop_start_index = 35000;
+    int total_crops = getImageCrops(&crops,( Config::DATASET_PATH+"/sun/com_faces/0.pgm" ).c_str(),&crop_start_index,7428,37428,_crop_size.x,_crop_size.y,_shift_step,check_data,&d);
 
-    printf("Total Crops: %d\n",total_crops);
+    printf("Total Crops: %d\n",total_crops);    
+}
+
+int teste_plain_writer(){
+    PlainWriter <int> pw1;
+    for(int i=0;i<2048;i++){
+        pw1.write(i);
+    }
+
+    pw1.moveBegin();
+    for(int i=0;i<2048;i++){
+        printf("%d ", pw1.read());
+    }
+
+    printf("\n\n");
+    pw1.moveBegin();
+    for(int i=0;i<4;i++){
+        printf("\nLINE %d\n", i);
+        int* l = pw1.readLine(512);
+        for(int j=0;j<512;j++){
+            printf("%d ",l[j]);
+        }
+    }
+
+    printf("\n\n");
+    pw1.moveBegin();
+    int** ar = pw1.readArray(128,16);
+    for(int i=0;i<16;i++){
+        printf("\nLINE %d\n", i);
+        for(int j=0;j<128;j++){
+            printf("%d ", ar[i][j]);
+        }
+    }
+
+}
+
+int main(int argc, char* argv[]){
+    teste_plain_writer();
 }
