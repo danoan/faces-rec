@@ -2,6 +2,7 @@
 #define __MASK_BLOCK__
 
 #include "../../util/headers/basic.h"
+#include "../../util/headers/plainWriter.h"
 #include "maskBlock.h"
 
 class MaskBlock{
@@ -23,6 +24,8 @@ public:
     inline ulong h(){ return this->_h; };
     inline void h(ulong h){this->_h=h;};
 
+    static void asPlainVector(PlainWriter<ulong>& pw, const MaskBlock& m);
+    static MaskBlock fromPlainVector(PlainWriter<ulong>& pw);
 };
 
 std::ostream& operator<<(std::ostream& os, const MaskBlock& mb);

@@ -8,7 +8,7 @@ class TableItem{
 public:
     double _weight;    
     ulong _filter_value;
-    TrainingType _tt;
+    ulong _tt;
     double _error;
 
     int _direction;
@@ -18,7 +18,7 @@ public:
     FeatureMask _fm;
 
     TableItem(){};
-    TableItem(double w, ulong f, TrainingType tt, double e, int d, int o):_weight(w),_filter_value(f),_tt(tt),_error(e),_direction(d),_order(o){};
+    TableItem(double w, ulong f, ulong tt, double e, int d, int o):_weight(w),_filter_value(f),_tt(tt),_error(e),_direction(d),_order(o){};
 };
 
 class TableItemComparator{

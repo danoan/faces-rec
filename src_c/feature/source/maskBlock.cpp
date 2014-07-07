@@ -32,3 +32,25 @@ std::istream& operator>>(std::istream& is, MaskBlock& mb){
 
     return is;
 }
+
+void MaskBlock::asPlainVector(PlainWriter<ulong>& pw, const MaskBlock& mb){
+    for(register int i=0;i<4;i++){
+		pw.write(mb._points[i].x);
+		pw.write(mb._points[i].y);
+    }
+    pw.write(mb._w);
+    pw.write(mb._h);
+}
+
+MaskBlock MaskBlock::fromPlainVector(PlainWriter<ulong>& pw){
+	MaskBlock mb;
+    for(register int i=0;i<4;i++){
+        mb._points[i].x = pw.read();
+        mb._points[i].y = pw.read();
+    }
+
+    mb._w = pw.read();
+    mb._h = pw.read();
+
+    return mb;	
+}

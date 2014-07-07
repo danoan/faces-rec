@@ -1,6 +1,6 @@
 #include "../headers/mask.h"
 
-Mask::Mask(Point size, int maskType){
+Mask::Mask(Point size, ulong maskType){
     this->_size = size;
     switch(maskType){
         case 0:
@@ -412,4 +412,60 @@ std::istream& operator>>(std::istream& is, Mask& m){
     }
 
     return is;
+}
+
+void Mask::asPlainVector(PlainWriter<ulong>& pw, const Mask& m){
+	pw.write(m._size.x);
+	pw.write(m._size.y);
+	
+    pw.write(m._white.size());   
+    for(register int i=0;i<m._white.size();i++){
+		MaskBlock::asPlainVector(pw,m._white[i]);
+    }
+
+    pw.write(m._black.size());
+    for(register int i=0;i<m._black.size();i++){
+        MaskBlock::asPlainVector(pw,m._black[i]);
+    }        
+
+	pw.write(m._createMaskId);
+}
+
+Mask Mask::fromPlainVector(PlainWriter<ulong>& pw){
+	Mask m;
+	
+	m._size.x = pw.read();
+    m._size.y = pw.read();
+
+    int s_white = pw.read();
+    for(register int i=0;i<s_white;i++){
+        m._white.push_back(MaskBlock::fromPlainVector(pw));
+    }
+
+    int s_black = pw.read();
+    for(register int i=0;i<s_black;i++){
+        m._black.push_back(MaskBlock::fromPlainVector(pw));
+    }
+
+    m._createMaskId = pw.read();
+
+    switch(m._createMaskId){
+        case 0:
+            m._createMask = &(createMaskM2H);
+            break;
+        case 1:
+            m._createMask = &(createMaskM2V);
+            break;
+        case 2:
+            m._createMask = &(createMaskM3H);
+            break;
+        case 3:
+            m._createMask = &(createMaskM3V);
+            break;
+        case 4:
+            m._createMask = &(createMaskMD);
+            break;
+    }
+
+    return m;
 }

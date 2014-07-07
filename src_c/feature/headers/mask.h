@@ -5,6 +5,7 @@
 #include <cmath>
 
 #include "../../util/headers/basic.h"
+#include "../../util/headers/plainWriter.h"
 #include "maskBlock.h"
 
 
@@ -14,11 +15,11 @@ public:
     std::vector<MaskBlock> _black;
 
     Point _size;
-    int _createMaskId;  //When saving the object, I can`t save the function pointer
+    ulong _createMaskId;  //When saving the object, I can`t save the function pointer
     Mask(* _createMask)(Point);
 
     Mask(){};
-    Mask(Point size, int maskType);
+    Mask(Point size, ulong maskType);
 
     void addBlock(MaskBlock &mb, int blockType);
     inline void addWhite(MaskBlock &mb);
@@ -29,6 +30,9 @@ public:
     inline std::vector<MaskBlock> black(){ return this->_black; };
 
     inline Point size(){return this->_size;};
+    
+    static void asPlainVector(PlainWriter<ulong>& pw, const Mask& m);
+    static Mask fromPlainVector(PlainWriter<ulong>& pw);
 };
 
 std::ostream& operator<<(std::ostream& os, const Mask& m);

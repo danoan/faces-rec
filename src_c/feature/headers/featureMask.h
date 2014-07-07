@@ -3,6 +3,7 @@
 
 #include <cstdio>
 #include "../../util/headers/basic.h"
+#include "../../util/headers/plainWriter.h"
 #include "maskBlock.h"
 #include "mask.h"
 
@@ -20,10 +21,10 @@ public:
 	Mask _mask;			
 	Point _location;	
 
-	int _id; //this id it would represent the position of this feature in the _ii_buffer of a TrainingImage
+	ulong _id; //this id it would represent the position of this feature in the _ii_buffer of a TrainingImage
 
 	FeatureMask(){};
-	FeatureMask(Mask mask, Point location,int id=0);
+	FeatureMask(Mask mask, Point location,ulong id=0);
 
 	void drawFeatureMask(Point ardis);
 	
@@ -36,6 +37,9 @@ public:
 	void adjustMask(Subwindow &sw);
 	inline Mask mask(){return _mask;};
 	inline Point location(){return _location;};
+	
+	static void asPlainVector(PlainWriter<ulong>& pw, const FeatureMask& fm);
+	static FeatureMask fromPlainVector(PlainWriter<ulong>& pw);
 };
 
 std::ostream& operator<<(std::ostream& os, const FeatureMask& fm);

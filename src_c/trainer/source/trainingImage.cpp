@@ -1,6 +1,6 @@
 #include "../headers/trainingImage.h"
 
-TrainingImage::TrainingImage(std::string imagePath, TrainingType tt, bool has_buffer,int features_number):_img_path(imagePath),_tt(tt),_has_buffer(has_buffer){
+TrainingImage::TrainingImage(std::string imagePath, ulong tt, bool has_buffer,int features_number):_img_path(imagePath),_tt(tt),_has_buffer(has_buffer){
     _ii = new IntegralImage(imagePath);
     // printf("%s\n",imagePath.c_str());
 
@@ -11,7 +11,7 @@ TrainingImage::TrainingImage(std::string imagePath, TrainingType tt, bool has_bu
     }
 }
 
-TrainingImage::TrainingImage(ulong** data, Point size, TrainingType tt):_tt(tt),_has_buffer(false){
+TrainingImage::TrainingImage(ulong** data, Point size, ulong tt):_tt(tt),_has_buffer(false){
     _ii = new IntegralImage(data,size);
 }
 
@@ -28,3 +28,24 @@ unsigned long int TrainingImage::filter(FeatureMask& fm){
     }    
     
 }   
+
+void TrainingImage::asPlainVector(PlainWriter<ulong>& pw, const TrainingImage& ti){
+	pw.write(ti._tt);
+	
+	pw.write(ti._ii->_size.x);
+	pw.write(ti._ii->_size.y);
+	
+	pw.writeArray(ti._ii->_data,ti._ii->_size.x,ti._ii->_size.y);	
+}
+
+TrainingImage TrainingImage::fromPlainVector(PlainWriter<ulong>& pw){
+	ulong tt = pw.read();
+	Point size;
+	
+	size.x = pw.read();
+	size.y = pw.read();
+		
+	ulong** data = pw.readArray(size.x,size.y);
+	
+	return TrainingImage(data,size,tt);	
+}

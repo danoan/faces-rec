@@ -26,7 +26,7 @@ public:
             delete _elements[i];
         }   
     }
-    void addTrainingImage(std::string imagePath, TrainingType tit);
+    void addTrainingImage(std::string imagePath, ulong tit);
 
     void initTable(TrainingSet& ts);
     TableItem getBestTableItem(FeatureMask& fm, TrainingSet& ts);

@@ -1,6 +1,6 @@
 #include "../headers/featureMask.h"
 
-FeatureMask::FeatureMask(Mask mask,Point location,int id){
+FeatureMask::FeatureMask(Mask mask,Point location,ulong id){
     this->_original_mask = mask;
     this->_original_location = location;
     this->_original_size = mask._size;
@@ -109,4 +109,39 @@ std::istream& operator>>(std::istream& is, FeatureMask& fm){
 
     return is;
 
+}
+
+void FeatureMask::asPlainVector(PlainWriter<ulong>& pw, const FeatureMask& fm){
+	pw.write(fm._id);
+	
+	pw.write(fm._original_location.x);
+	pw.write(fm._original_location.y);
+	
+	pw.write(fm._original_size.x);
+	pw.write(fm._original_size.y);
+	
+	pw.write(fm._location.x);
+	pw.write(fm._location.y);
+	
+	Mask::asPlainVector(pw,fm._mask);
+	Mask::asPlainVector(pw,fm._original_mask);
+}
+
+FeatureMask FeatureMask::fromPlainVector(PlainWriter<ulong>& pw){
+	FeatureMask fm;
+	fm._id = pw.read();
+	
+	fm._original_location.x = pw.read();
+	fm._original_location.y = pw.read();
+	
+	fm._original_size.x = pw.read();
+	fm._original_size.y = pw.read();
+	
+	fm._location.x = pw.read();
+	fm._location.y = pw.read();
+	
+	fm._mask = Mask::fromPlainVector(pw);
+	fm._original_mask = Mask::fromPlainVector(pw);
+
+	return fm;
 }

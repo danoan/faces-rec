@@ -1,6 +1,8 @@
 #ifndef __PLAIN_WRITER__
 #define __PLAIN_WRITER__
 
+#include <cstdlib>
+
 #define PW_DEFAULT_SIZE 4 //1024
 
 template<class T>
@@ -20,6 +22,7 @@ private:
     void checkSize(int length);
 public:
     PlainWriter():_cursor(0), _size(0),_cur_buffer(0),_old_buffer(1),_firstTime(true),_last_element(0){_buffers[0]=NULL;_buffers[1]=NULL;};
+    ~PlainWriter(){delete[] _buffers[0]; delete[] _buffers[1];};
 
     void write(T data);
     void writeLine(T* data, const int length);
@@ -29,8 +32,8 @@ public:
     T* readLine(const int length);
     T** readArray(const int w, const int h);
 
-    void moveBegin();
-    void moveEnd();
+    PlainWriter& moveBegin();
+    PlainWriter& moveEnd();
 };
 
 template<class T>
@@ -121,13 +124,15 @@ T** PlainWriter<T>::readArray(const int w, const int h){
 }
 
 template<class T>
-void PlainWriter<T>::moveBegin(){
+PlainWriter<T>& PlainWriter<T>::moveBegin(){
     _cursor = 0;
+    return *this;
 }
     
 template<class T>
-void PlainWriter<T>::moveEnd(){
+PlainWriter<T>& PlainWriter<T>::moveEnd(){
     _cursor = _last_element = _cursor;
+    return *this;
 }
 
 #endif

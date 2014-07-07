@@ -35,7 +35,7 @@ int teste_crop_dinamico(){
 }
 
 int teste_plain_writer(){
-    PlainWriter <int> pw1;
+    PlainWriter <ulong> pw1;
     for(int i=0;i<2048;i++){
         pw1.write(i);
     }
@@ -49,7 +49,7 @@ int teste_plain_writer(){
     pw1.moveBegin();
     for(int i=0;i<4;i++){
         printf("\nLINE %d\n", i);
-        int* l = pw1.readLine(512);
+        ulong* l = pw1.readLine(512);
         for(int j=0;j<512;j++){
             printf("%d ",l[j]);
         }
@@ -57,7 +57,7 @@ int teste_plain_writer(){
 
     printf("\n\n");
     pw1.moveBegin();
-    int** ar = pw1.readArray(128,16);
+    ulong** ar = pw1.readArray(128,16);
     for(int i=0;i<16;i++){
         printf("\nLINE %d\n", i);
         for(int j=0;j<128;j++){

@@ -41,7 +41,7 @@ protected:
 	std::vector<Mask> _resizeList;
 	std::vector<Point> _localList;
 
-	static int _counter;
+	static ulong _counter;
 
 	Mask(* _fn_create)(Point);
 
@@ -64,7 +64,7 @@ public:
 	*/			
 	std::vector<Point> changeLocal(Point);
 	std::vector<Point> changeLocal();
-	FeatureMask next(int id);
+	FeatureMask next(ulong id);
 	FeatureMask next(){return next(_counter++);};
 
 	inline int hasNext(){ 
