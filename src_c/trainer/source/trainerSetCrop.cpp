@@ -99,7 +99,7 @@ int TrainerSetCrop::addSceneCrops(std::vector<TID>& vtid,std::vector<TID>& buffe
         int img_index = rand() % buffer.size();
         int totalGen;
         int wantGen;
-        if(Config::CLASSIFIER_SET_CROP_ELEMENTS_PER_IMAGE<diff) wantGen = Config::CLASSIFIER_SET_CROP_ELEMENTS_PER_IMAGE;
+        if(Config::CLASSIFIER_SET_CROP_ELEMENTS_PER_WINDOW<diff) wantGen = Config::CLASSIFIER_SET_CROP_ELEMENTS_PER_WINDOW;
         else wantGen = diff;
 
         if( generateCrops(buffer,img_index,wantGen,totalGen,vp)==1 ){
