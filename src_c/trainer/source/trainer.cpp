@@ -195,7 +195,7 @@ void Trainer::keepTraining(Classifier& cl){
 }
 
 bool Trainer::firstStagesCheckClassifier(Classifier& cc, double* ac, double* fi, double* di, int stage, int featureNumber){
-    bool check = _tsm->checkClassifier(cc,ac,fi,di,_max_fp_rate,_min_det_rate,0.6,0.1,0.2);
+    bool check = _tsm->checkClassifier(cc,ac,fi,di,0.75,_min_det_rate,0.4,0.025,0.1);
     if(check==false){
          if( featureNumber >= _firstStagesMaxFeature[stage] ) return true;
     }

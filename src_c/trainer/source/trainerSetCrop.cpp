@@ -17,8 +17,8 @@ TrainerSetCrop::TrainerSetCrop(std::string faces_training_path, std::string face
 }
 
 void TrainerSetCrop::init(int featuresNumber, int bufferSize){
-    _trs.init(featuresNumber,bufferSize*0.8);
-    _vas.init(featuresNumber,bufferSize*0.2);
+    _trs.init(featuresNumber,bufferSize*1.0);
+    _vas.init(featuresNumber,bufferSize*1.0);
 
     loadAndStoreFaces(_faces_training_path,_nFacesTraining,_trs);
     loadAndStoreFaces(_faces_validation_path,_nFacesValidation,_vas);
@@ -28,7 +28,7 @@ void TrainerSetCrop::init(int featuresNumber, int bufferSize){
     loadScenes(_scenes_validation_path,_tid_validation);
 
     printf("AddScenesCrop\n");
-    addSceneCrops(_tid_training,_buffer_training,_ncropsScenesTraining,_trs,NULL);
+    addSceneCrops(_tid_training,_buffer_training,10000,_trs,NULL);
     addSceneCrops(_tid_validation,_buffer_validation,_ncropsScenesValidation,_vas,NULL);
 }
 
@@ -84,6 +84,8 @@ int TrainerSetCrop::generateCrops(std::vector<TID>& vtid,int imgIndex, int ncrop
 
 int TrainerSetCrop::addSceneCrops(std::vector<TID>& vtid,std::vector<TID>& buffer, int n,TrainingSet& ts, void* vp){
     printf("BEFORE DIFF:: Scenes %d N %d TOTAL READ: %d \n",ts._scenes.size(),n,_totalRead);
+
+	if(n<0){ printf("TUDO GERADO\n"); return 1;}
 
     int total = 0;
     int diff = n - total;
@@ -183,8 +185,13 @@ bool TrainerSetCrop::checkClassifier(ClassifierInterface& cc, double* ac, double
         rate_det = rate_det/_vas._faces.size();
         Logger::debug->log("RATE DET: %.4f (MIN:%.4f)\n",rate_det,min_det_rate);
 
-        if(rate_fp>max_fp_rate) return false;    //I have to put more features in the classifier
-        if(rate_det<min_det_rate) continue;
+        if(rate_fp>max_fp_rate){ //I have to put more features in the classifier
+			*ac+=ac_step;
+			return false;    
+		}
+        if(rate_det<min_det_rate){
+			continue;
+		}
 
         *fi = rate_fp;
         *di = rate_det;
