@@ -14,11 +14,10 @@ public:
     int _direction;
     double _alpha;
 
-    int _order;
     FeatureMask _fm;
 
     TableItem(){};
-    TableItem(double w, ulong f, ulong tt, double e, int d, int o):_weight(w),_filter_value(f),_tt(tt),_error(e),_direction(d),_order(o){};
+    TableItem(double w, ulong f, ulong tt, double e, int d):_weight(w),_filter_value(f),_tt(tt),_error(e),_direction(d){};
 };
 
 class TableItemComparator{
