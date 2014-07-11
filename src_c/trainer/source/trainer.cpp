@@ -155,7 +155,7 @@ void Trainer::keepTraining(Classifier& cl){
         ep[t].t = this;
         ep[t].thread_number = t;
         ep[t].factor = factor;
-        ep[t].best = TableItem(0,0,FACE,1.0,1,-1);
+        ep[t].best = TableItem(0,0,FACE,1.0,1);
         ep[t].final = (t==4?1:0);
 
         pthread_create(&(_threads[t]), NULL, getBestFromFeature, &ep[t]);
