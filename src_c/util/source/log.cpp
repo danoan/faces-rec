@@ -30,6 +30,8 @@ int FilePrint::log(char *fmt, ...){
   unsigned u;
   char *s;
   void *v;
+  
+  if(!_to_print) return 0;
 
   va_start(ap, fmt);                         /* must be called before work   */
   while (*fmt) {

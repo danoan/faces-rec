@@ -3,7 +3,7 @@
 void* cpuThread(void* vp){
     elem_params* ep = (elem_params*) vp;
 
-	printf("GO %d - %d\n", ep->from, ep->to);
+	Logger::cuda->log("GO %d - %d\n", ep->from, ep->to);
 
     TableItem partialBest;
     for(int i=ep->from;i<ep->to;i++){
@@ -16,7 +16,7 @@ void* cpuThread(void* vp){
         }   
     }
 
-    printf("THE END\n");
+    Logger::cuda->log("THE END\n");
 
     pthread_exit(NULL);
 
@@ -50,7 +50,7 @@ TableItem CPUManager::consumeBuffer(GPUBuffer* b, GPUManager* gpum, Trainer* t){
         pthread_join(_threads[i],NULL);
     }
     
-    printf("END JOIN\n");
+    Logger::cuda->log("END JOIN\n");
     
     gpum->bufferHasBeenConsumed(b);
 

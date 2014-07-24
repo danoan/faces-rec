@@ -7,7 +7,7 @@ GPUBuffer::GPUBuffer(int id, int nfeatures, int nimages):_id(id){
 }
 
 GPUBuffer::~GPUBuffer(){
-	printf("*** \n FREE BUFFER \n *** \n");
+	Logger::cuda->log("*** \n FREE BUFFER \n *** \n");
 	free(answer_host);
 	cudaFree(answer_device);
 }

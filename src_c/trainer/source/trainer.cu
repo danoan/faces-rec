@@ -140,7 +140,7 @@ void Trainer::keepTraining(Classifier& cl){
         GPUBuffer* gpb = gpuManager->getFilledBuffer();    
 
         if(gpb!=NULL){
-			printf("CONSUME BUFFER\n");
+			Logger::cuda->log("CONSUME BUFFER\n");
 			TableItem partial = cpuManager->consumeBuffer(gpb,gpuManager,this);
 			if(partial._error < theBest._error) theBest = partial;
 		}

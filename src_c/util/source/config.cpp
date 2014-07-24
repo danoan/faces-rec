@@ -1,6 +1,6 @@
 #include "../headers/config.h"
 
-//LIVRE:  g,p,o,q,z
+//LIVRE:  o,z
 
 std::string Config::CONFIG_FILE;
 
@@ -36,6 +36,8 @@ int Config::CLASSIFIER_SET_CROP_BUFFER_SIZE = 10;
 int Config::CLASSIFIER_SET_CROP_ELEMENTS_PER_WINDOW = 50;
 
 bool Config::CLASSIFIER_CUDA = false;	//g
+bool Config::CUDA_DEBUG = false;		//p
+bool Config::ANALYSIS_DEBUG = false;	//q
 
 
 int Config::DETECTOR_GENERATIONS = 3;   //"G"
@@ -76,7 +78,7 @@ std::string Config::VALIDATION_SCENES_PATH = VALIDATION_IMG_PATH + "/non_faces";
 
 
 int Config::readInput(int argc, char* argv[]){
-    char* options = "c:a:b:s:r:w:h:f:d:m:t:n:x:i:ue:j:k:v:y:l:gG:S:W:H:P:O:Q:RC:Z:?";
+    char* options = "c:a:b:s:r:w:h:f:d:m:t:n:x:i:ue:j:k:v:y:l:gpqG:S:W:H:P:O:Q:RC:Z:?";
     int c=0;
     while(1){
         c = getopt(argc,argv,options);
@@ -149,6 +151,12 @@ int Config::readInput(int argc, char* argv[]){
             case 'g':
                 Config::CLASSIFIER_CUDA = true;
                 break;                                
+            case 'p':
+                Config::CUDA_DEBUG = true;
+                break;                    
+            case 'q':
+                Config::ANALYSIS_DEBUG = true;
+                break;                    
             case 'G':
                 Config::DETECTOR_GENERATIONS = atoi(optarg);
                 break;
@@ -202,6 +210,9 @@ int Config::readInput(int argc, char* argv[]){
                 printf("-v Faces Validation Set Size \n");
                 printf("-y Scenes Validation Set Size \n");
                 printf("-l Scenes crops Training set for first classifier \n");
+                printf("-g Use CUDA (Is already the standard) \n");
+                printf("-p Print CUDA DEBUG \n");
+                printf("-q Print ANALYSIS DEBUG \n");
 
                 printf("-a Ardis Width \n");
                 printf("-b Ardis Height \n");

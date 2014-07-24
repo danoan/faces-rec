@@ -48,7 +48,7 @@ void ClassificationTable::initTable(TrainingSet& ts){
     }
 
     Logger::debug->log("TOTAL ELEMENTS TRAINING: %d\n",_elements.size());
-    printf("BEGIN CLASSIFICATION\n");
+    //printf("BEGIN CLASSIFICATION\n");
 
 }
 

@@ -226,10 +226,10 @@ __global__ void kernelFilter(ulong* data, Point size, int nimages, FeatureMaskDe
 
 
 int callCUDA(ulong* data_device, Point size_image, int nimages, FeatureMaskDev* fmd_device, int startFeature, int stepFeature, int nfeatures, int sizeAnswer, ulong* answer_host, ulong* answer_device){	
-	printf("KERNEL CALL %d %d %d %d %d %d %d\n",size_image.x,size_image.y,nimages,startFeature,stepFeature,nfeatures,sizeAnswer);
+	Logger::cuda->log("KERNEL CALL %d %d %d %d %d %d %d\n",size_image.x,size_image.y,nimages,startFeature,stepFeature,nfeatures,sizeAnswer);
 	kernelFilter<<<GRID_SIZE,BLOCK_SIZE>>>(data_device, size_image, nimages, fmd_device, startFeature, stepFeature, nfeatures, answer_device);
 	cudaMemcpy( answer_host, answer_device, sizeof(ulong)*sizeAnswer, cudaMemcpyDeviceToHost );			
-	printf("END CALL\n");
+	Logger::cuda->log("END CALL\n");
 	
 	cudaError_t error = cudaGetLastError();
 	if(error != cudaSuccess){
@@ -242,20 +242,20 @@ int callCUDA(ulong* data_device, Point size_image, int nimages, FeatureMaskDev* 
 void* gpuThread(void* vp){
     GPUManager* manager = (GPUManager*) vp;
 
-	printf("BEGINBEGUNBEGIN\n");
+	Logger::cuda->log("BEGINBEGUNBEGIN\n");
     while(manager->END_STAGE==0){
         if(manager->CONSUMED_BUFFER==1){
-			printf("BUFFER LOAD PROCESS BEGIN\n");
+			Logger::cuda->log("BUFFER LOAD PROCESS BEGIN\n");
             pthread_mutex_lock( &(manager->M) );
-            printf("INSIDE LOCK\n");
+            Logger::cuda->log("INSIDE LOCK\n");
             int from,to;
             GPUBuffer* buffer = manager->getConsumedBuffer(&from,&to);
             pthread_mutex_unlock( &(manager->M) );
             manager->fillBuffer(buffer,from,to);
-            printf("BUFFER LOAD PROCESS END\n");
+            Logger::cuda->log("BUFFER LOAD PROCESS END\n");
         }
     }
-	printf("FIMFIMFIM\n");
+	Logger::cuda->log("FIMFIMFIM\n");
     pthread_exit(NULL);
 
 }
@@ -298,7 +298,7 @@ void GPUManager::resetManager(){
 
 void GPUManager::resetImageData(TrainingSet& ts){
 	_nimages = ts.size();
-	printf("NEW SIZE %d\n",_nimages);
+	Logger::cuda->log("NEW SIZE %d\n",_nimages);
     
 	free(data_host);
 	free(fmd_host);
@@ -307,7 +307,7 @@ void GPUManager::resetImageData(TrainingSet& ts){
 	cudaFree(fmd_device);
 	
     for(int i=0;i<GPU_BUFFER;i++){
-		printf("REMOVING BUFFER\n");
+		Logger::cuda->log("REMOVING BUFFER\n");
 		delete buffers[i];
         buffers[i] = new GPUBuffer(i,_feat_per_buffer, _nimages);
     }	
@@ -317,14 +317,14 @@ void GPUManager::resetImageData(TrainingSet& ts){
 }
 
 void GPUManager::restart(){
-    printf("INITIALIZING GPU MANAGER...START THREAD\n");
+    Logger::cuda->log("INITIALIZING GPU MANAGER...START THREAD\n");
 	pthread_create(&(threads[0]),NULL, gpuThread, this);
 }
 
 GPUBuffer* GPUManager::getConsumedBuffer(int* from, int* to){
 	
     if(consumed_buffers.size()==0) return NULL;
-    if(consumed_buffers.size()==1){ CONSUMED_BUFFER = false; printf("CONSUMED FALSE %d\n", CONSUMED_BUFFER); }
+    if(consumed_buffers.size()==1){ CONSUMED_BUFFER = false; Logger::cuda->log("CONSUMED FALSE %d\n", CONSUMED_BUFFER); }
 
     GPUBuffer* b = consumed_buffers.front();
     consumed_buffers.pop();
@@ -350,12 +350,12 @@ void GPUManager::bufferHasBeenConsumed(GPUBuffer* b){
 	consumed_buffers.push(b);
 	pthread_mutex_lock( &(M) );
 	CONSUMED_BUFFER = true;
-	printf("CONSUMED TRUE %d\n", CONSUMED_BUFFER);
+	Logger::cuda->log("CONSUMED TRUE %d\n", CONSUMED_BUFFER);
 	pthread_mutex_unlock( &(M) );
 }
 
 void GPUManager::fillBuffer(GPUBuffer* b, int from, int to){
-	printf("CALL CUDA BUFFER ID: %d\n",b->_id);
+	Logger::cuda->log("CALL CUDA BUFFER ID: %d\n",b->_id);
 	if(from>_total_features) return;
     callCUDA(data_device, size_image, _nimages, fmd_device, from, _feat_per_buffer, _total_features, b->_size, b->answer_host, b->answer_device);
     filled_buffers.push(b);
@@ -364,7 +364,7 @@ void GPUManager::fillBuffer(GPUBuffer* b, int from, int to){
 GPUBuffer* GPUManager::getFilledBuffer(){
     if(filled_buffers.size()==0) return NULL;
 
-	printf("%d - %d\n",_get_filled_counter,_max_stage);
+	Logger::cuda->log("%d - %d\n",_get_filled_counter,_max_stage);
 
     if( _get_filled_counter==(GPU_BUFFER*_max_stage-1) ) END_STAGE = true;
     else END_STAGE = false;

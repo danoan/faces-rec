@@ -7,7 +7,7 @@ TID::TID(std::string img_path, bool crop_selector): _img_path(img_path), _crop_s
         _crop_size.y = Config::ARDIS_HEIGHT;
 
         _last_crop=0;
-        _shift_step=10;
+        _shift_step=1;
 
         int real_width = _size.x - _crop_size.x;
         int real_height = _size.y - _crop_size.y;

@@ -2,7 +2,7 @@
 
 struct timeval stop,start;
 FilePrint* Logger::logger;
-FilePrint* Logger::error;
+FilePrint* Logger::cuda;
 FilePrint* Logger::debug;
 FilePrint* Logger::feat_anal;
 
@@ -33,10 +33,10 @@ void Logger::init(std::string folder){
     char time_str[12];
     sprintf(time_str,"%lu",start.tv_sec);
 
-    Logger::logger = new FilePrint(folder + "/log_" + time_str + ".txt");
-    Logger::error = new FilePrint(folder + "/error_" + time_str + ".txt");
-    Logger::debug = new FilePrint(folder + "/debug_" + time_str + ".txt");
-    Logger::feat_anal = new FilePrint(folder + "/feat_anal_" + time_str + ".txt");        
+    Logger::logger = new FilePrint(folder + "/log_" + time_str + ".txt",true);
+    Logger::cuda = new FilePrint(folder + "/cuda_" + time_str + ".txt",Config::CUDA_DEBUG);
+    Logger::debug = new FilePrint(folder + "/debug_" + time_str + ".txt",true);
+    Logger::feat_anal = new FilePrint(folder + "/feat_anal_" + time_str + ".txt",Config::ANALYSIS_DEBUG);        
 }
 
 
