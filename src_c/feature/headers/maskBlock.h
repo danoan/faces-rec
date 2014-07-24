@@ -4,6 +4,7 @@
 #include "../../util/headers/basic.h"
 #include "../../util/headers/plainWriter.h"
 #include "maskBlock.h"
+#include "cudaDefs.h"
 
 class MaskBlock{
 public:
@@ -26,6 +27,15 @@ public:
 
     static void asPlainVector(PlainWriter<ulong>& pw, const MaskBlock& m);
     static MaskBlock fromPlainVector(PlainWriter<ulong>& pw);
+};
+
+class MaskBlockDev{
+public:
+    Point _points[4];
+    ulong _w,_h;
+
+    CUDA_CALLABLE_MEMBER MaskBlockDev(){};
+    CUDA_CALLABLE_MEMBER MaskBlockDev(Point a, Point b, Point c, Point d);
 };
 
 std::ostream& operator<<(std::ostream& os, const MaskBlock& mb);

@@ -6,6 +6,7 @@
 #include <string>
 #include "../../feature/headers/libfeature.h"
 #include "image.h"
+#include "config.h"
 
 void drawOnBox(int** boxes,int num_box,Point location, MaskBlock b, char* color);
 void drawBlocks(MagickWand* image_wand, std::vector<MaskBlock> blocks, Point location, char* color);

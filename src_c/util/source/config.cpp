@@ -1,6 +1,6 @@
 #include "../headers/config.h"
 
-//LIVRE:  l,g,p,o,q,v,y,z
+//LIVRE:  g,p,o,q,z
 
 std::string Config::CONFIG_FILE;
 
@@ -23,6 +23,9 @@ double Config::CLASSIFIER_BETA_MIN_VALUE = 1e-8;    //"NONE"
 
 int Config::CLASSIFIER_FACES_TRAINING_SET_SIZE = 300; //"j"
 int Config::CLASSIFIER_SCENES_TRAINING_SET_SIZE = 400; //"k"
+int Config::CLASSIFIER_FACES_VALIDATION_SET_SIZE = 100;	//v
+int Config::CLASSIFIER_SCENES_VALIDATION_SET_SIZE = 200;	//y
+int Config::CLASSIFIER_SCENES_CROPS_FIRST_CLASSIFIER = 10000; //l
 
 int Config::CLASSIFIER_MAX_HYPOTHESIS_PER_STAGE = 300;      //"x"
 
@@ -31,6 +34,8 @@ bool Config::CLASSIFIER_HAS_BUFFER = false;                 //"u"
 
 int Config::CLASSIFIER_SET_CROP_BUFFER_SIZE = 10;
 int Config::CLASSIFIER_SET_CROP_ELEMENTS_PER_WINDOW = 50;
+
+bool Config::CLASSIFIER_CUDA = false;	//g
 
 
 int Config::DETECTOR_GENERATIONS = 3;   //"G"
@@ -71,7 +76,7 @@ std::string Config::VALIDATION_SCENES_PATH = VALIDATION_IMG_PATH + "/non_faces";
 
 
 int Config::readInput(int argc, char* argv[]){
-    char* options = "c:a:b:s:r:w:h:f:d:m:t:n:x:i:ue:j:k:G:S:W:H:P:O:Q:RC:Z:?";
+    char* options = "c:a:b:s:r:w:h:f:d:m:t:n:x:i:ue:j:k:v:y:l:gG:S:W:H:P:O:Q:RC:Z:?";
     int c=0;
     while(1){
         c = getopt(argc,argv,options);
@@ -123,15 +128,27 @@ int Config::readInput(int argc, char* argv[]){
             case 'x':   //MAXIMOS DE ESTAGIOS POR HIPOTESE
                 Config::CLASSIFIER_MAX_HYPOTHESIS_PER_STAGE = atoi(optarg);
                 break;                          
-            case 'j':
+            case 'j':	//NUMERO DE FACES NO CONJUNTO DE TREINAMENTO
                 Config::CLASSIFIER_FACES_TRAINING_SET_SIZE = atoi(optarg);
                 break;                                                            
-            case 'k':
+            case 'k':	//NUMERO DE SCENE CROPS NO CONJUNTO DE TREINAMENTO
                 Config::CLASSIFIER_SCENES_TRAINING_SET_SIZE = atoi(optarg);
-                break;                                                    
+                break;     
+            case 'v':	//NUMERO DE FACES NO CONJUNTO DE VALIDACAO
+                Config::CLASSIFIER_FACES_VALIDATION_SET_SIZE = atoi(optarg);
+                break;     
+            case 'y':	//NUMERO DE SCENE CROPS NO CONJUNTO DE VALIDACAO
+                Config::CLASSIFIER_SCENES_VALIDATION_SET_SIZE = atoi(optarg);
+                break;
+            case 'l':	//NUMERO DE SCENE CROPS NO CONJUNTO DE TREINAMENTO DO PRIMEIRO CLASSIFICADOR (COSTUMA SER ALTO: 10000)
+                CLASSIFIER_SCENES_CROPS_FIRST_CLASSIFIER = atoi(optarg);
+                break;                                                                                                                   
             case 'e':
                 Config::VIEWER_FEATURE_ID = atoi(optarg);
                 break;                
+            case 'g':
+                Config::CLASSIFIER_CUDA = true;
+                break;                                
             case 'G':
                 Config::DETECTOR_GENERATIONS = atoi(optarg);
                 break;
@@ -182,6 +199,9 @@ int Config::readInput(int argc, char* argv[]){
                 printf("-x Max Hypothesis per Stage \n");
                 printf("-j Faces Training Set Size \n");
                 printf("-k Scenes Training Set Size \n");
+                printf("-v Faces Validation Set Size \n");
+                printf("-y Scenes Validation Set Size \n");
+                printf("-l Scenes crops Training set for first classifier \n");
 
                 printf("-a Ardis Width \n");
                 printf("-b Ardis Height \n");

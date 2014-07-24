@@ -1,6 +1,6 @@
 #include "../headers/trainerSetCrop.h"
 
-TrainerSetCrop::TrainerSetCrop(std::string faces_training_path, std::string faces_validation_path, std::string scenes_training_path, std::string scenes_validation_path, int nFacesTraining, int nFacesValidation, int ncropsScenesTraining, int ncropsScenesValidation){
+TrainerSetCrop::TrainerSetCrop(std::string faces_training_path, std::string faces_validation_path, std::string scenes_training_path, std::string scenes_validation_path, int nFacesTraining, int nFacesValidation, int ncropsScenesTraining, int ncropsScenesValidation, int firstClassifierScenesCrops){
     _faces_training_path = faces_training_path;
     _faces_validation_path = faces_validation_path;
     _scenes_training_path = scenes_training_path;
@@ -10,6 +10,7 @@ TrainerSetCrop::TrainerSetCrop(std::string faces_training_path, std::string face
     _nFacesValidation = nFacesValidation;
     _ncropsScenesTraining = ncropsScenesTraining;
     _ncropsScenesValidation = ncropsScenesValidation;
+    _firstClassifierScenesCrops = firstClassifierScenesCrops;
 
     _totalRead = 0;
 
@@ -28,7 +29,7 @@ void TrainerSetCrop::init(int featuresNumber, int bufferSize){
     loadScenes(_scenes_validation_path,_tid_validation);
 
     printf("AddScenesCrop\n");
-    addSceneCrops(_tid_training,_buffer_training,10000,_trs,NULL);
+    addSceneCrops(_tid_training,_buffer_training,_firstClassifierScenesCrops,_trs,NULL);
     addSceneCrops(_tid_validation,_buffer_validation,_ncropsScenesValidation,_vas,NULL);
 }
 
@@ -150,8 +151,10 @@ int TrainerSetCrop::resetSets(int stage, ClassifierInterface& cc){
         printf("REACH END OF THE GROUP\n");
     }
 
-    addSceneCrops(_tid_validation,_buffer_validation,_ncropsScenesValidation,_vas,NULL);
+    addSceneCrops(_tid_validation,_buffer_validation,_ncropsScenesValidation,_vas,&cc);
     printf("VALIDATION: %d\n",_vas.size());
+    
+    Logger::debug->log("TOTAL IMAGES READ: %d\n",_totalRead);
     return 1;
 }
 

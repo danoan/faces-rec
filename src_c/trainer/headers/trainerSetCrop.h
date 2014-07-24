@@ -29,6 +29,7 @@ private:
     int _nFacesValidation;
     int _ncropsScenesTraining;
     int _ncropsScenesValidation;
+    int _firstClassifierScenesCrops;
 
     int _theEnd;
     int _totalRead;
@@ -37,7 +38,7 @@ private:
     int chargeBuffer(std::vector<TID>& vtid, std::vector<TID>& buffer, int n);
 
 public:
-    TrainerSetCrop(std::string faces_training_path, std::string faces_validation_path, std::string scenes_training_path, std::string scenes_validation_path, int nFacesTraining, int nFacesValidation, int ncropsScenesTraining, int ncropsScenesValidation);
+    TrainerSetCrop(std::string faces_training_path, std::string faces_validation_path, std::string scenes_training_path, std::string scenes_validation_path, int nFacesTraining, int nFacesValidation, int ncropsScenesTraining, int ncropsScenesValidation, int firstClassifierScenesCrops);
     void init(int featuresNumber, int bufferSize);
 
     int loadAndStoreFaces(std::string dir_path,int n,TrainingSet& ts);

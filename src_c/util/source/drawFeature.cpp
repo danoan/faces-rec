@@ -32,9 +32,9 @@ void drawFeatureImage(FeatureMask fm, int saveOrDisplay, std::string save_path, 
     image_wand = NewMagickWand();
 
     if(ardis==64){
-        MagickReadImage(image_wand,"/home/daniel/Projects/faces-rec/dataset/64x64/lfw_faces/Abdel_Madi_Shabneh_0001.pgm");     
+        MagickReadImage(image_wand, (Config::DATASET_PATH + "64x64/lfw_faces/Abdel_Madi_Shabneh_0001.pgm").c_str());     
     }else{
-        MagickReadImage(image_wand,"/home/daniel/Projects/faces-rec/dataset/24x24/lfw_faces/Abdel_Madi_Shabneh_0001.pgm");     
+        MagickReadImage(image_wand, (Config::DATASET_PATH + "/24x24/lfw_faces/Abdel_Madi_Shabneh_0001.pgm").c_str());     
     }
     
     

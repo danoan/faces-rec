@@ -6,6 +6,7 @@
 #include "../../util/headers/plainWriter.h"
 #include "maskBlock.h"
 #include "mask.h"
+#include "cudaDefs.h"
 
 /*
 A FeatureMask is a rectangle composed by a list of white and black MaskBlock.
@@ -40,6 +41,20 @@ public:
 	
 	static void asPlainVector(PlainWriter<ulong>& pw, const FeatureMask& fm);
 	static FeatureMask fromPlainVector(PlainWriter<ulong>& pw);
+};
+
+class FeatureMaskDev{
+public:
+	Point _mask_size;
+	Point _location;	
+	ulong _white_length, _black_length;
+	
+	ulong _id; //this id it would represent the position of this feature in the _ii_buffer of a TrainingImage
+	MaskBlockDev _white[2];
+	MaskBlockDev _black[2];
+	
+	
+	CUDA_CALLABLE_MEMBER FeatureMaskDev(){};
 };
 
 std::ostream& operator<<(std::ostream& os, const FeatureMask& fm);

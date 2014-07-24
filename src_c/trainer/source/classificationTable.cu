@@ -54,17 +54,28 @@ void ClassificationTable::initTable(TrainingSet& ts){
 
 
 TableItem ClassificationTable::getBestTableItem(FeatureMask& fm, TrainingSet& ts){
-	return getBestTableItem(fm, ts, NULL, 0);
+	getBestTableItem(FeatureMask& fm, TrainingSet& ts, NULL);
 }
 
-TableItem ClassificationTable::getBestTableItem(FeatureMask& fm, TrainingSet& ts, ulong* answer_host, int startFeature){
+TableItem ClassificationTable::getBestTableItem(FeatureMask& fm, TrainingSet& ts, ulong* answer_host){
     _s_plus=0;
     _s_minus=0;
     // TrainingImage* t;
 
 
     //------------PARTE 1: 90% do tempo de Execucao------------
-        
+    
+    if(Config::CLASSIFIER_CUDA){
+		if( !(fm._id>=startFeature && fm._id < endFeature) ){
+			printf("OI\n");
+			startFeature = fm._id;
+			endFeature = startFeature+stepFeature;			
+			prepareData(ts, &size_image, &data_host, &data_device, nfeatures, &fmd_host, &fmd_device, sizeAnswer, &answer_host, &answer_device, false);				
+			testFilterCuda(data_device,size_image,ts.size(),fmd_device,startFeature,stepFeature,nfeatures,sizeAnswer,answer_host,answer_device);
+			printf("FIM\n");
+		}
+	}
+
     int i=0;
     for(int i=0;i<ts.size();i++){
         TrainingImage* ti = ts.get(i);
@@ -77,7 +88,7 @@ TableItem ClassificationTable::getBestTableItem(FeatureMask& fm, TrainingSet& ts
 			int fcuda = answer_host[ (fm._id-startFeature)*ts.size() + i ];
 			int fnormal = ti->filter(fm);
 			
-			if(fcuda!=fnormal && hj<10) printf("FID(%d-%d): %d - %d\n", fm._id,hj,fcuda,fnormal);
+			if(fcuda!=fnormal) printf("FID(%d-%d): %d - %d\n", fm._id,hj,fcuda,fnormal);
 			*/
 			 
 			_elements[i]->_filter_value = answer_host[ (fm._id-startFeature)*ts.size() + i ];  //ti->filter(fm);   //Filter 70%
