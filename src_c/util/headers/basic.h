@@ -17,7 +17,7 @@ void stopClock(std::string testName);
 class Logger{
 public:
     static FilePrint* logger;
-    static FilePrint* error;
+    static FilePrint* cuda;
     static FilePrint* debug;
 
     static FilePrint* feat_anal;

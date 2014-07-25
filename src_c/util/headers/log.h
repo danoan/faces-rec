@@ -19,8 +19,9 @@
 class FilePrint{
 private:
   FILE *log_file;
+  bool _to_print;
 public:
-  FilePrint(const std::string file){init_log(file.c_str());};
+  FilePrint(const std::string file, bool to_print):_to_print(to_print){init_log(file.c_str());};
 
   void init_log(const char *file);
   void init_log(const char *file, char* mode);

@@ -44,6 +44,8 @@ Trainer::Trainer(TrainerSetManager* tsm){
 	_firstStagesMaxFeature[3] = 25;
 	_firstStagesMaxFeature[4] = 50;
 	
+	_ct = (ClassificationTable**) malloc(sizeof(ClassificationTable*)*CPU_THREADS);
+	
 	gpuManager = new GPUManager( _tsm->trs(), _facesFactory._facesFeatures.size(), tsm->trs().size() );
 	cpuManager = new CPUManager();
 }

@@ -9,10 +9,10 @@
 #include "trainingSet.h"
 #include "cudaDefs.h"
 
-#define GPU_BUFFER 4
-#define SINGLE_BUFFER_STEP_FEATURE 30000
-#define BLOCK_SIZE 106
-#define GRID_SIZE 16000
+#define GPU_BUFFER Config::CUDA_BUFFER
+#define SINGLE_BUFFER_STEP_FEATURE Config::CUDA_FEATURE_COVER_SIZE
+#define BLOCK_SIZE Config::CUDA_BLOCK_SIZE
+#define GRID_SIZE Config::CUDA_GRID_SIZE
 
 class GPUManager{
 private:
@@ -40,7 +40,7 @@ public:
     FeatureMaskDev* fmd_host;
     FeatureMaskDev* fmd_device;
 
-    GPUBuffer* buffers[GPU_BUFFER];
+    GPUBuffer** buffers;
     std::queue<GPUBuffer*> consumed_buffers;
     std::queue<GPUBuffer*> filled_buffers;
 

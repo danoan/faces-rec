@@ -16,7 +16,7 @@
 #include "../../util/headers/libutil.h"
 
 class CPUManager;
-#define CPU_THREADS 5
+#define CPU_THREADS Config::CUDA_CPU_THREADS
 
 //#define THREADS_NUMBER 1
 
@@ -50,7 +50,7 @@ private:
 
 
 public:
-    ClassificationTable* _ct[CPU_THREADS];
+    ClassificationTable** _ct;
     FacesFeatureFactory _facesFactory;
     TrainerSetManager* _tsm;
 

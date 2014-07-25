@@ -45,7 +45,8 @@ int TrainerSetCrop::loadAndStoreFaces(std::string dir_path,int n,TrainingSet& ts
 
 int TrainerSetCrop::loadScenes(std::string dir_path,std::vector<TID>& vtid){
     std::vector<std::string> file_paths;
-    int r = getAllFiles(dir_path,file_paths);
+	int r = getAllFiles(dir_path,file_paths);
+	//int r = getFiles(dir_path,1000,file_paths);
     for(int i=0;i<file_paths.size();i++){
         vtid.push_back( TID(file_paths[i],true) ); 
     }

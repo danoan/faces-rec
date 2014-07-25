@@ -27,7 +27,7 @@ int Config::CLASSIFIER_FACES_VALIDATION_SET_SIZE = 100;	//v
 int Config::CLASSIFIER_SCENES_VALIDATION_SET_SIZE = 200;	//y
 int Config::CLASSIFIER_SCENES_CROPS_FIRST_CLASSIFIER = 10000; //l
 
-int Config::CLASSIFIER_MAX_HYPOTHESIS_PER_STAGE = 300;      //"x"
+int Config::CLASSIFIER_MAX_HYPOTHESIS_PER_STAGE = 5000;      //"x"
 
 int Config::CLASSIFIER_INTEGRAL_IMAGE_BUFFER_SIZE = 2000;   //"i"
 bool Config::CLASSIFIER_HAS_BUFFER = false;                 //"u"
@@ -38,6 +38,11 @@ int Config::CLASSIFIER_SET_CROP_ELEMENTS_PER_WINDOW = 50;
 bool Config::CLASSIFIER_CUDA = false;	//g
 bool Config::CUDA_DEBUG = false;		//p
 bool Config::ANALYSIS_DEBUG = false;	//q
+int Config::CUDA_BUFFER = 4;			//1
+int Config::CUDA_BLOCK_SIZE = 106;		//2
+int Config::CUDA_GRID_SIZE = 16000;	//3
+int Config::CUDA_FEATURE_COVER_SIZE = 30000;	//4
+int Config::CUDA_CPU_THREADS = 5;	//5
 
 
 int Config::DETECTOR_GENERATIONS = 3;   //"G"
@@ -78,7 +83,7 @@ std::string Config::VALIDATION_SCENES_PATH = VALIDATION_IMG_PATH + "/non_faces";
 
 
 int Config::readInput(int argc, char* argv[]){
-    char* options = "c:a:b:s:r:w:h:f:d:m:t:n:x:i:ue:j:k:v:y:l:gpqG:S:W:H:P:O:Q:RC:Z:?";
+    char* options = "c:a:b:s:r:w:h:f:d:m:t:n:x:i:ue:j:k:v:y:l:gpqA:B:D:E:F:G:S:W:H:P:O:Q:RC:Z:?";
     int c=0;
     while(1){
         c = getopt(argc,argv,options);
@@ -156,7 +161,22 @@ int Config::readInput(int argc, char* argv[]){
                 break;                    
             case 'q':
                 Config::ANALYSIS_DEBUG = true;
+                break;                                    
+            case 'A':
+                Config::CUDA_BUFFER = atoi(optarg);
                 break;                    
+            case 'B':
+                Config::CUDA_BLOCK_SIZE = atoi(optarg);
+                break;                    
+            case 'D':
+                Config::CUDA_GRID_SIZE = atoi(optarg);
+                break;                                                                    
+            case 'E':
+                Config::CUDA_FEATURE_COVER_SIZE = atoi(optarg);
+                break;                            
+            case 'F':
+                Config::CUDA_CPU_THREADS = atoi(optarg);
+                break;                                            
             case 'G':
                 Config::DETECTOR_GENERATIONS = atoi(optarg);
                 break;
@@ -213,6 +233,11 @@ int Config::readInput(int argc, char* argv[]){
                 printf("-g Use CUDA (Is already the standard) \n");
                 printf("-p Print CUDA DEBUG \n");
                 printf("-q Print ANALYSIS DEBUG \n");
+                printf("-A Set CUDA Buffers \n");
+                printf("-B Set CUDA Block Size \n");
+                printf("-D Set CUDA Grid Size \n");
+                printf("-E Set CUDA Feature Cover \n");
+                printf("-F Set CPU Threads \n");
 
                 printf("-a Ardis Width \n");
                 printf("-b Ardis Height \n");

@@ -19,7 +19,10 @@ void* cpuThread(void* vp){
     Logger::cuda->log("THE END\n");
 
     pthread_exit(NULL);
+}
 
+CPUManager::CPUManager(){
+	_threads = (pthread_t*) malloc(sizeof(pthread_t)*CPU_THREADS);
 }
 
 void CPUManager::createThreads(GPUBuffer* b, Trainer* t, elem_params* ep){

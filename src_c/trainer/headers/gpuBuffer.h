@@ -2,6 +2,7 @@
 #define __GPU_BUFFER__
 
 #include <cstdio>
+#include "../../util/headers/basic.h"
 
 class GPUBuffer{
 public:    

@@ -1,5 +1,143 @@
 #include "../headers/gpuManager.h"
 
+typedef struct{
+    int e1,e2;
+} pair;
+
+CUDA_CALLABLE_MEMBER_DEVICE pair pair_init(int e1, int e2){
+    pair p;
+    p.e1 = e1;
+    p.e2 = e2;
+
+    return p;
+}
+
+typedef struct{
+    pair* v;
+
+    int max_size;
+    int read_cursor;
+    int write_cursor;
+    int size;
+} queue;
+
+CUDA_CALLABLE_MEMBER_DEVICE queue queue_init(int size){
+    queue q;
+    q.v = (pair*) malloc(sizeof(pair)*size);
+    q.max_size = size;
+    q.read_cursor = 0;
+    q.write_cursor = 0;
+    q.size=0;
+
+    return q;
+}
+
+CUDA_CALLABLE_MEMBER_DEVICE void queue_push(queue* q, pair e){
+    q->v[ q->write_cursor ] = e;
+    q->write_cursor = (q->write_cursor+1)%q->max_size;
+    q->size+=1;
+}
+
+CUDA_CALLABLE_MEMBER_DEVICE pair queue_pop(queue* q){
+    pair p = q->v[q->read_cursor];
+    q->read_cursor = (q->read_cursor+1)%q->max_size;
+    q->size-=1;
+    return p;
+}
+
+CUDA_CALLABLE_MEMBER_DEVICE void queue_destroy(queue* q){
+	free(q->v);
+}
+
+template<class T>
+CUDA_CALLABLE_MEMBER_DEVICE void merge(T* l, bool(* comp)(T* el1, T* el2), int b1, int e1, int b2, int e2){
+    int size = e1-b1+1 + e2-b2+1;
+    T* buffer = (T*) malloc(sizeof(T)*size);
+    
+    int cur_l = 0;
+    int end_l = e1-b1+1;
+    for(int i=cur_l;i<end_l;i++){
+        buffer[i] = l[b1+i];
+    }
+
+    int cur_r = e1-b1+1;    
+    int end_r = e2-b1+1;
+    for(int i=cur_r;i<end_r;i++){
+        buffer[i] = l[b1+i];
+    }   
+    
+    int index=0;
+    while( cur_l < end_l && cur_r < end_r ){
+		
+		if( comp( &buffer[cur_l], &buffer[cur_r] ) ){
+            l[b1+index++] = buffer[cur_l++];
+        }else{
+            l[b1+index++] = buffer[cur_r++];
+        }
+    }
+
+    while( cur_l < end_l ) l[b1+index++] = buffer[cur_l++];
+    while( cur_r < end_r ) l[b1+index++] = buffer[cur_r++];
+    
+    free(buffer);
+}
+
+template<class T>
+CUDA_CALLABLE_MEMBER_DEVICE void mergeSort(T* l, bool(* comp)(T* el1, T* el2), int begin, int end){
+	int size = end-begin+1;
+    
+    queue q1 = queue_init(size+1);
+    queue q2 = queue_init(size+1);
+        
+    for(int i=begin;i<=end;i++){
+        queue_push(&q1, pair_init(i,i));
+    }
+
+    queue* q = &q1;
+    queue* qb = &q2;
+
+	while(1){
+		
+		if(q->size==1) break;
+		
+		while( q->size>0 ){			
+			if(q->size==3){
+				pair pl = queue_pop(q);
+				pair pr = queue_pop(q);			
+				pair plast = queue_pop(q);
+				
+				//printf("%d %d - %d %d\n",pl.e1,pl.e2, pr.e1, pr.e2);
+				
+				merge<T>(l, comp, pl.e1, pl.e2, pr.e1, pr.e2 );	
+				pair presult = pair_init(pl.e1,pr.e2);				
+				
+				merge<T>(l, comp, presult.e1, presult.e2, plast.e1, plast.e2 );	
+				queue_push(qb, pair_init(presult.e1,plast.e2));
+			}else{
+				
+				pair pl = queue_pop(q);
+				pair pr = queue_pop(q);
+				
+				//printf("%d %d - %d %d\n",pl.e1,pl.e2, pr.e1, pr.e2);
+
+				merge<T>(l, comp, pl.e1, pl.e2, pr.e1, pr.e2 );
+
+				queue_push(qb, pair_init(pl.e1,pr.e2));
+			}			
+		}
+		
+		queue* qt = q;
+		q = qb;
+		qb = qt;		
+    }
+    
+    queue_destroy(&q1);
+    queue_destroy(&q2);
+    
+    //pair p = queue_pop(q);
+    //printf("%d %d - %d\n",p.e1,p.e2, q->size);
+}
+
 FeatureMaskDev convertFeatureMask(FeatureMask fm){
 	FeatureMaskDev fmd;
 	fmd._mask_size = fm._mask._size;
@@ -215,6 +353,7 @@ __global__ void kernelFilter(ulong* data, Point size, int nimages, FeatureMaskDe
 			}			
 		}
 	}
+	
 	/*
 	answer[0] = data[0];
 	answer[1] = data[1];
@@ -266,11 +405,11 @@ void GPUManager::wait(){
 
 GPUManager::GPUManager(TrainingSet& ts, int totalFeatures, int nimages):_total_features(totalFeatures),_nimages(nimages){	  
     _feat_per_buffer = SINGLE_BUFFER_STEP_FEATURE/GPU_BUFFER + 1;
-    _max_stage = totalFeatures/SINGLE_BUFFER_STEP_FEATURE + 1;
+    _max_stage = totalFeatures/_feat_per_buffer + 1;
  
  	size_image.x = 24;
-	size_image.y = 24;    
-
+	size_image.y = 24;    printf("GPU BUFFER %d\n",Config::CUDA_BUFFER);
+	buffers = (GPUBuffer**) malloc(sizeof(GPUBuffer*)*GPU_BUFFER);
     for(int i=0;i<GPU_BUFFER;i++){
         buffers[i] = new GPUBuffer(i,_feat_per_buffer, nimages);
     }
@@ -356,8 +495,9 @@ void GPUManager::bufferHasBeenConsumed(GPUBuffer* b){
 
 void GPUManager::fillBuffer(GPUBuffer* b, int from, int to){
 	Logger::cuda->log("CALL CUDA BUFFER ID: %d\n",b->_id);
-	if(from>_total_features) return;
-    callCUDA(data_device, size_image, _nimages, fmd_device, from, _feat_per_buffer, _total_features, b->_size, b->answer_host, b->answer_device);
+	if(from<_total_features){
+		callCUDA(data_device, size_image, _nimages, fmd_device, from, _feat_per_buffer, _total_features, b->_size, b->answer_host, b->answer_device);
+	}
     filled_buffers.push(b);
 }
 
@@ -366,10 +506,9 @@ GPUBuffer* GPUManager::getFilledBuffer(){
 
 	Logger::cuda->log("%d - %d\n",_get_filled_counter,_max_stage);
 
-    if( _get_filled_counter==(GPU_BUFFER*_max_stage-1) ) END_STAGE = true;
-    else END_STAGE = false;
+    if( _get_filled_counter==(_max_stage-1) ) END_STAGE = true;
 
-    _get_filled_counter= (_get_filled_counter+1)%(GPU_BUFFER*_max_stage);
+    _get_filled_counter= (_get_filled_counter+1)%(_max_stage);
 
     GPUBuffer* b = filled_buffers.front();
     filled_buffers.pop();

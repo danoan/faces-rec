@@ -9,7 +9,7 @@
 
 class Trainer;
 
-#define CPU_THREADS 5
+#define CPU_THREADS Config::CUDA_CPU_THREADS
 
 typedef struct{
     Trainer* t;
@@ -24,10 +24,10 @@ typedef struct{
 
 class CPUManager{
 private:
-    pthread_t _threads[CPU_THREADS];
+    pthread_t* _threads;
 
 public:
-    CPUManager(){};
+    CPUManager();
 
     TableItem consumeBuffer(GPUBuffer* b, GPUManager* gpum, Trainer* t);
     void createThreads(GPUBuffer* b, Trainer* t, elem_params* ep);

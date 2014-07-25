@@ -42,6 +42,13 @@ public:
     static int CLASSIFIER_SET_CROP_ELEMENTS_PER_WINDOW;
     
     static bool CLASSIFIER_CUDA;
+    static bool CUDA_DEBUG;
+    static bool ANALYSIS_DEBUG;
+    static int CUDA_BUFFER;
+	static int CUDA_BLOCK_SIZE;
+	static int CUDA_GRID_SIZE;
+	static int CUDA_FEATURE_COVER_SIZE;    
+	static int CUDA_CPU_THREADS;
 
     static int DETECTOR_GENERATIONS;
     static int DETECTOR_SHIFT_STEP;
