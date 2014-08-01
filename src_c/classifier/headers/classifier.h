@@ -35,6 +35,8 @@ public:
 	virtual int isFace(IntegralImage &ii, double ac) = 0;
 	virtual int isFace(IntegralImage &ii, Subwindow &sw) = 0;
 	virtual int isFace(IntegralImage &ii) = 0;	
+
+	virtual void resize(double factor) = 0;
 };
 
 class Classifier:public ClassifierInterface{
@@ -49,6 +51,8 @@ public:
 	int isFace(IntegralImage &ii, double ac);
 	int isFace(IntegralImage &ii, Subwindow &sw);
 	int isFace(IntegralImage &ii);
+
+	void resize(double factor);
 
 	inline Point ardis(){return _ardis;};
 	inline void ardis(Point p){_ardis=p;};

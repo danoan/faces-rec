@@ -41,6 +41,12 @@ int CascadeClassifier::isFace(IntegralImage& ii){
     Subwindow sw (0,0,wr,1,1);        
     return isFace(ii,sw);
 }
+
+void CascadeClassifier::resize(double factor){
+    for(int i=0;i<_classifiers.size();i++){
+        _classifiers[i].resize(factor);
+    }
+}
     
 
 void CascadeClassifier::save(std::string path){

@@ -35,7 +35,8 @@ public:
 	(now called subwindows) would be located in different coordinates, that's why we
 	have to adjust it.
 	*/
-	void adjustMask(Subwindow &sw);
+	void resizeMask(double factor);
+	void repositionMask(Subwindow &sw);
 	inline Mask mask(){return _mask;};
 	inline Point location(){return _location;};
 	

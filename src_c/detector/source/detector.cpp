@@ -11,17 +11,27 @@ int Detector::detectFaces(ClassifierInterface* ci, const std::string img_path, d
 	SubwindowGenerator sg(img_path,_wr,_shift_step);
 	IntegralImage ii(img_path);
 
+	startClock();
 	ulong total_sw,total_faces;
 	std::vector<Subwindow> lista = sg.generateSubwindows(_ng);
+	stopClock("Generating Windows");
 
 	total_faces=0;
 	total_sw = lista.size();
 
 	int res;		
+	int cur_gen=-1;
 	std::vector<int*> faces_boxes;
 	std::vector<int*> scenes_boxes;
+	startClock();
 	for(register int i=0;i<lista.size();++i){		
 		// printf("NEW SUBWINDOW\n");
+
+		if(cur_gen!=lista[i]._cur_ng){
+			ci->resize(lista[i]._ce);
+			cur_gen = lista[i]._cur_ng;
+		}
+
 		if(ac<0){
 			res = ci->isFace(ii,(lista[i]));
 		}else{
@@ -37,6 +47,7 @@ int Detector::detectFaces(ClassifierInterface* ci, const std::string img_path, d
 			lista[i].cropBox( scenes_boxes[scenes_boxes.size()-1] );			
 		}
 	}
+	stopClock("Detection Time");
 
 	if(draw==1){
 		int** boxes_array = (int**) malloc(faces_boxes.size()*sizeof(int*));

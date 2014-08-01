@@ -37,7 +37,7 @@ public:
 	inline int outsideLimits(Point& p);
 	inline ulong** data(){return _data;};
 
-	long computeBlock(std::vector<MaskBlock> &b, Point location);
+	long computeBlock(std::vector<MaskBlock> &b, Point& location);
 	long getFromData(Point* points);
 	ulong filter(FeatureMask &fm);
 };

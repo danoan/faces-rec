@@ -42,7 +42,7 @@ int Classifier::isFace(IntegralImage &ii, Subwindow &sw, double ac){
 		a=h._alpha;
 		fm=h._fm;
 
-		fm.adjustMask(sw);
+		fm.repositionMask(sw);
 		sx+= a*h_function(ii.filter(fm),d,t);		
 
         // printf(" FILTER %lu\n",ii.filter(fm));
@@ -56,6 +56,12 @@ int Classifier::isFace(IntegralImage &ii, Subwindow &sw, double ac){
 	}else{
 		return 0;
 	}
+}
+
+void Classifier::resize(double factor){
+    for(int i=0;i<_hypothesis.size();i++){
+        _hypothesis[i]._fm.resizeMask(factor);
+    }
 }
 
 namespace ClassifierCheckFunctions{

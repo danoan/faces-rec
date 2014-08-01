@@ -34,11 +34,13 @@ inline int IntegralImage::outsideLimits(Point& p){
 	return (p.y>=_size.y) || (p.y<0) || (p.x>=_size.x) || (p.x<0);
 }
 
-long IntegralImage::computeBlock(std::vector<MaskBlock> &b, Point location){
+long IntegralImage::computeBlock(std::vector<MaskBlock> &b, Point& location){
 	long block_sum = 0;
+	Point pa,pb,pc,pd;
+	Point points[4];
 
 	for(register int i=0;i<b.size();++i){
-		Point pa,pb,pc,pd;
+		
 
 		pa.y = location.y + b[i]._points[0].y - 1;
 		pa.x = location.x + b[i]._points[0].x - 1;
@@ -53,7 +55,10 @@ long IntegralImage::computeBlock(std::vector<MaskBlock> &b, Point location){
 		pd.x = location.x + b[i]._points[3].x;						
 
 
-		Point points[4] = {pa,pb,pc,pd};
+		points[0] = pa;
+		points[1] = pb;
+		points[2] = pc;
+		points[3] = pd;
 
 		// printf("%ld (%lu %lu) [ (%lu %lu) (%lu %lu) (%lu %lu) (%lu %lu) ]\n",getFromData(points),location.x,location.y,pa.y,pa.x,pb.y,pb.x,pc.y,pc.x,pd.y,pd.x);
 		// printf("%ld (%lu %lu)",b[i]._points[0].y,b[i]._points[0].x);
@@ -66,9 +71,10 @@ long IntegralImage::computeBlock(std::vector<MaskBlock> &b, Point location){
 
 long IntegralImage::getFromData(Point* points){
 	long sum[4]={0,0,0,0};
+	Point p;
 
 	for(register int i=0;i<4;++i){
-		Point p = points[i];
+		p = points[i];
 		if(outsideLimits(p)){
 			sum[i] = 0;
 		}else{

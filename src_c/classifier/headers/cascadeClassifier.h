@@ -16,7 +16,9 @@ public:
     int isFace(IntegralImage& ii);
 
     int isFace(IntegralImage &ii, Subwindow &sw, double ac);
-    int isFace(IntegralImage &ii, double ac);    
+    int isFace(IntegralImage &ii, double ac);   
+
+    void resize(double factor); 
 
     void save(std::string path);
     void load(std::string path);

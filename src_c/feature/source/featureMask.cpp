@@ -11,7 +11,12 @@ FeatureMask::FeatureMask(Mask mask,Point location,ulong id){
     this->_id = id;
 }
 
-void FeatureMask::adjustMask(Subwindow &sw){
+void FeatureMask::resizeMask(double factor){
+    // Mask Rescale
+    this->_mask = this->_mask.rescale(factor,this->_original_size);
+}
+
+void FeatureMask::repositionMask(Subwindow &sw){
     // Mask's Subwindow Rescale     
     ulong featureLocation[2] = { (int) floor( this->_original_location.y*sw._ce ),
                                  (int) floor( this->_original_location.x*sw._ce )
@@ -20,10 +25,6 @@ void FeatureMask::adjustMask(Subwindow &sw){
     // Subwindow Location
     this->_location.y = featureLocation[0]+sw._y;
     this->_location.x = featureLocation[1]+sw._x;
-                        
-    
-    // Mask Rescale
-    this->_mask = this->_mask.rescale(sw._ce,this->_original_size);
 
     // printf("%.5f SW:(%lu, %lu) ORIGINAL: (%lu, %lu) FINAL: (%lu, %lu) MASK_SIZE: (%lu, %lu) ",sw._ce,sw._y,sw._x,this->_original_location.y,this->_original_location.x,_location.y,_location.x,_mask._size.y,_mask._size.x);
 }
