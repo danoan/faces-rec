@@ -176,8 +176,12 @@ bool TrainerSetCrop::checkClassifier(ClassifierInterface& cc, double* ac, double
         for(it=_vas._scenes.begin();it!=_vas._scenes.end();it++){
             rate_fp += cc.isFace( *( (*it)->_ii),*ac);
         }
+        
+        for(it=_trs._scenes.begin();it!=_trs._scenes.end();it++){
+            rate_fp += cc.isFace( *( (*it)->_ii),*ac);
+        }        
 
-        rate_fp = rate_fp/_vas._scenes.size();
+        rate_fp = rate_fp/(_vas._scenes.size()+_trs._scenes.size());
         Logger::debug->log("RATE FP: %.4f\n",rate_fp);
 
 

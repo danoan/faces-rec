@@ -38,11 +38,11 @@ Trainer::Trainer(TrainerSetManager* tsm){
 
     inputInfo();
     
-	_firstStagesMaxFeature[0] = 2;
-	_firstStagesMaxFeature[1] = 5;
+	_firstStagesMaxFeature[0] = 3;
+	_firstStagesMaxFeature[1] = 6;
 	_firstStagesMaxFeature[2] = 10;
-	_firstStagesMaxFeature[3] = 25;
-	_firstStagesMaxFeature[4] = 50;
+	_firstStagesMaxFeature[3] = 16;
+	_firstStagesMaxFeature[4] = 20;
 	
 	_ct = (ClassificationTable**) malloc(sizeof(ClassificationTable*)*CPU_THREADS);
 	
@@ -174,7 +174,7 @@ void Trainer::keepTraining(Classifier& cl){
 }
 
 bool Trainer::firstStagesCheckClassifier(Classifier& cc, double* ac, double* fi, double* di, int stage, int featureNumber){
-    bool check = _tsm->checkClassifier(cc,ac,fi,di,0.75,_min_det_rate,0.4,0.025,0.1);
+    bool check = _tsm->checkClassifier(cc,ac,fi,di,0.7,1.0,0.5,0.005,0.05);
     if(check==false){
          if( featureNumber >= _firstStagesMaxFeature[stage] ) return true;
     }
@@ -183,5 +183,5 @@ bool Trainer::firstStagesCheckClassifier(Classifier& cc, double* ac, double* fi,
 }
 
 bool Trainer::checkClassifier(Classifier& cc, double* ac, double* fi, double* di){
-    return _tsm->checkClassifier(cc,ac,fi,di,_max_fp_rate,_min_det_rate,0.525,0.025,0.25);
+    return _tsm->checkClassifier(cc,ac,fi,di,_max_fp_rate,_min_det_rate,0.525,0.005,0.1);
 }
