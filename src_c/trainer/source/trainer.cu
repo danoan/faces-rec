@@ -76,6 +76,7 @@ CascadeClassifier Trainer::startTrainingCascade(){
     double di;
 
     int total_features = 0;
+    int before_validate = 0;
     int r;
     while( _fp_rate>_final_fp_rate && _stage_number < Config::CLASSIFIER_MAX_STAGES ){          
         prepareTrainer(); 
@@ -96,9 +97,13 @@ CascadeClassifier Trainer::startTrainingCascade(){
             }
         }else{
             while(!checkClassifier(fc,&ac,&fi,&di) && _feature_number < Config::CLASSIFIER_MAX_HYPOTHESIS_PER_STAGE){
-                startClock();       
-                keepTraining(fc);
-                stopClock("KEEP TRAINING");
+                before_validate = 25;
+                while(before_validate>0){
+                    startClock();       
+                    keepTraining(fc);
+                    stopClock("KEEP TRAINING");                    
+                    before_validate-=1;
+                }
             }            
         }
 
