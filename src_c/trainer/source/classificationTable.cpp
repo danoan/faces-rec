@@ -65,9 +65,9 @@ TableItem ClassificationTable::getBestTableItem(FeatureMask& fm, TrainingSet& ts
 
     //------------PARTE 1: 90% do tempo de Execucao------------
         
-    int i=0;
-    for(int i=0;i<ts.size();i++){
-        TrainingImage* ti = ts.get(i);
+    TrainingImage* ti;
+    for(int i=0;i<ts._faces.size();i++){
+        ti = ts._faces[i];
 
         _elements[i]->_weight = _weights[i];
         if(answer_host!=NULL){
@@ -89,6 +89,32 @@ TableItem ClassificationTable::getBestTableItem(FeatureMask& fm, TrainingSet& ts
         _elements[i]->_error = 0;
         _elements[i]->_direction = 1;
     }
+
+    for(int i=0;i<ts._scenes.size();i++){
+        ti = ts._scenes[i];
+
+        _elements[i]->_weight = _weights[i];
+        if(answer_host!=NULL){
+            
+            /*
+            int hj = (fm._id-startFeature)*ts.size() + i;
+            int fcuda = answer_host[ (fm._id-startFeature)*ts.size() + i ];
+            int fnormal = ti->filter(fm);
+            
+            if(fcuda!=fnormal && hj<10) printf("FID(%d-%d): %d - %d\n", fm._id,hj,fcuda,fnormal);
+            */
+             
+            _elements[i]->_filter_value = answer_host[ (fm._id-startFeature)*ts.size() + i ];  //ti->filter(fm);   //Filter 70%
+        }else{
+            _elements[i]->_filter_value = ti->filter(fm);   //Filter 70%
+        }
+            
+        _elements[i]->_tt = ti->_tt;
+        _elements[i]->_error = 0;
+        _elements[i]->_direction = 1;
+    }
+
+
     // printf("WEIGHT 1: %.12lf\n",_elements[0]->_weight);
     // printf("PRE-SORT\n");
     std::sort( _elements.begin(),_elements.end(),TableItemComparator() );   //Sort 30%
@@ -104,7 +130,7 @@ TableItem ClassificationTable::getBestTableItem(FeatureMask& fm, TrainingSet& ts
     int bestErrorIndex = 0;
     int bestErrorDirection = 1;
     // std::string table = "";
-    for(i=_elements.size()-1;i>=0;i--){
+    for(int i=_elements.size()-1;i>=0;i--){
         e1 = _s_plus + (_t_minus - _s_minus);  //Error of: Everything below i is negative
         e2 = _s_minus + (_t_plus - _s_plus);    //Error of: Everything below i is positive        
 
