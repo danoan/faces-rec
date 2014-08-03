@@ -45,11 +45,3 @@ void TrainingSet::addScene(TID tid){
         _scenes.push_back(new TrainingImage(tid._img_path,SCENE,false,_features_number));                
     }    
 }
-
-TrainingImage* TrainingSet::get(int index){
-    if(index<_faces.size()){
-        return _faces[index];
-    }else{
-        return _scenes[ index- _faces.size() ];
-    }
-}

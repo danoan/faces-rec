@@ -66,8 +66,8 @@ TableItem ClassificationTable::getBestTableItem(FeatureMask& fm, TrainingSet& ts
     //------------PARTE 1: 90% do tempo de Execucao------------
         
     TrainingImage* ti;
-    for(int i=0;i<ts._faces.size();i++){
-        ti = ts._faces[i];
+    for(int i=0;i<ts.size();i++){
+        ti = ts.get(i);
 
         _elements[i]->_weight = _weights[i];
         if(answer_host!=NULL){
@@ -89,31 +89,6 @@ TableItem ClassificationTable::getBestTableItem(FeatureMask& fm, TrainingSet& ts
         _elements[i]->_error = 0;
         _elements[i]->_direction = 1;
     }
-
-    for(int i=0;i<ts._scenes.size();i++){
-        ti = ts._scenes[i];
-
-        _elements[i]->_weight = _weights[i];
-        if(answer_host!=NULL){
-            
-            /*
-            int hj = (fm._id-startFeature)*ts.size() + i;
-            int fcuda = answer_host[ (fm._id-startFeature)*ts.size() + i ];
-            int fnormal = ti->filter(fm);
-            
-            if(fcuda!=fnormal && hj<10) printf("FID(%d-%d): %d - %d\n", fm._id,hj,fcuda,fnormal);
-            */
-             
-            _elements[i]->_filter_value = answer_host[ (fm._id-startFeature)*ts.size() + i ];  //ti->filter(fm);   //Filter 70%
-        }else{
-            _elements[i]->_filter_value = ti->filter(fm);   //Filter 70%
-        }
-            
-        _elements[i]->_tt = ti->_tt;
-        _elements[i]->_error = 0;
-        _elements[i]->_direction = 1;
-    }
-
 
     // printf("WEIGHT 1: %.12lf\n",_elements[0]->_weight);
     // printf("PRE-SORT\n");

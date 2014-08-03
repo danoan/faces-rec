@@ -21,8 +21,14 @@ public:
     void addScene(TID tid);
     void addScene(TID tid,ClassifierInterface& cc);
 
-    TrainingImage* get(int index);
-    int size(){ return _faces.size() + _scenes.size(); };
+    inline TrainingImage* get(int index){
+        if(index<_faces.size()){
+            return _faces[index];
+        }else{
+            return _scenes[ index- _faces.size() ];
+        }        
+    };
+    inline int size(){ return _faces.size() + _scenes.size(); };
     
     void clearScenes(){ for(int i=_scenes.size()-1;i>=0;i--) delete _scenes[i]; _scenes.clear(); };
     void clearFaces(){ for(int i=_faces.size()-1;i>=0;i--) delete _faces[i]; _faces.clear(); };
