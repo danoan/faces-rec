@@ -97,7 +97,7 @@ CascadeClassifier Trainer::startTrainingCascade(){
             }
         }else{
             while(!checkClassifier(fc,&ac,&fi,&di) && _feature_number < Config::CLASSIFIER_MAX_HYPOTHESIS_PER_STAGE){
-                before_validate = 25;
+                before_validate = 5;
                 while(before_validate>0){
                     startClock();       
                     keepTraining(fc);

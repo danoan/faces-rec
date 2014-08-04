@@ -161,14 +161,31 @@ void teste_integral_2(IntegralImage ii){
     }
 
     Point ardis;
-    ardis.y = Config::ARDIS_HEIGHT;
-    ardis.x = Config::ARDIS_WIDTH;
+    ardis.y = 24;
+    ardis.x = 24;
 
-    MaskTwoHorizontalFactory m2hf(ardis);
-    MaskTwoVerticalFactory m2vf(ardis);
-    MaskThreeHorizontalFactory m3hf(ardis);
-    MaskThreeVerticalFactory m3vf(ardis);
-    MaskDiagonalFactory mdf(ardis);
+    MaskTwoHorizontalFactory m2hf(ardis,1,1,0,2,1);
+    MaskTwoVerticalFactory m2vf(ardis,1,1,0,1,2);
+    MaskThreeHorizontalFactory m3hf(ardis,1,1,0,3,1);
+    MaskThreeVerticalFactory m3vf(ardis,1,1,0,1,3);
+    MaskDiagonalFactory mdf(ardis,1,1,0,2,2);
+
+    FMF factories[5];
+    std::vector<FeatureMask> _facesFeatures;
+    factories[0] = m2hf;
+    factories[1] = m2vf;
+    factories[2] = m3hf;
+    factories[3] = m3vf;
+    factories[4] = mdf;
+    
+    int counter=0;
+    for(int i=0;i<5;i++){
+        while( factories[i].hasNext()==1 ){
+            _facesFeatures.push_back( factories[i].next(counter++) );
+        }        
+    }    
+    
+    printf("%d\n", _facesFeatures.size());
 
     FeatureMask fm = m2hf.next();
     printf("M2HF: %lu\n",ii.filter( fm ) );
@@ -187,8 +204,8 @@ void teste_integral_2(IntegralImage ii){
 }
 
 void run_teste_integral_2(){
-    std::string crop_image = "/home/daniel/Projects/faces-rec/dataset/24x24/Instancia_Sun_300_400_nocrop/training_images/non_faces_crops/group_0/crop/1404566632.67/crop_285.pgm";
-    std::string full_image = "/home/daniel/Projects/faces-rec/dataset/24x24/Instancia_Sun_300_400_nocrop/training_images/non_faces_simple/5304.pgm";
+    std::string crop_image = "/home/ldap/dantunes/Documentos/faces-rec/dataset/24x24/Instancia_Sun_300_400/training_images/non_faces/group_0/crop/1403571922.05/crop_399.pgm";
+    std::string full_image = "/home/ldap/dantunes/Documentos/faces-rec/dataset/24x24/Instancia_Sun_nocrop/training_images/non_faces/SUN2012/16155.pgm";
 
     IntegralImage ii1(crop_image);
     teste_integral_2(ii1);

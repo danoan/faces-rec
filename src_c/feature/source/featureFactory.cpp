@@ -35,16 +35,16 @@ std::vector<Mask> FMF::resize(Mask(* fn_create)(Point)){
     ulong original_w = this->_w;
     ulong original_h = this->_h;
 
-    std::vector<ulong> width_list = incrementList(this->_resize_factor,this->_resize_w_step,this->_w,this->_ardis.x);
-    std::vector<ulong> height_list = incrementList(this->_resize_factor,this->_resize_h_step,this->_h,this->_ardis.y);
+    //std::vector<ulong> width_list = incrementList(this->_resize_factor,this->_resize_w_step,this->_w,this->_ardis.x);
+    //std::vector<ulong> height_list = incrementList(this->_resize_factor,this->_resize_h_step,this->_h,this->_ardis.y);
 
 
     std::vector<Mask> resize_list;
-    for(int i=0;i<width_list.size();++i){
-        for(int j=0;j<height_list.size();++j){
+    for(int i=_w;i<=_ardis.x;i+=_resize_w_step){
+        for(int j=_h;j<=_ardis.y;j+=_resize_h_step){
             Point size;
-            size.x = width_list[i];
-            size.y = height_list[j];
+            size.x = i;
+            size.y = j;
 
             resize_list.push_back( (*fn_create)(size) );
         }

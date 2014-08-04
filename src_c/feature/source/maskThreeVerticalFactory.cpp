@@ -4,7 +4,7 @@ MaskThreeVerticalFactory::MaskThreeVerticalFactory(Point ardis,ulong shift_w,ulo
     if(this->_h%3!=0){
         this->_h+= 3-this->_h%3;
     }
-
+    
     this->_resizeList = this->resize(_fn_create);
     this->_localList = this->changeLocal();     
 }

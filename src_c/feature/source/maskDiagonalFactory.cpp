@@ -1,8 +1,8 @@
 #include "../headers/maskDiagonalFactory.h"
 
-MaskDiagonalFactory::MaskDiagonalFactory(Point ardis,ulong shift_w,ulong shift_h,double resize_factor,ulong w,ulong h): FMF(&createMaskMD, ardis,shift_w,shift_h,resize_factor,w,h,1,1){
+MaskDiagonalFactory::MaskDiagonalFactory(Point ardis,ulong shift_w,ulong shift_h,double resize_factor,ulong w,ulong h): FMF(&createMaskMD, ardis,shift_w,shift_h,resize_factor,w,h,2,2){
     if(this->_w%2!=0){
-        this->_w+1;
+        this->_w+=1;
     }
 
     if(this->_h%2!=0){
@@ -29,15 +29,17 @@ std::vector<Mask> MaskDiagonalFactory::resize(Mask(* fn_create)(Point)){
     ulong original_w = this->_w;
     ulong original_h = this->_h;
         
-    std::vector<ulong> width_list = incrementList(this->_resize_factor,this->_resize_w_step,this->_w,this->_ardis.x);   
+    //std::vector<ulong> width_list = incrementList(this->_resize_factor,this->_resize_w_step,this->_w,this->_ardis.x);   
 
     std::vector<Mask> resize_list;
-    for(int i=0;i<width_list.size();++i){
-        Point size;
-        size.x = width_list[i];
-        size.y = width_list[i];
+    for(int i=_w;i<=_ardis.x;i+=_resize_w_step){
+		for(int j=_h;j<=_ardis.y;j+=_resize_h_step){
+			Point size;
+			size.x = i;
+			size.y = j;
 
-        resize_list.push_back( (*fn_create)(size) );
+			resize_list.push_back( (*fn_create)(size) );
+		}
     }
 
     return resize_list;
