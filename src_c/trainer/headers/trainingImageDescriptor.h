@@ -8,6 +8,8 @@
 class TID{
 public:
     TID(std::string img_path, bool crop_selector);
+    TID(std::string img_path, bool crop_selector, Point crop_size);
+    void init();
 
     ulong** _img_data;
     Point _img_size;

@@ -1,10 +1,8 @@
 #include "../headers/trainingImageDescriptor.h"
 
-TID::TID(std::string img_path, bool crop_selector): _img_path(img_path), _crop_selector(crop_selector){
-    if(_crop_selector){
+void TID::init(){	
+	if(_crop_selector){
         getSize(_img_path.c_str(), &_size);
-        _crop_size.x = Config::ARDIS_WIDTH;
-        _crop_size.y = Config::ARDIS_HEIGHT;
 
         _last_crop=0;
         _shift_step=1;
@@ -16,7 +14,18 @@ TID::TID(std::string img_path, bool crop_selector): _img_path(img_path), _crop_s
         _max_crops = ie + (int) floor( (real_width - (ie*_shift_step)%real_width)/_shift_step );
 
         _img_data = NULL;
-    }
+    }	
+}
+
+TID::TID(std::string img_path, bool crop_selector, Point crop_size): _img_path(img_path), _crop_selector(crop_selector), _crop_size(crop_size){
+	init();
+}
+
+TID::TID(std::string img_path, bool crop_selector): _img_path(img_path), _crop_selector(crop_selector){
+	_crop_size.x = Config::ARDIS_WIDTH;
+	_crop_size.y = Config::ARDIS_HEIGHT;
+	
+	init();
 }
 
 int TID::loadNextCrops(int n, int& totalRead, int& theEnd, int(* checkData)(ulong**,Point,void*), void* vp){
