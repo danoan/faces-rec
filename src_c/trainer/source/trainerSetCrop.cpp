@@ -173,24 +173,32 @@ bool TrainerSetCrop::checkClassifier(ClassifierInterface& cc, double* ac, double
         *ac-=ac_step;
         rate_fp=0;
 
-        for(it=_vas._scenes.begin();it!=_vas._scenes.end();it++){
-            rate_fp += cc.isFace( *( (*it)->_ii),*ac);
-        }
+//        for(it=_vas._scenes.begin();it!=_vas._scenes.end();it++){
+//            rate_fp += cc.isFace( *( (*it)->_ii),*ac);
+//        }
         
         for(it=_trs._scenes.begin();it!=_trs._scenes.end();it++){
             rate_fp += cc.isFace( *( (*it)->_ii),*ac);
         }        
 
-        rate_fp = rate_fp/(_vas._scenes.size()+_trs._scenes.size());
+//        rate_fp = rate_fp/(_vas._scenes.size()+_trs._scenes.size());
+        rate_fp = rate_fp/(_trs._scenes.size());
         Logger::debug->log("RATE FP: %.4f\n",rate_fp);
 
 
         rate_det=0;
-        for(it=_vas._faces.begin();it!=_vas._faces.end();it++){
+//        for(it=_vas._faces.begin();it!=_vas._faces.end();it++){
+//            rate_det += cc.isFace(  *( (*it)->_ii),*ac);
+//        }    
+
+//        rate_det = rate_det/_vas._faces.size();
+
+
+        for(it=_trs._faces.begin();it!=_trs._faces.end();it++){
             rate_det += cc.isFace(  *( (*it)->_ii),*ac);
         }    
 
-        rate_det = rate_det/_vas._faces.size();
+        rate_det = rate_det/_trs._faces.size();
         Logger::debug->log("RATE DET: %.4f (MIN:%.4f)\n",rate_det,min_det_rate);
 
         if(rate_fp>max_fp_rate){ //I have to put more features in the classifier
