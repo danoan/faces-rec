@@ -11,7 +11,7 @@ int teste_crop_dinamico(){
     int d = 4;
 
     Point _size;
-    getSize(( Config::DATASET_PATH+"/sun/com_faces/1.pgm" ).c_str(),&_size);
+    getSize(( Config::DATASET_PATH+"/24x24/Instancia_Sun_300_400_nocrop/training_images/non_faces/9.pgm" ).c_str(),&_size);
 
     Point _crop_size;
     _crop_size.x = Config::ARDIS_WIDTH;
@@ -30,7 +30,8 @@ int teste_crop_dinamico(){
 
     int crop_start_index = 0;
     int random_hop=83;
-    int total_crops = getImageCrops(&crops,( Config::DATASET_PATH+"/sun/com_faces/1.pgm" ).c_str(),&crop_start_index,963,_max_crops,_crop_size.x,_crop_size.y,_shift_step,random_hop,check_data,&d);
+    int total_read;
+    int total_crops = getImageCrops(&crops,( Config::DATASET_PATH+"/24x24/Instancia_Sun_300_400_nocrop/training_images/non_faces/9.pgm" ).c_str(),&crop_start_index,&total_read,963,_max_crops,_crop_size.x,_crop_size.y,_shift_step,random_hop,check_data,&d);
 
     //Step by Step
     // struct timeval stop_t,start_t;
