@@ -71,7 +71,7 @@ int TrainerSetCrop::chargeBuffer(std::vector<TID>& vtid, std::vector<TID>& buffe
 
 int TrainerSetCrop::generateCrops(std::vector<TID>& vtid,int imgIndex, int ncrops, int& totalGen, void* vp ){
     int theEnd;
-    int windowsRead;
+    int windowsRead = 0;
     totalGen = vtid[imgIndex].loadNextCrops(ncrops,windowsRead,theEnd,ClassifierCheckFunctions::checkData,vp);
 
     _totalRead+=windowsRead;

@@ -30,13 +30,13 @@ void freeImgData(ulong** img_data,Point img_size);
 
 
 /*Dont care about imgData. It loads and free it right after*/
-int getImageCrops(ulong**** data, const char* filepath, int* crop_start_index, int ncrops, int maxCrops, int crop_width, int crop_height, int shift_step, int random_hop, int(* checkData)(ulong**,Point,void*), void* vp);
+int getImageCrops(ulong**** data, const char* filepath, int* crop_start_index, int* total_read, int ncrops, int maxCrops, int crop_width, int crop_height, int shift_step, int random_hop, int(* checkData)(ulong**,Point,void*), void* vp);
 
 /*imgData is not free it after the operation is done. The programmer must call freeImgData on imgData later on*/
-int getImageCrops(ulong**** data, ulong*** img_data, Point* img_size, const char* filepath, int* crop_start_index, int ncrops, int maxCrops, int crop_width, int crop_height, int shift_step, int random_hop, int(* checkData)(ulong**,Point,void*), void* vp);
+int getImageCrops(ulong**** data, ulong*** img_data, Point* img_size, const char* filepath, int* crop_start_index, int* total_read, int ncrops, int maxCrops, int crop_width, int crop_height, int shift_step, int random_hop, int(* checkData)(ulong**,Point,void*), void* vp);
 
 /*Programmer specifies if imgData should be or should not be free it after crop operation*/
-int getImageCrops(ulong**** data, ulong*** img_data, Point* img_size, int* crop_start_index, int ncrops, int maxCrops, int crop_width, int crop_height, int shift_step, int random_hop, int(* checkData)(ulong**,Point,void*), void* vp, int freeImg);
+int getImageCrops(ulong**** data, ulong*** img_data, Point* img_size, int* crop_start_index, int* total_read, int ncrops, int maxCrops, int crop_width, int crop_height, int shift_step, int random_hop, int(* checkData)(ulong**,Point,void*), void* vp, int freeImg);
 
 
 

@@ -103,20 +103,20 @@ void loadAsOriginalImage(ulong*** data, const char* filepath,Point* size){
     DestroyMagickWand(image_wand);	    
 }
 
-int getImageCrops(ulong**** data, const char* filepath, int* crop_start_index, int ncrops, int maxCrops, int crop_width, int crop_height, int shift_step, int random_hop, int(* checkData)(ulong**,Point,void*), void* vp){
+int getImageCrops(ulong**** data, const char* filepath, int* crop_start_index, int* total_read, int ncrops, int maxCrops, int crop_width, int crop_height, int shift_step, int random_hop, int(* checkData)(ulong**,Point,void*), void* vp){
 	ulong** img_data;
 	Point img_size;
 	loadAsOriginalImage(&img_data,filepath,&img_size);	//Jah retorna com as somas do integral image		
-	return getImageCrops(data,&img_data,&img_size,crop_start_index,ncrops,maxCrops,crop_width,crop_height,shift_step,random_hop,checkData,vp,1);
+	return getImageCrops(data,&img_data,&img_size,crop_start_index,total_read,ncrops,maxCrops,crop_width,crop_height,shift_step,random_hop,checkData,vp,1);
 }
 
-int getImageCrops(ulong**** data, ulong*** img_data, Point* img_size, const char* filepath, int* crop_start_index, int ncrops, int maxCrops, int crop_width, int crop_height, int shift_step, int random_hop, int(* checkData)(ulong**,Point,void*), void* vp){
+int getImageCrops(ulong**** data, ulong*** img_data, Point* img_size, const char* filepath, int* crop_start_index, int* total_read, int ncrops, int maxCrops, int crop_width, int crop_height, int shift_step, int random_hop, int(* checkData)(ulong**,Point,void*), void* vp){
 	printf("IMG LOADED \n");
 	loadAsOriginalImage(img_data,filepath,img_size);	//Jah retorna com as somas do integral image		
-	return getImageCrops(data,img_data,img_size,crop_start_index,ncrops,maxCrops,crop_width,crop_height,shift_step,random_hop,checkData,vp,0);
+	return getImageCrops(data,img_data,img_size,crop_start_index,total_read,ncrops,maxCrops,crop_width,crop_height,shift_step,random_hop,checkData,vp,0);
 }
 
-int getImageCrops(ulong**** data, ulong*** img_data, Point* img_size, int* crop_start_index, int ncrops, int maxCrops, int crop_width, int crop_height, int shift_step, int random_hop, int(* checkData)(ulong**,Point,void*), void* vp, int freeImg){
+int getImageCrops(ulong**** data, ulong*** img_data, Point* img_size, int* crop_start_index, int* total_read, int ncrops, int maxCrops, int crop_width, int crop_height, int shift_step, int random_hop, int(* checkData)(ulong**,Point,void*), void* vp, int freeImg){
 	int x,y;
 
 	int real_width = img_size->x - crop_width;
@@ -177,6 +177,7 @@ int getImageCrops(ulong**** data, ulong*** img_data, Point* img_size, int* crop_
 		}
 
 		i=(i+random_hop)%maxCrops;
+		(*total_read)+=1;
 	}
 	*crop_start_index = i;
 
