@@ -141,7 +141,7 @@ int getImageCrops(ulong**** data, ulong*** img_data, Point* img_size, int* crop_
 	int total_crops=0;
 	int i = *crop_start_index;
 	ulong line_sum;
-	while(total_crops<ncrops){
+	while(total_crops<ncrops && (*total_read)<maxCrops){
 		Point loc;
 		loc.x = (i*shift_step)%real_width;
 		loc.y = (i*shift_step)/real_width*shift_step;

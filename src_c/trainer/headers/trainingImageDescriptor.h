@@ -19,6 +19,7 @@ public:
 
     bool _crop_selector;
     int _last_crop;
+    int _crops_read;
     int _max_crops;
     int _random_hop;
     int _shift_step;

@@ -16,6 +16,7 @@ void TID::init(){
         _max_crops = ie + (int) floor( (real_width - (ie*_shift_step)%real_width)/_shift_step );
 
         _random_hop = choose_random_hop(_max_crops);
+        _crops_read = 0;
 
         _img_data = NULL;
     }	
@@ -48,7 +49,7 @@ int TID::loadNextCrops(int n, int& totalRead, int& theEnd, int(* checkData)(ulon
 
     printf("%d %d %d\n",_last_crop,_crop_size.x,_crop_size.y);
 
-    if(_last_crop>=_max_crops){
+    if(_crops_read>=_max_crops){
         printf("FREE IMG DATA\n");
         theEnd=1;
         freeImgData(_img_data,_img_size);
@@ -58,15 +59,19 @@ int TID::loadNextCrops(int n, int& totalRead, int& theEnd, int(* checkData)(ulon
     else theEnd=0;    
 
     int total_crops;
+    totalRead = _crops_read;
 
     if(_img_data==NULL){
-        total_crops = getImageCrops(&data,&_img_data,&_img_size,_img_path.c_str(),&_last_crop,&totalRead,n,_max_crops,_crop_size.x,_crop_size.y,_shift_step,_random_hop,checkData,vp);
+        total_crops = getImageCrops(&data,&_img_data,&_img_size,_img_path.c_str(),&_last_crop,&_crops_read,n,_max_crops,_crop_size.x,_crop_size.y,_shift_step,_random_hop,checkData,vp);
     }else{
-        total_crops = getImageCrops(&data,&_img_data,&_img_size,&_last_crop,&totalRead,n,_max_crops,_crop_size.x,_crop_size.y,_shift_step,_random_hop,checkData,vp,0);
+        total_crops = getImageCrops(&data,&_img_data,&_img_size,&_last_crop,&_crop_read,n,_max_crops,_crop_size.x,_crop_size.y,_shift_step,_random_hop,checkData,vp,0);
     }
+
     for(int i=0;i<total_crops;i++){
         _crops.push_back(data[i]);;
     }
+
+    totalRead = _crops_read - totalRead;
 
     return total_crops;
 }
