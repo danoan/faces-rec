@@ -49,7 +49,7 @@ int detectFaces(std::string classifier_path){
     ardis.y = Config::ARDIS_HEIGHT;
 
     Detector d(Config::DETECTOR_GENERATIONS,ardis,ref_mask,Config::DETECTOR_SHIFT_STEP);
-    return d.detectFaces(&cc,Config::DATASET_PATH + Config::DETECTOR_IMG_PATH,Config::DETECTOR_DRAW);
+    return d.detectFaces(&cc,Config::DATASET_PATH + Config::DETECTOR_IMG_PATH,Config::DETECTOR_DRAW,1);
 }
 
 int detectFaces(std::string folder_classifiers, std::string classifier_path){

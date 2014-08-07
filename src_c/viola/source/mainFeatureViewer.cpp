@@ -7,5 +7,5 @@ int main(int argc, char* argv[]){
     FeatureMask fm;
     fm = fff.next();
 
-    drawFeatureImage(fff._facesFeatures[Config::VIEWER_FEATURE_ID],1,Config::PROJECT_PATH + "/analysis/feature_images/", Config::ARDIS_WIDTH);    
+    drawFeatureImage(fff._facesFeatures[Config::VIEWER_FEATURE_ID],0,Config::PROJECT_PATH + "/analysis/feature_images/", Config::ARDIS_WIDTH);    
 }

@@ -26,8 +26,10 @@ public:
 	Detector(){};
 	Detector(int ng, Point wr, Point ref_mask, int shift_step);
 
-	int detectFaces(ClassifierInterface* ci, const std::string img_path,int draw);
-	int detectFaces(ClassifierInterface* ci, const std::string img_path, double ac,int draw);	
+    int detectFaces(ClassifierInterface* ci, const std::string img_path,int draw);
+    int detectFaces(ClassifierInterface* ci, const std::string img_path,int draw, int save);
+    int detectFaces(ClassifierInterface* ci, const std::string img_path, double ac,int draw);       
+    int detectFaces(ClassifierInterface* ci, const std::string img_path, double ac, int draw, int save);
 };
 
 #endif

@@ -204,21 +204,27 @@ void teste_integral_2(IntegralImage ii){
 }
 
 void run_teste_integral_2(){
-    std::string crop_image = "/home/ldap/dantunes/Documentos/faces-rec/dataset/24x24/Instancia_Sun_300_400/training_images/non_faces/group_0/crop/1403571922.05/crop_399.pgm";
-    std::string full_image = "/home/ldap/dantunes/Documentos/faces-rec/dataset/24x24/Instancia_Sun_nocrop/training_images/non_faces/SUN2012/16155.pgm";
+    std::string crop_image = Config::PROJECT_PATH + "/dataset/24x24/Instancia_Sun_300_400/training_images/non_faces/group_0/crop/1403571922.05/crop_399.pgm";
+    std::string full_image = Config::PROJECT_PATH + "/dataset/24x24/Instancia_Sun_nocrop/training_images/non_faces/SUN2012/16155.pgm";
 
     IntegralImage ii1(crop_image);
     teste_integral_2(ii1);
 
     ulong*** data;
-    int crop_start_index = 40;
+    int crop_start_index = 10;
     int ncrops = 1;
-    int maxCrops = 380;
+    int maxCrops = 10;
     int crop_width = 24;
     int crop_height = 24;
     int shift_step = 24;
 
-    getImageCrops(&data,full_image.c_str(),&crop_start_index,ncrops,maxCrops,crop_width,crop_height,shift_step,checkData,NULL);
+    Point img_size;
+    int last_crop;
+    int random_hop = 23;
+
+    ulong** img_data;
+    getImageCrops(&data,&img_data,&img_size,full_image.c_str(),&crop_start_index,ncrops,maxCrops,crop_width,crop_height,shift_step,random_hop,checkData,NULL);
+    
     Point p;
     p.x = 24;
     p.y = 24;

@@ -103,20 +103,20 @@ void loadAsOriginalImage(ulong*** data, const char* filepath,Point* size){
     DestroyMagickWand(image_wand);	    
 }
 
-int getImageCrops(ulong**** data, const char* filepath, int* crop_start_index, int ncrops, int maxCrops, int crop_width, int crop_height, int shift_step, int(* checkData)(ulong**,Point,void*), void* vp){
+int getImageCrops(ulong**** data, const char* filepath, int* crop_start_index, int ncrops, int maxCrops, int crop_width, int crop_height, int shift_step, int random_hop, int(* checkData)(ulong**,Point,void*), void* vp){
 	ulong** img_data;
 	Point img_size;
 	loadAsOriginalImage(&img_data,filepath,&img_size);	//Jah retorna com as somas do integral image		
-	return getImageCrops(data,&img_data,&img_size,crop_start_index,ncrops,maxCrops,crop_width,crop_height,shift_step,checkData,vp,1);
+	return getImageCrops(data,&img_data,&img_size,crop_start_index,ncrops,maxCrops,crop_width,crop_height,shift_step,random_hop,checkData,vp,1);
 }
 
-int getImageCrops(ulong**** data, ulong*** img_data, Point* img_size, const char* filepath, int* crop_start_index, int ncrops, int maxCrops, int crop_width, int crop_height, int shift_step, int(* checkData)(ulong**,Point,void*), void* vp){
+int getImageCrops(ulong**** data, ulong*** img_data, Point* img_size, const char* filepath, int* crop_start_index, int ncrops, int maxCrops, int crop_width, int crop_height, int shift_step, int random_hop, int(* checkData)(ulong**,Point,void*), void* vp){
 	printf("IMG LOADED \n");
 	loadAsOriginalImage(img_data,filepath,img_size);	//Jah retorna com as somas do integral image		
-	return getImageCrops(data,img_data,img_size,crop_start_index,ncrops,maxCrops,crop_width,crop_height,shift_step,checkData,vp,0);
+	return getImageCrops(data,img_data,img_size,crop_start_index,ncrops,maxCrops,crop_width,crop_height,shift_step,random_hop,checkData,vp,0);
 }
 
-int getImageCrops(ulong**** data, ulong*** img_data, Point* img_size, int* crop_start_index, int ncrops, int maxCrops, int crop_width, int crop_height, int shift_step, int(* checkData)(ulong**,Point,void*), void* vp, int freeImg){
+int getImageCrops(ulong**** data, ulong*** img_data, Point* img_size, int* crop_start_index, int ncrops, int maxCrops, int crop_width, int crop_height, int shift_step, int random_hop, int(* checkData)(ulong**,Point,void*), void* vp, int freeImg){
 	int x,y;
 
 	int real_width = img_size->x - crop_width;
@@ -141,7 +141,7 @@ int getImageCrops(ulong**** data, ulong*** img_data, Point* img_size, int* crop_
 	int total_crops=0;
 	int i = *crop_start_index;
 	ulong line_sum;
-	while(total_crops<ncrops && i<maxCrops){
+	while(total_crops<ncrops){
 		Point loc;
 		loc.x = (i*shift_step)%real_width;
 		loc.y = (i*shift_step)/real_width*shift_step;
@@ -176,11 +176,11 @@ int getImageCrops(ulong**** data, ulong*** img_data, Point* img_size, int* crop_
 			}
 		}
 
-		i++;
+		i=(i+random_hop)%maxCrops;
 	}
 	*crop_start_index = i;
 
-	// drawRectangles(filepath,total_crops,boxes,"Green");
+	// drawRectangles( (Config::DATASET_PATH+"/sun/com_faces/1.pgm").c_str(),total_crops,boxes,"Green");
 
 	for(t=total_crops;t<ncrops;t++){
 		for(h=0;h<crop_height;h++){
@@ -204,6 +204,10 @@ void freeImgData(ulong** img_data,Point img_size){
 }
 
 void drawRectangles(const char* filepath,int num_boxes,int** boxes, const char* color){
+	drawRectangles(filepath,num_boxes,boxes,color,0,"");
+}
+
+void drawRectangles(const char* filepath,int num_boxes,int** boxes, const char* color, int save, const char* save_path){
 	MagickWand* image_wand;
 	DrawingWand* d_wand;
 	PixelWand* c_wand;
@@ -235,11 +239,22 @@ void drawRectangles(const char* filepath,int num_boxes,int** boxes, const char* 
 	status=MagickReadImage(image_wand,filepath);	
 	MagickDrawImage(image_wand,d_wand);		
 
+	if(save==1){
+	    FILE* f;
+	    f = fopen(save_path,"wb");
+	    printf("%s\n",save_path);
+		MagickWriteImageFile(image_wand,f);		
+	}		
+
 	MagickDisplayImage(image_wand,"");
 	DestroyMagickWand(image_wand);	   
 }
 
 void drawRectangles(MagickWand* image_wand,int num_boxes,int** boxes, const char* color){
+	drawRectangles(image_wand,num_boxes,boxes,color,0, "");
+}
+
+void drawRectangles(MagickWand* image_wand,int num_boxes,int** boxes, const char* color, int save, const char* save_path){
 	DrawingWand* d_wand;
 	PixelWand* c_wand;
 
@@ -263,6 +278,13 @@ void drawRectangles(MagickWand* image_wand,int num_boxes,int** boxes, const char
 	int i;
 	for(i=0;i<num_boxes;i++){
 		DrawRectangle(d_wand,boxes[i][0],boxes[i][1],boxes[i][2],boxes[i][3]);	
+	}	
+
+	if(save==1){
+	    FILE* f;
+	    f = fopen(save_path,"wb");
+	    printf("%s\n",save_path);
+		MagickWriteImageFile(image_wand,f);		
 	}	
 	
 	MagickDrawImage(image_wand,d_wand);			

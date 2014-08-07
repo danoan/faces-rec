@@ -13,8 +13,18 @@ void TID::init(){
         int ie = (int) floor( (real_width*real_height)/(_shift_step*_shift_step) ) + 1;
         _max_crops = ie + (int) floor( (real_width - (ie*_shift_step)%real_width)/_shift_step );
 
+        _random_hop = choose_random_hop(_max_crops);
+
         _img_data = NULL;
     }	
+}
+
+void TID::choose_random_hop(int total_crops){
+    for(int i=0;i<145;i++){
+        if(total_crops%TID::prime_numbers[i]!=0){
+            return TID::prime_numbers[i];
+        }
+    }
 }
 
 TID::TID(std::string img_path, bool crop_selector, Point crop_size): _img_path(img_path), _crop_selector(crop_selector), _crop_size(crop_size){
@@ -50,9 +60,9 @@ int TID::loadNextCrops(int n, int& totalRead, int& theEnd, int(* checkData)(ulon
     int total_crops;
 
     if(_img_data==NULL){
-        total_crops = getImageCrops(&data,&_img_data,&_img_size,_img_path.c_str(),&_last_crop,n,_max_crops,_crop_size.x,_crop_size.y,_shift_step,checkData,vp);
+        total_crops = getImageCrops(&data,&_img_data,&_img_size,_img_path.c_str(),&_last_crop,n,_max_crops,_crop_size.x,_crop_size.y,_shift_step,random_hop,checkData,vp);
     }else{
-        total_crops = getImageCrops(&data,&_img_data,&_img_size,&_last_crop,n,_max_crops,_crop_size.x,_crop_size.y,_shift_step,checkData,vp,0);
+        total_crops = getImageCrops(&data,&_img_data,&_img_size,&_last_crop,n,_max_crops,_crop_size.x,_crop_size.y,_shift_step,random_hop,checkData,vp,0);
     }
     for(int i=0;i<total_crops;i++){
         _crops.push_back(data[i]);;
