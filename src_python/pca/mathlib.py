@@ -91,11 +91,16 @@ def get_distance(v1,v2):
 	return np.linalg.norm(v1-v2)
 
 
-def run_PCA(X,Y):
+def run_PCA(X,Y,n=0):
 	"""
 		X: Trainning DB
 		Y: Test DB
+		n: Number of eigenvector to use
 	"""
+
+	if n==0:
+		n = X.shape[1]
+
 	X = subtract_average_image(X)
 	Y = subtract_average_image(Y)
 
@@ -107,8 +112,8 @@ def run_PCA(X,Y):
 	# for j in range(0,U.shape[1]):
 	#     U[:,j] = U[:,j]/(pow(S[j],0.5))	
 
-	Px = U.T.dot(X)	#Projection of X on the EigenBasis
-	Py = U.T.dot(Y)
+	Px = U[:,:n].T.dot(X)	#Projection of X on the EigenBasis
+	Py = U[:,:n].T.dot(Y)
 
 	return (Px,Py)	
 

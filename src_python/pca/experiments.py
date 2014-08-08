@@ -136,7 +136,7 @@ class Experiment3(Experiment):
 		return self
 
 	def run(self):
-		Px,Py = mathlib.run_PCA(self.X,self.Y) 	#When using X_m and Y_m the result is horrible, but with X and Y are nicer.
+		Px,Py = mathlib.run_PCA(self.X,self.Y,20) 	#When using X_m and Y_m the result is horrible, but with X and Y are nicer.
 
 		cols = Py.shape[1]
 		for i in range(0,cols):
@@ -241,7 +241,7 @@ class ExperimentFriends(Experiment):
 
 if __name__=="__main__":
 	#Executed as a main file
-	Experiment2().setup().run()
+	Experiment3().setup().run()
 else:
 	#Used as an import from another python file
 	pass
