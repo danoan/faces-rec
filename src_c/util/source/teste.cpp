@@ -1,5 +1,6 @@
 #include <string>
 #include <cstdio>
+#include <cstdlib>
 #include "../headers/libutil.h"
 
 int check_data(ulong** data, Point size, void* vp){
@@ -9,9 +10,10 @@ int check_data(ulong** data, Point size, void* vp){
 int teste_crop_dinamico(){
     ulong*** crops;
     int d = 4;
+    srand(time(NULL));
 
     Point _size;
-    getSize(( Config::DATASET_PATH+"/24x24/Instancia_Sun_300_400_nocrop/training_images/non_faces/9.pgm" ).c_str(),&_size);
+    getSize(( Config::DATASET_PATH+"/24x24/Instancia_Sun_300_400_nocrop/training_images/non_faces/1691.pgm" ).c_str(),&_size);
 
     Point _crop_size;
     _crop_size.x = Config::ARDIS_WIDTH;
@@ -26,12 +28,13 @@ int teste_crop_dinamico(){
     int ie = (int) floor( (real_width*real_height)/(_shift_step*_shift_step) ) + 1;
     int _max_crops = ie + (int) floor( (real_width - (ie*_shift_step)%real_width)/_shift_step );
 
-    printf("%d\n",_max_crops);
+    
+    printf("%d - %d\n", _max_crops, rand()%_max_crops );
 
     int crop_start_index = 0;
     int random_hop=83;
-    int total_read;
-    int total_crops = getImageCrops(&crops,( Config::DATASET_PATH+"/24x24/Instancia_Sun_300_400_nocrop/training_images/non_faces/9.pgm" ).c_str(),&crop_start_index,&total_read,963,_max_crops,_crop_size.x,_crop_size.y,_shift_step,random_hop,check_data,&d);
+    int total_read;                      
+    int total_crops = getImageCrops(&crops,( Config::DATASET_PATH+"/24x24/Instancia_Sun_300_400_nocrop/training_images/non_faces/1691.pgm" ).c_str(),&crop_start_index,&total_read,_max_crops,_max_crops,_crop_size.x,_crop_size.y,_shift_step,random_hop,check_data,&d);
 
     //Step by Step
     // struct timeval stop_t,start_t;

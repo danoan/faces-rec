@@ -5,8 +5,8 @@ int TID::prime_numbers[146] = {83,89,97,101,103,107,109,113,127,131,137,139,149,
 void TID::init(){	
 	if(_crop_selector){
         getSize(_img_path.c_str(), &_size);
+        srand(time(NULL));
 
-        _last_crop=0;
         _shift_step=1;
 
         int real_width = _size.x - _crop_size.x;
@@ -15,6 +15,7 @@ void TID::init(){
         int ie = (int) floor( (real_width*real_height)/(_shift_step*_shift_step) ) + 1;
         _max_crops = ie + (int) floor( (real_width - (ie*_shift_step)%real_width)/_shift_step );
 
+        _last_crop= (rand()%_max_crops);
         _random_hop = choose_random_hop(_max_crops);
         _crops_read = 0;
 
@@ -23,7 +24,7 @@ void TID::init(){
 }
 
 int TID::choose_random_hop(int total_crops){
-    for(int i=0;i<145;i++){
+    for(int i=0;i<146;i++){
         if(total_crops%TID::prime_numbers[i]!=0){
             return TID::prime_numbers[i];
         }

@@ -2,6 +2,7 @@
 #define __TRAINING_IMAGE_DESCRIPTOR__
 
 #include <string>
+#include <cstdlib>
 #include <list>
 #include "../../util/headers/image.h"
 
