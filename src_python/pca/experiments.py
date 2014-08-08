@@ -10,7 +10,7 @@ class Experiment():
 	def run(self):
 		pass
 
-	def match_images(self,db_name,np,Px,Py):
+	def match_images(self,db_name,np,Px,Py,len_test_imgs=2):
 		"""
 			db_name: Name of the image Database
 			np: Number of images per unique person
@@ -18,6 +18,8 @@ class Experiment():
 			Py: Test Images Projected on to the eigenspace
 		"""
 
+		rate_correct = 0
+		step_correct = 1.0/Py.shape[1]
 		print "Match Images Test for database: %s" % (db_name,)
 		for cy in range(0,Py.shape[1]):
 			y = Py[:,cy]
@@ -36,7 +38,13 @@ class Experiment():
 
 				im+=1
 
-			print "Image %d (%d) : Closest one: Person %d" % (cy+1,cy/2+1,min_im/np+1)	
+			if( (cy/len_test_imgs+1)==min_im/np+1 ):
+				rate_correct+=step_correct
+
+			print len(Px),len(Py)
+			print "Image %d (%d) : Closest one: Person %d" % (cy+1,cy/len_test_imgs+1,min_im/np+1)	
+
+		print "Correct: %.2f \n Incorrect: %.2f" % (rate_correct,1-rate_correct)
 
 	def match_rtcl(self,metadb,rtcl,Px):
 		"""
@@ -123,10 +131,8 @@ class Experiment3(Experiment):
 		tl = [3,7]	#Image Indexes used as Test (not included in the database)	
 		ni = 10		#Number of Images per person
 		np = ni - len(tl)
-		self.X,self.Y,AVG_X,AVG_Y,self.metadb,self.rtcl = misc.create_image_database_3( "%s/att_faces" % (config.DATASET_PATH,),ni,p_db,p_uk,tl)
+		self.X,self.Y,self.metadb,self.rtcl = misc.create_image_database_3( "%s/att_faces" % (config.DATASET_PATH,),ni,p_db,p_uk,tl)
 
-		self.X_m = self.X-AVG_X
-		self.Y_m = self.Y-AVG_Y
 		return self
 
 	def run(self):
@@ -138,7 +144,7 @@ class Experiment3(Experiment):
 
 		self.rtcl = self.match_rtcl(self.metadb,self.rtcl,Px)
 		self.print_results(self.rtcl)
-		imglib.draw_results(self.rtcl)	
+		# imglib.draw_results(self.rtcl)	
 		return self
 
 	def print_results(self,rtcl):
@@ -156,7 +162,7 @@ class Experiment3(Experiment):
 		incorrect_sum_d = 0
 		unknown_sum_d = 0
 
-		TH_UNKNOWN = 38178110.60
+		TH_UNKNOWN = 28267208.01
 
 		print "Match Results \n"
 		for r in rtcl:
@@ -216,9 +222,26 @@ class Experiment3(Experiment):
 
 		return self
 
+class ExperimentFriends(Experiment):
+	"""
+		The database will be formed by 6 pictures of each Friend's character TV show. The database structure
+		it is the same of the AT&T database.
+
+	"""
+	def setup(self):
+		self.tl = [6]		#Image Indexes from each person used as Test (not included in the database)
+		self.ni = 6		#Number of Images per person 
+		self.X,self.Y = misc.create_image_database_2( "%s/friends_database/crop" % (config.DATASET_PATH,),6,self.ni,self.tl)
+		return self
+
+	def run(self):
+		Px,Py = mathlib.run_PCA(self.X,self.Y)
+		self.match_images("friends_database",self.ni-len(self.tl),Px,Py,1)
+		return self	
+
 if __name__=="__main__":
 	#Executed as a main file
-	Experiment3().setup().run()
+	Experiment2().setup().run()
 else:
 	#Used as an import from another python file
 	pass

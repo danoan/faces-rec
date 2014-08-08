@@ -96,15 +96,42 @@ def run_PCA(X,Y):
 		X: Trainning DB
 		Y: Test DB
 	"""
+	X = subtract_average_image(X)
+	Y = subtract_average_image(Y)
+
 	CT = build_transpose_covariance_matrix(X)
 
-	S,U = find_all_heigen(CT)
-	U = X.dot(U)	#Eigenbasis
+	S,W = find_all_heigen(CT)
+	U = X.dot(W)	#Eigenbasis
+
+	# for j in range(0,U.shape[1]):
+	#     U[:,j] = U[:,j]/(pow(S[j],0.5))	
 
 	Px = U.T.dot(X)	#Projection of X on the EigenBasis
 	Py = U.T.dot(Y)
 
 	return (Px,Py)	
+
+def subtract_average_image(X):
+	'''
+		Compute the Average Image
+	'''
+	avg_xj = np.zeros((X.shape[0],1))		#A vector column (nx1)
+	for j in range(0,X.shape[1]):
+	    avg_xj = avg_xj + X[:,j].reshape(X.shape[0],1)	#Sum all vector columns of the matrix
+
+	avg_xj = avg_xj*(1.0/X.shape[1])	#Average by the number of columns
+
+	'''
+		Subtract the Average Image from the matrix
+	'''
+	mat_avg_xj = np.zeros((X.shape[0],X.shape[1]))
+	for j in range(0,X.shape[1]):	
+	    mat_avg_xj[:,j] = avg_xj.reshape(X.shape[0])
+
+	X = X - mat_avg_xj	
+
+	return X
 
 def build_transpose_covariance_matrix(X):
 	'''
