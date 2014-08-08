@@ -144,7 +144,7 @@ class Experiment3(Experiment):
 
 		self.rtcl = self.match_rtcl(self.metadb,self.rtcl,Px)
 		self.print_results(self.rtcl)
-		# imglib.draw_results(self.rtcl)	
+		imglib.draw_results(self.rtcl)	
 		return self
 
 	def print_results(self,rtcl):
