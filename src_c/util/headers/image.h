@@ -38,6 +38,7 @@ int getImageCrops(ulong**** data, ulong*** img_data, Point* img_size, const char
 /*Programmer specifies if imgData should be or should not be free it after crop operation*/
 int getImageCrops(ulong**** data, ulong*** img_data, Point* img_size, int* crop_start_index, int* total_read, int ncrops, int maxCrops, int crop_width, int crop_height, int shift_step, int random_hop, int(* checkData)(ulong**,Point,void*), void* vp, int freeImg);
 
+int getImageCropsTest(ulong**** data, const char* filepath, int* crop_start_index, int* total_read, int ncrops, int maxCrops, int crop_width, int crop_height, int shift_step, int random_hop, int(* checkData)(ulong**,Point,void*), void* vp);	
 
 
 void getSize(const char* filepath,Point* size);
