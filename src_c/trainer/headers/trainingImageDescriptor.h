@@ -4,7 +4,9 @@
 #include <string>
 #include <cstdlib>
 #include <list>
+#include <vector>
 #include "../../util/headers/image.h"
+#include "windowCropper.h"
 
 class TID{
 public:
@@ -12,7 +14,6 @@ public:
     TID(std::string img_path, bool crop_selector, Point crop_size);
     void init();
 
-    ulong** _img_data;
     Point _img_size;
 
     std::string _img_path;
