@@ -112,8 +112,9 @@ int getImageCrops(ulong**** data, const char* filepath, int* crop_start_index, i
 
 int getImageCrops(ulong**** data, ulong*** img_data, Point* img_size, const char* filepath, int* crop_start_index, int* total_read, int ncrops, int maxCrops, int crop_width, int crop_height, int shift_step, int random_hop, int(* checkData)(ulong**,Point,void*), void* vp){
 	printf("IMG LOADED \n");
-	loadAsOriginalImage(img_data,filepath,img_size);	//Jah retorna com as somas do integral image		
-	return getImageCrops(data,img_data,img_size,crop_start_index,total_read,ncrops,maxCrops,crop_width,crop_height,shift_step,random_hop,checkData,vp,0);
+	//loadAsOriginalImage(img_data,filepath,img_size);	//Jah retorna com as somas do integral image	
+	//return getImageCropsTest(data,img_data,img_size,crop_start_index,total_read,ncrops,maxCrops,crop_width,crop_height,shift_step,random_hop,checkData,vp,0);
+	return getImageCropsTest(data,filepath,crop_start_index,total_read,ncrops,maxCrops,crop_width,crop_height,shift_step,random_hop,checkData,vp);	
 }
 
 int getImageCrops(ulong**** data, ulong*** img_data, Point* img_size, int* crop_start_index, int* total_read, int ncrops, int maxCrops, int crop_width, int crop_height, int shift_step, int random_hop, int(* checkData)(ulong**,Point,void*), void* vp, int freeImg){
@@ -193,7 +194,106 @@ int getImageCrops(ulong**** data, ulong*** img_data, Point* img_size, int* crop_
 	if(freeImg==1){
 		freeImgData(*img_data,*img_size);
 	}
+	
+	
 
+	return total_crops;
+}
+
+int getImageCropsTest(ulong**** data, const char* filepath,  int* crop_start_index, int* total_read, int ncrops, int maxCrops, int crop_width, int crop_height, int shift_step, int random_hop, int(* checkData)(ulong**,Point,void*), void* vp){
+	int x,y;
+
+	(*data) = (ulong***) malloc(sizeof(*data)*ncrops);
+
+	int t,h;
+	for(t=0;t<ncrops;t++){
+		(*data)[t] = (ulong**) malloc(sizeof(**data)*Config::ARDIS_HEIGHT);		
+		for(h=0;h<Config::ARDIS_HEIGHT;h++){
+			(*data)[t][h] = (ulong*) malloc(sizeof(***data)*Config::ARDIS_WIDTH);
+		}
+	}
+	
+	MagickWand * image_wand;
+	MagickWand* transformed_wand;
+	PixelIterator* iterator;
+	MagickBooleanType status;
+	PixelWand** pixels;
+	
+	image_wand = NewMagickWand();
+	status=MagickReadImage(image_wand,filepath);			
+	
+	int real_height = MagickGetImageHeight(image_wand) - crop_width;
+	int real_width = MagickGetImageWidth(image_wand) - crop_height;
+
+	char crop_spec[32];
+	char size_spec[32];
+
+
+	int total_crops=0;
+	int i = *crop_start_index;
+	ulong line_sum;
+	ulong n_pixels;
+	Point loc;	
+	while(total_crops<ncrops && (*total_read)<maxCrops){
+		
+		loc.x = (i*shift_step)%real_width;
+		loc.y = (i*shift_step)/real_width*shift_step;
+		
+		//printf("i:%d ss:%d rw:%d lx: %d ly: %d\n", i,shift_step, real_width,loc.x,loc.y);
+		
+		sprintf(crop_spec,"%dx%d+%u+%u",crop_width,crop_height,loc.x,loc.y);
+		sprintf(size_spec,"%dx%d",Config::ARDIS_WIDTH,Config::ARDIS_HEIGHT);
+		
+		transformed_wand = MagickTransformImage(image_wand,crop_spec,size_spec);
+		//printf("SIZE %d %d\n",MagickGetImageWidth(transformed_wand),MagickGetImageHeight(transformed_wand));
+		
+		iterator=NewPixelIterator(transformed_wand);		
+		for(y=0;y<Config::ARDIS_HEIGHT;y++){								
+			pixels=PixelGetNextIteratorRow(iterator,&(n_pixels));
+			if ( (pixels == (PixelWand **) NULL) ) break;			
+						
+			line_sum=0;
+			for(x=0;x<Config::ARDIS_WIDTH;x++){
+				line_sum+=PixelGetBlue(pixels[x])*255;
+
+				if(y>0){
+					(*data)[total_crops][y][x] = (*data)[total_crops][y-1][x] + line_sum;				
+				}else{
+					(*data)[total_crops][y][x] = line_sum;			
+				}		
+			}
+		}	
+		DestroyPixelIterator(iterator);
+		DestroyMagickWand(transformed_wand);	   	
+
+		Point crop_size;
+		crop_size.x = crop_width;
+		crop_size.y = crop_height;
+
+		if(vp==NULL){
+			total_crops+=1;
+		}else{
+			if(checkData((*data)[total_crops],crop_size,vp)==1){
+				total_crops+=1;
+			}
+		}
+
+		i=(i+random_hop)%maxCrops;
+		(*total_read)+=1;
+	}
+	*crop_start_index = i;
+
+	// drawRectangles( (Config::DATASET_PATH+"/sun/com_faces/1.pgm").c_str(),total_crops,boxes,"Green");
+
+	for(t=total_crops;t<ncrops;t++){
+		for(h=0;h<crop_height;h++){
+			free((*data)[t][h]);
+		}
+		free((*data)[t]);
+	}
+	
+	DestroyMagickWand(image_wand);	   	
+	
 	return total_crops;
 }
 
