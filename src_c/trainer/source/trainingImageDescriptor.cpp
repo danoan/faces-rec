@@ -65,7 +65,7 @@ int TID::loadNextCrops(int n, int& totalRead, int& theEnd, int(* checkData)(ulon
     if(_img_data==NULL){
         total_crops = getImageCrops(&data,&_img_data,&_img_size,_img_path.c_str(),&_last_crop,&_crops_read,n,_max_crops,_crop_size.x,_crop_size.y,_shift_step,_random_hop,checkData,vp);
     }else{
-        total_crops = getImageCrops(&data,&_img_data,&_img_size,&_last_crop,&_crop_read,n,_max_crops,_crop_size.x,_crop_size.y,_shift_step,_random_hop,checkData,vp,0);
+        total_crops = getImageCrops(&data,&_img_data,&_img_size,&_last_crop,&_crops_read,n,_max_crops,_crop_size.x,_crop_size.y,_shift_step,_random_hop,checkData,vp,0);
     }
 
     for(int i=0;i<total_crops;i++){
