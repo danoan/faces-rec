@@ -32,8 +32,8 @@ int Config::CLASSIFIER_MAX_HYPOTHESIS_PER_STAGE = 5000;      //"x"
 int Config::CLASSIFIER_INTEGRAL_IMAGE_BUFFER_SIZE = 2000;   //"i"
 bool Config::CLASSIFIER_HAS_BUFFER = false;                 //"u"
 
-int Config::CLASSIFIER_SET_CROP_BUFFER_SIZE = 10;
-int Config::CLASSIFIER_SET_CROP_ELEMENTS_PER_WINDOW = 50;
+int Config::CLASSIFIER_SET_CROP_BUFFER_SIZE = 200;
+int Config::CLASSIFIER_SET_CROP_ELEMENTS_PER_WINDOW = 25;
 
 bool Config::CLASSIFIER_CUDA = false;	//g
 bool Config::CUDA_DEBUG = false;		//p

@@ -14,10 +14,7 @@ public:
     TID(std::string img_path, bool crop_selector, Point crop_size);
     void init();
 
-    Point _img_size;
-
     std::string _img_path;
-    Point _size;
 
     bool _crop_selector;
     Point _crop_size;
